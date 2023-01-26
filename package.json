@@ -1,9 +1,10 @@
 {
-  "name": "hardhat-boilerplate",
+  "name": "safe-clubcard",
   "version": "1.0.0",
-  "description": "A boilerplate repository to get you started with Hardhat and Ethereum development",
+  "description": "Programmable Safe ownership: allow holders of designated NFTs to sign transactions",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "format": "prettier '**/*.{sol,ts,tsx}' --write"
   },
   "repository": {
     "type": "git",
@@ -23,10 +24,20 @@
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.4",
+    "@typechain/ethers-v5": "^10.2.0",
+    "@typechain/hardhat": "^6.1.5",
     "chai": "^4.3.7",
     "ethers": "^5.7.2",
     "hardhat": "^2.12.5",
     "hardhat-gas-reporter": "^1.0.9",
-    "solidity-coverage": "^0.8.2"
+    "prettier": "^2.8.3",
+    "prettier-plugin-solidity": "^1.1.1",
+    "solidity-coverage": "^0.8.2",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.1.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.1"
   }
 }
