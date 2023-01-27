@@ -32,7 +32,7 @@ interface IClubCard is IERC1271 {
   ) external returns (bool success);
 
   /**
-   * @dev Marks a hash as approved. This can be used to validate a hash that is used by a signature.
+   * @dev Marks the hash of a transaction from the specified Safe as approved.
    * @param from The address of the Safe from which the transaction is executed.
    * @param hashToApprove The hash that should be marked as approved for signatures that are verified by this contract.
    */
