@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 export function NoWalletDetected() {
   return (
@@ -20,5 +20,5 @@ export function NoWalletDetected() {
         </div>
       </div>
     </div>
-  );
+  )
 }

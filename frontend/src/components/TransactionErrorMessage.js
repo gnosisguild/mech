@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 export function TransactionErrorMessage({ message, dismiss }) {
   return (
@@ -14,5 +14,5 @@ export function TransactionErrorMessage({ message, dismiss }) {
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-  );
+  )
 }
