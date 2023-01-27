@@ -10,92 +10,63 @@ describe("ClubCardERC721 contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
-  async function deployTokenFixture() {
-    // Get the ContractFactory and Signers here.
+  async function deployClubCard1() {
+    const TestToken = await ethers.getContractFactory("ERC721Token")
     const ClubCardERC721 = await ethers.getContractFactory("ClubCardERC721")
-    const [owner, addr1, addr2] = await ethers.getSigners()
+    const [deployer, alice, bob] = await ethers.getSigners()
 
-    // To deploy our contract, we just have to call Token.deploy() and await
-    // for it to be deployed(), which happens onces its transaction has been
-    // mined.
-    const hardhatToken = await ClubCardERC721.deploy()
+    const testToken = await TestToken.deploy()
+    const clubCard1 = await ClubCardERC721.deploy(testToken.address, 1)
 
-    await hardhatToken.deployed()
+    await clubCard1.deployed()
 
     // Fixtures can return anything you consider useful for your tests
-    return { ClubCardERC721, hardhatToken, owner, addr1, addr2 }
+    return { ClubCardERC721, testToken, clubCard1, alice, bob }
   }
 
   describe("deployment", () => {
     it("should set token address and ID", async () => {
-      // We use loadFixture to setup our environment, and then assert that
-      // things went well
-      const { hardhatToken, owner } = await loadFixture(deployTokenFixture)
+      const { clubCard1, testToken } = await loadFixture(deployClubCard1)
 
-      // Expect receives a value and wraps it in an assertion object. These
-      // objects have a lot of utility methods to assert values.
-
-      // This test expects the owner variable stored in the contract to be
-      // equal to our Signer's owner.
-      expect(await hardhatToken.owner()).to.equal(owner.address)
-    })
-
-    it("Should assign the total supply of tokens to the owner", async () => {
-      const { hardhatToken, owner } = await loadFixture(deployTokenFixture)
-      const ownerBalance = await hardhatToken.balanceOf(owner.address)
-      expect(await hardhatToken.totalSupply()).to.equal(ownerBalance)
+      expect(await clubCard1.token()).to.equal(testToken.address)
+      expect(await clubCard1.tokenId()).to.equal(1)
     })
   })
 
-  describe("Transactions", () => {
-    it("Should transfer tokens between accounts", async () => {
-      const { hardhatToken, owner, addr1, addr2 } = await loadFixture(
-        deployTokenFixture
-      )
-      // Transfer 50 tokens from owner to addr1
-      await expect(
-        hardhatToken.transfer(addr1.address, 50)
-      ).to.changeTokenBalances(hardhatToken, [owner, addr1], [-50, 50])
+  describe("isCardHolder()", () => {
+    it("should return true for the owner of the linked NFT", async () => {
+      const { clubCard1, testToken, alice } = await loadFixture(deployClubCard1)
+      // clubCard1 is linked to testToken#1
 
-      // Transfer 50 tokens from addr1 to addr2
-      // We use .connect(signer) to send a transaction from another account
-      await expect(
-        hardhatToken.connect(addr1).transfer(addr2.address, 50)
-      ).to.changeTokenBalances(hardhatToken, [addr1, addr2], [-50, 50])
+      // mint testToken#1 to alice
+      await testToken.mintToken(alice.address, 1)
+      expect(await clubCard1.isCardHolder(alice.address)).to.equal(true)
     })
 
-    it("should emit Transfer events", async () => {
-      const { hardhatToken, owner, addr1, addr2 } = await loadFixture(
-        deployTokenFixture
+    it("should return false for any other address", async () => {
+      const { clubCard1, testToken, alice, bob } = await loadFixture(
+        deployClubCard1
       )
+      // clubCard1 is linked to testToken#1
 
-      // Transfer 50 tokens from owner to addr1
-      await expect(hardhatToken.transfer(addr1.address, 50))
-        .to.emit(hardhatToken, "Transfer")
-        .withArgs(owner.address, addr1.address, 50)
+      // mint testToken#1 to alice
+      await testToken.mintToken(alice.address, 1)
+      // mint testToken#2 to bob
+      await testToken.mintToken(bob.address, 2)
 
-      // Transfer 50 tokens from addr1 to addr2
-      // We use .connect(signer) to send a transaction from another account
-      await expect(hardhatToken.connect(addr1).transfer(addr2.address, 50))
-        .to.emit(hardhatToken, "Transfer")
-        .withArgs(addr1.address, addr2.address, 50)
+      // bob does not hold clubCard1 since he doesn't own testToken#1
+      expect(await clubCard1.isCardHolder(bob.address)).to.equal(false)
     })
 
-    it("Should fail if sender doesn't have enough tokens", async () => {
-      const { hardhatToken, owner, addr1 } = await loadFixture(
-        deployTokenFixture
+    it("should revert if the linked token does not exist", async () => {
+      const { clubCard1, testToken, alice, bob } = await loadFixture(
+        deployClubCard1
       )
-      const initialOwnerBalance = await hardhatToken.balanceOf(owner.address)
+      // clubCard1 is linked to testToken#1
 
-      // Try to send 1 token from addr1 (0 tokens) to owner (1000 tokens).
-      // `require` will evaluate false and revert the transaction.
-      await expect(
-        hardhatToken.connect(addr1).transfer(owner.address, 1)
-      ).to.be.revertedWith("Not enough tokens")
-
-      // Owner balance shouldn't have changed.
-      expect(await hardhatToken.balanceOf(owner.address)).to.equal(
-        initialOwnerBalance
+      // testToken#1 has not been minted
+      expect(clubCard1.isCardHolder(alice.address)).to.be.revertedWith(
+        "ERC721: invalid token ID"
       )
     })
   })
