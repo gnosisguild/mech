@@ -39,6 +39,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
+    "@gnosis.pm/safe-contracts": "^1.3.0",
     "@openzeppelin/contracts": "^4.8.1",
     "@safe-global/safe-core-sdk": "^3.3.1"
   }

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
-import "./Enum.sol";
+import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 interface IClubCard is IERC1271 {
     /// @dev Executes either a delegatecall or a call with provided parameters
@@ -15,10 +15,10 @@ interface IClubCard is IERC1271 {
         address to,
         uint256 value,
         bytes memory data,
-        Enum.Operation operation,
-    ) public returns (bool success);
+        Enum.Operation operation
+    ) external returns (bool success);
 
-    /// @dev Allows a the card holder to execute arbitrary transaction 
+    /// @dev Allows a the card holder to execute arbitrary transaction
     /// @param to Destination address of transaction.
     /// @param value Ether value of transaction.
     /// @param data Data payload of transaction.
@@ -30,5 +30,5 @@ interface IClubCard is IERC1271 {
         uint256 value,
         bytes memory data,
         Enum.Operation operation
-    ) public returns (bool success, bytes memory returnData);
+    ) external returns (bool success, bytes memory returnData);
 }

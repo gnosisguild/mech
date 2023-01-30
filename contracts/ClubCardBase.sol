@@ -2,15 +2,14 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 import "./interfaces/IClubCard.sol";
-import "./interfaces/Enum.sol";
 
 /**
  * @dev This contract implements the authorization and signature validation for a club card. It's unopinionated about what it means to hold a club card. Child contract must define that by implementing the `isCardHolder` function.
  */
 abstract contract ClubCardBase is IClubCard {
-  
     // bytes4(keccak256("isValidSignature(bytes32,bytes)")
     bytes4 internal constant EIP1271_MAGICVALUE = 0x1626ba7e;
 
@@ -79,7 +78,7 @@ abstract contract ClubCardBase is IClubCard {
         address to,
         uint256 value,
         bytes memory data,
-        Enum.Operation operation,
+        Enum.Operation operation
     ) public onlyCardHolder returns (bool success) {
         uint256 txGas = type(uint256).max;
         if (operation == Enum.Operation.DelegateCall) {
@@ -110,7 +109,7 @@ abstract contract ClubCardBase is IClubCard {
         }
     }
 
-    /// @dev Allows a the card holder to execute arbitrary transaction 
+    /// @dev Allows a the card holder to execute arbitrary transaction
     /// @param to Destination address of transaction.
     /// @param value Ether value of transaction.
     /// @param data Data payload of transaction.
