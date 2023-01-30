@@ -4,12 +4,13 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "./interfaces/IClubCard.sol";
-import "./interfaces/ISafe.sol";
+import "./interfaces/Enum.sol";
 
 /**
  * @dev This contract implements the authorization and signature validation for a club card. It's unopinionated about what it means to hold a club card. Child contract must define that by implementing the `isCardHolder` function.
  */
 abstract contract ClubCardBase is IClubCard {
+  
     // bytes4(keccak256("isValidSignature(bytes32,bytes)")
     bytes4 internal constant EIP1271_MAGICVALUE = 0x1626ba7e;
 
@@ -68,39 +69,75 @@ abstract contract ClubCardBase is IClubCard {
         return 0xffffffff;
     }
 
-    function execTransaction(
-        address payable from,
+    /// @dev Executes either a delegatecall or a call with provided parameters
+    /// @param to Destination address.
+    /// @param value Ether value.
+    /// @param data Data payload.
+    /// @param operation Operation type.
+    /// @return success boolean flag indicating if the call succeeded
+    function exec(
         address to,
         uint256 value,
-        bytes calldata data,
-        ISafe.Operation operation,
-        uint256 safeTxGas,
-        uint256 baseGas,
-        uint256 gasPrice,
-        address gasToken,
-        address payable refundReceiver,
-        bytes memory signatures
-    ) external onlyCardHolder returns (bool success) {
-        return
-            ISafe(from).execTransaction(
-                to,
-                value,
-                data,
-                operation,
-                safeTxGas,
-                baseGas,
-                gasPrice,
-                gasToken,
-                refundReceiver,
-                signatures
-            );
+        bytes memory data,
+        Enum.Operation operation,
+    ) public onlyCardHolder returns (bool success) {
+        uint256 txGas = type(uint256).max;
+        if (operation == Enum.Operation.DelegateCall) {
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                success := delegatecall(
+                    txGas,
+                    to,
+                    add(data, 0x20),
+                    mload(data),
+                    0,
+                    0
+                )
+            }
+        } else {
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                success := call(
+                    txGas,
+                    to,
+                    value,
+                    add(data, 0x20),
+                    mload(data),
+                    0,
+                    0
+                )
+            }
+        }
     }
 
-    function approveHash(
-        address payable from,
-        bytes32 hashToApprove
-    ) external onlyCardHolder {
-        ISafe(from).approveHash(hashToApprove);
+    /// @dev Allows a the card holder to execute arbitrary transaction 
+    /// @param to Destination address of transaction.
+    /// @param value Ether value of transaction.
+    /// @param data Data payload of transaction.
+    /// @param operation Operation type of transaction.
+    /// @return success boolean flag indicating if the call succeeded
+    /// @return returnData Return data of the call
+    function execReturnData(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation
+    ) public onlyCardHolder returns (bool success, bytes memory returnData) {
+        success = exec(to, value, data, operation);
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            // Load free memory location
+            let ptr := mload(0x40)
+            // We allocate memory for the return data by setting the free memory location to
+            // current free memory location + data size + 32 bytes for data size value
+            mstore(0x40, add(ptr, add(returndatasize(), 0x20)))
+            // Store the size
+            mstore(ptr, returndatasize())
+            // Store the data
+            returndatacopy(add(ptr, 0x20), 0, returndatasize())
+            // Point the return data to the correct memory location
+            returnData := ptr
+        }
     }
 
     /**

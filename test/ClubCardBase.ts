@@ -6,41 +6,6 @@ import Safe, {
 import { expect } from "chai"
 import { ethers } from "hardhat"
 
-{
-  t: Tuploe
-  c: matchesOd
-  children: [
-    {c: equals},
-    {c: any}
-    {c: equals}
-  ]
-}
-
-{
-  type: Tuple
-  c: oneOf
-  children: [
-    {
-      t: Tuploe
-      c: matches
-      children: [
-        {c: equals},
-        {c: any}
-        {c: equals}
-      ]
-    },
-    {
-      t: Tuple
-      c: matches
-      children: [
-        {c: any},
-        {c: any}
-        {c: equals}
-      ]
-    }
-  ]
-}
-
 // We use `loadFixture` to share common setups (or fixtures) between tests.
 // Using this simplifies your tests and makes them run faster, by taking
 // advantage or Hardhat Network's snapshot functionality.
