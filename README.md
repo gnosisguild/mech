@@ -1,6 +1,6 @@
-# Safe ClubCard
+# ClubCard
 
-Programmable Safe ownership
+Programmable ownership
 
 #### Transferrable ownership
 

@@ -1,21 +1,21 @@
 {
-  "name": "safe-clubcard",
+  "name": "clubcard",
   "version": "1.0.0",
-  "description": "Programmable Safe ownership: allow holders of designated NFTs to sign transactions",
+  "description": "Programmable ownership: allow holders of designated NFTs to sign transactions",
   "scripts": {
     "test": "hardhat test",
     "format": "prettier '**/*.{sol,js,ts,tsx,json}' --ignore-path .gitignore --write"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gnosis/safe-clubcard.git"
+    "url": "git+https://github.com/gnosis/clubcard.git"
   },
   "author": "Gnosis Guild",
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/gnosis/safe-clubcard/issues"
+    "url": "https://github.com/gnosis/clubcard/issues"
   },
-  "homepage": "https://github.com/gnosis/safe-clubcard#readme",
+  "homepage": "https://github.com/gnosis/clubcard#readme",
   "devDependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
