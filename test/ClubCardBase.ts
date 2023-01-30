@@ -1,8 +1,3 @@
-import Safe, {
-  SafeFactory,
-  SafeAccountConfig,
-} from "@safe-global/safe-core-sdk"
-
 import { expect } from "chai"
 import { ethers } from "hardhat"
 
@@ -10,6 +5,9 @@ import { ethers } from "hardhat"
 // Using this simplifies your tests and makes them run faster, by taking
 // advantage or Hardhat Network's snapshot functionality.
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
+import { signMessageWithClubCard } from "../sdk/signMessageWithClubCard"
+
+const EIP1271_MAGIC_VALUE = "0x1626ba7e"
 
 describe("ClubCardBase contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
@@ -25,11 +23,142 @@ describe("ClubCardBase contract", () => {
 
     await clubCard1.deployed()
 
-    const safeFactory = await SafeFactory.create({ ethAdapter })
-
     // Fixtures can return anything you consider useful for your tests
     return { ClubCardERC721, testToken, clubCard1, alice, bob }
   }
 
-  describe("isCardHolder()", () => {})
+  describe("isValidSignature()", () => {
+    it("returns magic value for a valid signature of the card holder EOA", async () => {
+      const { clubCard1, testToken, alice } = await loadFixture(deployClubCard1)
+      // clubCard1 is linked to testToken#1
+
+      // mint testToken#1 to alice
+      await testToken.mintToken(alice.address, 1)
+
+      const message = "Test message"
+      const signature = await alice.signMessage(message)
+      const messageHash = ethers.utils.hashMessage(message)
+
+      expect(await clubCard1.isValidSignature(messageHash, signature)).to.equal(
+        EIP1271_MAGIC_VALUE
+      )
+    })
+
+    it("returns zero for any other ECDSA signature", async () => {
+      const { clubCard1, testToken, alice, bob } = await loadFixture(
+        deployClubCard1
+      )
+      // clubCard1 is linked to testToken#1
+
+      // mint testToken#1 to alice
+      await testToken.mintToken(alice.address, 1)
+
+      // let bob sign message
+      const message = "Test message"
+      const signature = await bob.signMessage(message)
+      const messageHash = ethers.utils.hashMessage(message)
+
+      expect(await clubCard1.isValidSignature(messageHash, signature)).to.equal(
+        "0xffffffff"
+      )
+    })
+
+    it("returns magic value for a valid EIP-1271 signature of the card holder contract", async () => {
+      const { ClubCardERC721, clubCard1, testToken, alice } = await loadFixture(
+        deployClubCard1
+      )
+      // clubCard1 is linked to testToken#1
+
+      const clubCard2 = await ClubCardERC721.deploy(testToken.address, 2)
+      await clubCard2.deployed()
+
+      // mint testToken#1 to alice
+      await testToken.mintToken(alice.address, 1)
+
+      // mint testToken#2 to clubCard1
+      await testToken.mintToken(clubCard1.address, 2)
+
+      const message = "Test message"
+      const ecdsaSignature = await alice.signMessage(message)
+      const messageHash = ethers.utils.hashMessage(message)
+
+      const contractSignature = signMessageWithClubCard(
+        clubCard1.address,
+        ecdsaSignature
+      )
+
+      expect(
+        await clubCard2.isValidSignature(messageHash, contractSignature)
+      ).to.equal(EIP1271_MAGIC_VALUE)
+    })
+
+    it("returns zero for an invalid EIP-1271 signature of the card holder contract", async () => {
+      const { ClubCardERC721, clubCard1, testToken, alice, bob } =
+        await loadFixture(deployClubCard1)
+      // clubCard1 is linked to testToken#1
+
+      const clubCard2 = await ClubCardERC721.deploy(testToken.address, 2)
+      await clubCard2.deployed()
+
+      // mint testToken#1 to alice
+      await testToken.mintToken(alice.address, 1)
+
+      // mint testToken#2 to clubCard1
+      await testToken.mintToken(clubCard1.address, 2)
+
+      const message = "Test message"
+      const wrongEcdsaSignature = await bob.signMessage(message)
+      const messageHash = ethers.utils.hashMessage(message)
+
+      const contractSignature = signMessageWithClubCard(
+        clubCard1.address,
+        wrongEcdsaSignature
+      )
+
+      expect(
+        await clubCard2.isValidSignature(messageHash, contractSignature)
+      ).to.equal("0xffffffff")
+    })
+
+    it("returns zero for an EIP-1271 signature from a contract that does not hold the card", async () => {
+      const { ClubCardERC721, clubCard1, testToken, alice } = await loadFixture(
+        deployClubCard1
+      )
+      // clubCard1 is linked to testToken#1
+
+      const clubCard2 = await ClubCardERC721.deploy(testToken.address, 2)
+      await clubCard2.deployed()
+
+      // mint testToken#1 to alice
+      await testToken.mintToken(alice.address, 1)
+
+      // mint testToken#2 to clubCard1
+      await testToken.mintToken(clubCard1.address, 2)
+
+      const message = "Test message"
+      const ecdsaSignature = await alice.signMessage(message)
+      const messageHash = ethers.utils.hashMessage(message)
+
+      const contractSignature = signMessageWithClubCard(
+        clubCard2.address,
+        ecdsaSignature
+      )
+
+      expect(
+        await clubCard2.isValidSignature(messageHash, contractSignature)
+      ).to.equal("0xffffffff")
+    })
+  })
+
+  describe("exec()", () => {
+    it("reverts if called from an account that doesn't hold the card")
+    it("returns true if the call succeeds")
+    it("returns false if the call reverts")
+  })
+
+  describe("exec()", () => {
+    it("reverts if called from an account that doesn't hold the card")
+    it("returns true and call result if the call succeeds")
+    it("returns false and revert data if the call reverts")
+  })
 })

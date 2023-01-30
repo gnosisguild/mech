@@ -1,6 +1,8 @@
 //SPDX-License-Identifier: LGPL-3.0
 pragma solidity ^0.8.9;
 
+import "hardhat/console.sol";
+
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
@@ -46,18 +48,22 @@ abstract contract ClubCardBase is IClubCard {
             // The address of the contract is encoded into r
             address signingContract = address(uint160(uint256(r)));
 
-            require(
-                isCardHolder(signingContract),
-                "signing contract does not hold this club card"
-            );
+            if (!isCardHolder(signingContract)) {
+                return 0xffffffff;
+            }
 
             // The signature data to pass for validation to the contract is appended to the signature and the offset is stored in s
             bytes memory contractSignature;
             // solhint-disable-next-line no-inline-assembly
             assembly {
-                contractSignature := add(add(signature, s), 0x20)
+                contractSignature := add(add(signature, s), 0x20) // add 0x20 to skip over the length of the bytes array
             }
-            return IERC1271(signingContract).isValidSignature(hash, signature);
+
+            return
+                IERC1271(signingContract).isValidSignature(
+                    hash,
+                    contractSignature
+                );
         } else {
             // This is an ECDSA signature
             if (isCardHolder(ECDSA.recover(hash, v, r, s))) {

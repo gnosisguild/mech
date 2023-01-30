@@ -34,7 +34,7 @@ describe("ClubCardERC721 contract", () => {
   })
 
   describe("isCardHolder()", () => {
-    it("should return true for the owner of the linked NFT", async () => {
+    it("returns true for the owner of the linked NFT", async () => {
       const { clubCard1, testToken, alice } = await loadFixture(deployClubCard1)
       // clubCard1 is linked to testToken#1
 
@@ -43,7 +43,7 @@ describe("ClubCardERC721 contract", () => {
       expect(await clubCard1.isCardHolder(alice.address)).to.equal(true)
     })
 
-    it("should return false for any other address", async () => {
+    it("returns false for any other address", async () => {
       const { clubCard1, testToken, alice, bob } = await loadFixture(
         deployClubCard1
       )
@@ -58,7 +58,7 @@ describe("ClubCardERC721 contract", () => {
       expect(await clubCard1.isCardHolder(bob.address)).to.equal(false)
     })
 
-    it("should revert if the linked token does not exist", async () => {
+    it("reverts if the linked token does not exist", async () => {
       const { clubCard1, testToken, alice, bob } = await loadFixture(
         deployClubCard1
       )
