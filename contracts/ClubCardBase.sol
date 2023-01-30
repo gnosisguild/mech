@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 import "./interfaces/IClubCard.sol";
 
@@ -80,12 +80,11 @@ abstract contract ClubCardBase is IClubCard {
         bytes memory data,
         Enum.Operation operation
     ) public onlyCardHolder returns (bool success) {
-        uint256 txGas = type(uint256).max;
         if (operation == Enum.Operation.DelegateCall) {
             // solhint-disable-next-line no-inline-assembly
             assembly {
                 success := delegatecall(
-                    txGas,
+                    gas(),
                     to,
                     add(data, 0x20),
                     mload(data),
@@ -97,7 +96,7 @@ abstract contract ClubCardBase is IClubCard {
             // solhint-disable-next-line no-inline-assembly
             assembly {
                 success := call(
-                    txGas,
+                    gas(),
                     to,
                     value,
                     add(data, 0x20),

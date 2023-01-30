@@ -2,9 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
-import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import "./IFactoryFriendly.sol";
 
-interface IClubCard is IERC1271 {
+interface IClubCard is IERC1271, IFactoryFriendly {
     /// @dev Executes either a delegatecall or a call with provided parameters
     /// @param to Destination address.
     /// @param value Ether value.
