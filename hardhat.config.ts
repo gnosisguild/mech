@@ -19,7 +19,7 @@ export default {
   },
   networks: {
     hardhat: {
-      chainId: 1337, // We set 1337 to make interacting with MetaMask simpler
+      chainId: 31337, // This is the value used in the @gnosis.pm/zodiac package (important for looking up the ModuleProxyFactory address)
     },
   },
 } satisfies HardhatUserConfig

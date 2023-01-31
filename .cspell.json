@@ -4,7 +4,14 @@
   "language": "en",
   "words": [
     "arrayify",
+    "bytecode",
+    "ethersproject",
     "hexlify",
+    "Keccak",
+    "mastercopy",
+    "nomicfoundation",
+    "Numberish",
+    "typechain",
     "unpadded"
   ],
   "flagWords": [],
