@@ -1,9 +1,5 @@
 import { defaultAbiCoder } from "@ethersproject/abi"
-import {
-  JsonRpcProvider,
-  JsonRpcSigner,
-  Provider,
-} from "@ethersproject/providers"
+import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers"
 import {
   deployAndSetUpCustomModule,
   deployMastercopyWithInitData,
@@ -11,7 +7,9 @@ import {
 } from "@gnosis.pm/zodiac"
 import { BigNumberish } from "ethers"
 import { HardhatRuntimeEnvironment } from "hardhat/types"
+
 import { ClubCardERC721__factory } from "../typechain-types"
+
 import {
   calculateClubCardERC721Address,
   calculateClubCardERC721MastercopyAddress,

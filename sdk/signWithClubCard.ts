@@ -2,7 +2,7 @@ import { defaultAbiCoder } from "@ethersproject/abi"
 import { Bytes } from "ethers"
 import { arrayify, hexlify } from "ethers/lib/utils"
 
-export const signMessageWithClubCard = (
+export const signWithClubCard = (
   clubCardAddress: string,
   signatureData: string | Bytes
 ) => {

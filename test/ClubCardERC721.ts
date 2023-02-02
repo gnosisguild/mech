@@ -1,10 +1,10 @@
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
 import { ethers } from "hardhat"
 
 // We use `loadFixture` to share common setups (or fixtures) between tests.
 // Using this simplifies your tests and makes them run faster, by taking
 // advantage or Hardhat Network's snapshot functionality.
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 
 describe("ClubCardERC721 contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
@@ -59,9 +59,7 @@ describe("ClubCardERC721 contract", () => {
     })
 
     it("reverts if the linked token does not exist", async () => {
-      const { clubCard1, testToken, alice, bob } = await loadFixture(
-        deployClubCard1
-      )
+      const { clubCard1, alice } = await loadFixture(deployClubCard1)
       // clubCard1 is linked to testToken#1
 
       // testToken#1 has not been minted

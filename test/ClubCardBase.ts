@@ -1,11 +1,11 @@
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
 import { ethers } from "hardhat"
 
 // We use `loadFixture` to share common setups (or fixtures) between tests.
 // Using this simplifies your tests and makes them run faster, by taking
 // advantage or Hardhat Network's snapshot functionality.
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
-import { signMessageWithClubCard } from "../sdk/signMessageWithClubCard"
+import { signWithClubCard } from "../sdk/signWithClubCard"
 
 const EIP1271_MAGIC_VALUE = "0x1626ba7e"
 
@@ -82,7 +82,7 @@ describe("ClubCardBase contract", () => {
       const ecdsaSignature = await alice.signMessage(message)
       const messageHash = ethers.utils.hashMessage(message)
 
-      const contractSignature = signMessageWithClubCard(
+      const contractSignature = signWithClubCard(
         clubCard1.address,
         ecdsaSignature
       )
@@ -110,7 +110,7 @@ describe("ClubCardBase contract", () => {
       const wrongEcdsaSignature = await bob.signMessage(message)
       const messageHash = ethers.utils.hashMessage(message)
 
-      const contractSignature = signMessageWithClubCard(
+      const contractSignature = signWithClubCard(
         clubCard1.address,
         wrongEcdsaSignature
       )
@@ -139,7 +139,7 @@ describe("ClubCardBase contract", () => {
       const ecdsaSignature = await alice.signMessage(message)
       const messageHash = ethers.utils.hashMessage(message)
 
-      const contractSignature = signMessageWithClubCard(
+      const contractSignature = signWithClubCard(
         clubCard2.address,
         ecdsaSignature
       )
@@ -156,7 +156,7 @@ describe("ClubCardBase contract", () => {
     it("returns false if the call reverts")
   })
 
-  describe("exec()", () => {
+  describe("execReturnData()", () => {
     it("reverts if called from an account that doesn't hold the card")
     it("returns true and call result if the call succeeds")
     it("returns false and revert data if the call reverts")

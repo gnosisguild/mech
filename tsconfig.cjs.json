@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig",
+  "compilerOptions": {
+    "noEmit": false,
+    "target": "es2017",
+    "outDir": "build/cjs",
+    "module": "commonjs"
+  },
+  "include": ["./sdk"]
+}
