@@ -4,3 +4,4 @@ artifacts
 build
 typechain-types
 *.log
+frontend/.env
