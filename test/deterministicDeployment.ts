@@ -26,7 +26,10 @@ describe("deterministic deployment", () => {
 
     const mastercopyAddress = await deployClubCardERC721Mastercopy(hre)
 
-    return { moduleProxyFactoryAddress, mastercopyAddress }
+    return {
+      moduleProxyFactoryAddress: "0x000000000000aDdB49795b0f9bA5BC298cDda236",
+      mastercopyAddress,
+    }
   }
 
   describe("calculateClubCardERC721MastercopyAddress", () => {
@@ -41,31 +44,27 @@ describe("deterministic deployment", () => {
     })
   })
 
-  describe.only("calculateClubCardERC721Address()", () => {
+  describe("calculateClubCardERC721Address()", () => {
     it("returns the address of the club card for a given NFT", async () => {
-      const { moduleProxyFactoryAddress, mastercopyAddress } =
-        await loadFixture(deployModuleFactoryAndMastercopy)
-
       const TestToken = await ethers.getContractFactory("ERC721Token")
       const testToken = await TestToken.deploy()
 
-      const address = await deployClubCardERC721(
+      const calculatedAddress = calculateClubCardERC721Address(
+        testToken.address,
+        1
+      )
+
+      expect(await ethers.provider.getCode(calculatedAddress)).to.equal("0x")
+
+      await deployClubCardERC721(
         testToken.address,
         1,
         hre.ethers.provider.getSigner()
       )
-      const calculatedAddress = calculateClubCardERC721Address(
-        hre.ethers.provider.network.chainId,
-        testToken.address,
-        1
+
+      expect(await ethers.provider.getCode(calculatedAddress)).to.not.equal(
+        "0x"
       )
-      console.log({
-        address,
-        calculatedAddress,
-        codeAtAddress: await hre.ethers.provider.getCode(address),
-        codeAtCalcAddress: await hre.ethers.provider.getCode(calculatedAddress),
-      })
-      expect(calculatedAddress).to.equal(address)
     })
   })
 })

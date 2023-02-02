@@ -7,17 +7,17 @@ import {
 import {
   deployAndSetUpCustomModule,
   deployMastercopyWithInitData,
-  deployModuleFactory,
   SupportedNetworks,
 } from "@gnosis.pm/zodiac"
 import { BigNumberish } from "ethers"
-import { getContractAddress } from "ethers/lib/utils"
 import { HardhatRuntimeEnvironment } from "hardhat/types"
 import { ClubCardERC721__factory } from "../typechain-types"
-import { calculateClubCardERC721MastercopyAddress } from "./calculateClubCardERC721Address"
+import {
+  calculateClubCardERC721Address,
+  calculateClubCardERC721MastercopyAddress,
+} from "./calculateClubCardERC721Address"
 import { DEFAULT_SALT, ZERO_ADDRESS } from "./constants"
 
-// TODO make this independent of a provider & chain ID
 export const makeClubCardERC721DeployTransaction = (
   /** Address of the ERC721 token contract */
   token: string,
@@ -30,7 +30,7 @@ export const makeClubCardERC721DeployTransaction = (
 
   const { transaction } = deployAndSetUpCustomModule(
     calculateClubCardERC721MastercopyAddress(),
-    ClubCardERC721__factory.abi,
+    ClubCardERC721__factory.abi as any,
     {
       types: ["address", "uint256"],
       values: [token, tokenId],
@@ -51,6 +51,18 @@ export const deployClubCardERC721 = async (
   signer: JsonRpcSigner,
   salt: string = DEFAULT_SALT
 ) => {
+  // make sure the club card does not already exist
+  const deterministicAddress = calculateClubCardERC721Address(
+    token,
+    tokenId,
+    salt
+  )
+  if ((await signer.provider.getCode(deterministicAddress)) !== "0x") {
+    throw new Error(
+      `A club card with the same token and token ID already exists at ${deterministicAddress}`
+    )
+  }
+
   const { chainId } = signer.provider.network
   // make sure the network is supported
   if (!Object.values(SupportedNetworks).includes(chainId)) {
@@ -71,8 +83,8 @@ export const deployClubCardERC721 = async (
     signer.provider,
     salt
   )
-  const response = await signer.sendTransaction(transaction)
-  return getContractAddress(response)
+
+  return signer.sendTransaction(transaction)
 }
 
 export const deployClubCardERC721Mastercopy = async (
