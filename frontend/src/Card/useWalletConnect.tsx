@@ -46,21 +46,21 @@ const WalletConnectProvider: React.FC<{ children: ReactNode }> = ({
         })
       })
 
-      client.on("session_request", async (event) => {
-        const { topic, params, id } = event
-        const { request } = params
-        const requestParamsMessage = request.params[0]
+      // client.on("session_request", async (event) => {
+      //   const { topic, params, id } = event
+      //   const { request } = params
+      //   const requestParamsMessage = request.params[0]
 
-        // convert `requestParamsMessage` by using a method like hexToUtf8
-        const message = hexToUtf8(requestParamsMessage)
+      //   // convert `requestParamsMessage` by using a method like hexToUtf8
+      //   const message = hexToUtf8(requestParamsMessage)
 
-        // sign the message
-        const signedMessage = await wallet.signMessage(message)
+      //   // sign the message
+      //   const signedMessage = await wallet.signMessage(message)
 
-        const response = { id, result: signedMessage, jsonrpc: "2.0" }
+      //   const response = { id, result: signedMessage, jsonrpc: "2.0" }
 
-        await client.respondSessionRequest({ topic, response })
-      })
+      //   await client.respondSessionRequest({ topic, response })
+      // })
     }
 
     init()
