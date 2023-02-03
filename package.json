@@ -1,6 +1,6 @@
 {
   "name": "clubcard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Programmable ownership: allow holders of designated NFTs to sign transactions",
   "scripts": {
     "prepare": "yarn build",
