@@ -23,9 +23,9 @@
     "LICENSE",
     "README.md"
   ],
-  "main": "build/cjs/index.js",
-  "typings": "build/cjs/index.d.ts",
-  "module": "build/esm/index.js",
+  "main": "build/cjs/sdk/index.js",
+  "typings": "build/cjs/sdk/index.d.ts",
+  "module": "build/esm/sdk/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gnosis/clubcard.git"
