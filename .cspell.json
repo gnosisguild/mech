@@ -6,6 +6,7 @@
     "arbitrum",
     "arrayify",
     "bytecode",
+    "clubcard",
     "ethersproject",
     "hexlify",
     "Keccak",
@@ -15,7 +16,8 @@
     "qrcode",
     "typechain",
     "unpadded",
-    "Wagmi"
+    "Wagmi",
+    "walletconnect"
   ],
   "flagWords": [],
   "ignorePaths": [
