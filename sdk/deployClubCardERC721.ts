@@ -6,7 +6,6 @@ import {
   SupportedNetworks,
 } from "@gnosis.pm/zodiac"
 import { BigNumberish } from "ethers"
-import { HardhatRuntimeEnvironment } from "hardhat/types"
 
 import { ClubCardERC721__factory } from "../typechain-types"
 
@@ -28,7 +27,7 @@ export const makeClubCardERC721DeployTransaction = (
 
   const { transaction } = deployAndSetUpCustomModule(
     calculateClubCardERC721MastercopyAddress(),
-    ClubCardERC721__factory.abi as any,
+    ClubCardERC721__factory.abi,
     {
       types: ["address", "uint256"],
       values: [token, tokenId],
@@ -85,15 +84,13 @@ export const deployClubCardERC721 = async (
   return signer.sendTransaction(transaction)
 }
 
-export const deployClubCardERC721Mastercopy = async (
-  hre: HardhatRuntimeEnvironment
-) => {
+export const deployClubCardERC721Mastercopy = async (signer: JsonRpcSigner) => {
   const initData = defaultAbiCoder.encode(
     ["address", "uint256"],
     [ZERO_ADDRESS, 0]
   )
   return await deployMastercopyWithInitData(
-    hre,
+    signer,
     ClubCardERC721__factory.bytecode + initData.slice(2),
     DEFAULT_SALT
   )

@@ -19,12 +19,14 @@ import {
 
 describe("deterministic deployment", () => {
   async function deployModuleFactoryAndMastercopy() {
-    const moduleProxyFactoryAddress = await deployModuleFactory(hre)
+    const [signer] = await hre.ethers.getSigners()
+    const deployer = hre.ethers.provider.getSigner(signer.address)
+    const moduleProxyFactoryAddress = await deployModuleFactory(deployer)
     if (moduleProxyFactoryAddress === ZERO_ADDRESS) {
       throw new Error("Module proxy factory address is already deployed")
     }
 
-    const mastercopyAddress = await deployClubCardERC721Mastercopy(hre)
+    const mastercopyAddress = await deployClubCardERC721Mastercopy(deployer)
 
     return {
       moduleProxyFactoryAddress: "0x000000000000aDdB49795b0f9bA5BC298cDda236",
