@@ -5,7 +5,8 @@
   "scripts": {
     "prepare": "yarn build",
     "prebuild": "rimraf build",
-    "build": "yarn build:cjs && yarn build:esm",
+    "build": "yarn build:evm && yarn build:cjs && yarn build:esm",
+    "build:evm": "yarn hardhat compile",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "check": "yarn check:prettier && yarn check:lint",
