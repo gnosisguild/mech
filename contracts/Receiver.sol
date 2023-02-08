@@ -47,6 +47,6 @@ contract Receiver is
         bytes calldata,
         bytes calldata
     ) external pure override {
-        // We implement this for completeness, doesn't really have any value
+        // Implemented for ERC-777, although we don't use it
     }
 }
