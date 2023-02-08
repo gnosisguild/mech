@@ -6,12 +6,13 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
+import "./Receiver.sol";
 import "./interfaces/IClubCard.sol";
 
 /**
  * @dev This contract implements the authorization and signature validation for a club card. It's unopinionated about what it means to hold a club card. Child contract must define that by implementing the `isCardHolder` function.
  */
-abstract contract ClubCardBase is IClubCard {
+abstract contract ClubCardBase is IClubCard, Receiver {
     // bytes4(keccak256("isValidSignature(bytes32,bytes)")
     bytes4 internal constant EIP1271_MAGICVALUE = 0x1626ba7e;
 
