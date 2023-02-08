@@ -27,6 +27,20 @@ describe("ClubCardBase contract", () => {
     return { ClubCardERC721, testToken, clubCard1, alice, bob }
   }
 
+  it("should be able to receive ether", async () => {
+    const { clubCard1 } = await loadFixture(deployClubCard1)
+    const [deployer] = await ethers.getSigners()
+
+    await deployer.sendTransaction({
+      to: clubCard1.address,
+      value: ethers.utils.parseEther("1.0"),
+    })
+
+    expect(await ethers.provider.getBalance(clubCard1.address)).to.equal(
+      ethers.utils.parseEther("1.0")
+    )
+  })
+
   describe("isValidSignature()", () => {
     it("returns magic value for a valid signature of the card holder EOA", async () => {
       const { clubCard1, testToken, alice } = await loadFixture(deployClubCard1)

@@ -161,4 +161,6 @@ abstract contract ClubCardBase is IClubCard {
             v := byte(0, mload(add(signature, 0x60)))
         }
     }
+
+    receive() external payable {}
 }
