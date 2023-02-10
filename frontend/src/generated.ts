@@ -10,8 +10,8 @@ import {
   UsePrepareContractWriteConfig,
   useContractEvent,
   UseContractEventConfig,
-} from 'wagmi'
-import { WriteContractMode, PrepareWriteContractResult } from 'wagmi/actions'
+} from "wagmi"
+import { WriteContractMode, PrepareWriteContractResult } from "wagmi/actions"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // erc721
@@ -19,160 +19,160 @@ import { WriteContractMode, PrepareWriteContractResult } from 'wagmi/actions'
 
 export const erc721ABI = [
   {
-    type: 'event',
+    type: "event",
     inputs: [
-      { name: 'owner', type: 'address', indexed: true },
-      { name: 'spender', type: 'address', indexed: true },
-      { name: 'tokenId', type: 'uint256', indexed: true },
+      { name: "owner", type: "address", indexed: true },
+      { name: "spender", type: "address", indexed: true },
+      { name: "tokenId", type: "uint256", indexed: true },
     ],
-    name: 'Approval',
+    name: "Approval",
   },
   {
-    type: 'event',
+    type: "event",
     inputs: [
-      { name: 'owner', type: 'address', indexed: true },
-      { name: 'operator', type: 'address', indexed: true },
-      { name: 'approved', type: 'bool', indexed: false },
+      { name: "owner", type: "address", indexed: true },
+      { name: "operator", type: "address", indexed: true },
+      { name: "approved", type: "bool", indexed: false },
     ],
-    name: 'ApprovalForAll',
+    name: "ApprovalForAll",
   },
   {
-    type: 'event',
+    type: "event",
     inputs: [
-      { name: 'from', type: 'address', indexed: true },
-      { name: 'to', type: 'address', indexed: true },
-      { name: 'tokenId', type: 'uint256', indexed: true },
+      { name: "from", type: "address", indexed: true },
+      { name: "to", type: "address", indexed: true },
+      { name: "tokenId", type: "uint256", indexed: true },
     ],
-    name: 'Transfer',
+    name: "Transfer",
   },
   {
-    stateMutability: 'payable',
-    type: 'function',
+    stateMutability: "payable",
+    type: "function",
     inputs: [
-      { name: 'spender', type: 'address' },
-      { name: 'tokenId', type: 'uint256' },
+      { name: "spender", type: "address" },
+      { name: "tokenId", type: "uint256" },
     ],
-    name: 'approve',
+    name: "approve",
     outputs: [],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'account', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: "view",
+    type: "function",
+    inputs: [{ name: "account", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "", type: "uint256" }],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    name: 'getApproved',
-    outputs: [{ name: '', type: 'address' }],
+    stateMutability: "view",
+    type: "function",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    name: "getApproved",
+    outputs: [{ name: "", type: "address" }],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
     inputs: [
-      { name: 'owner', type: 'address' },
-      { name: 'operator', type: 'address' },
+      { name: "owner", type: "address" },
+      { name: "operator", type: "address" },
     ],
-    name: 'isApprovedForAll',
-    outputs: [{ name: '', type: 'bool' }],
+    name: "isApprovedForAll",
+    outputs: [{ name: "", type: "bool" }],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
     inputs: [],
-    name: 'name',
-    outputs: [{ name: '', type: 'string' }],
+    name: "name",
+    outputs: [{ name: "", type: "string" }],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    name: 'ownerOf',
-    outputs: [{ name: 'owner', type: 'address' }],
+    stateMutability: "view",
+    type: "function",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    name: "ownerOf",
+    outputs: [{ name: "owner", type: "address" }],
   },
   {
-    stateMutability: 'payable',
-    type: 'function',
+    stateMutability: "payable",
+    type: "function",
     inputs: [
-      { name: 'from', type: 'address' },
-      { name: 'to', type: 'address' },
-      { name: 'tokenId', type: 'uint256' },
+      { name: "from", type: "address" },
+      { name: "to", type: "address" },
+      { name: "tokenId", type: "uint256" },
     ],
-    name: 'safeTransferFrom',
+    name: "safeTransferFrom",
     outputs: [],
   },
   {
-    stateMutability: 'nonpayable',
-    type: 'function',
+    stateMutability: "nonpayable",
+    type: "function",
     inputs: [
-      { name: 'from', type: 'address' },
-      { name: 'to', type: 'address' },
-      { name: 'id', type: 'uint256' },
-      { name: 'data', type: 'bytes' },
+      { name: "from", type: "address" },
+      { name: "to", type: "address" },
+      { name: "id", type: "uint256" },
+      { name: "data", type: "bytes" },
     ],
-    name: 'safeTransferFrom',
+    name: "safeTransferFrom",
     outputs: [],
   },
   {
-    stateMutability: 'nonpayable',
-    type: 'function',
+    stateMutability: "nonpayable",
+    type: "function",
     inputs: [
-      { name: 'operator', type: 'address' },
-      { name: 'approved', type: 'bool' },
+      { name: "operator", type: "address" },
+      { name: "approved", type: "bool" },
     ],
-    name: 'setApprovalForAll',
+    name: "setApprovalForAll",
     outputs: [],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
     inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', type: 'string' }],
+    name: "symbol",
+    outputs: [{ name: "", type: "string" }],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'index', type: 'uint256' }],
-    name: 'tokenByIndex',
-    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: "view",
+    type: "function",
+    inputs: [{ name: "index", type: "uint256" }],
+    name: "tokenByIndex",
+    outputs: [{ name: "", type: "uint256" }],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
     inputs: [
-      { name: 'owner', type: 'address' },
-      { name: 'index', type: 'uint256' },
+      { name: "owner", type: "address" },
+      { name: "index", type: "uint256" },
     ],
-    name: 'tokenByIndex',
-    outputs: [{ name: 'tokenId', type: 'uint256' }],
+    name: "tokenByIndex",
+    outputs: [{ name: "tokenId", type: "uint256" }],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    name: 'tokenURI',
-    outputs: [{ name: '', type: 'string' }],
+    stateMutability: "view",
+    type: "function",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    name: "tokenURI",
+    outputs: [{ name: "", type: "string" }],
   },
   {
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
     inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', type: 'uint256' }],
+    name: "totalSupply",
+    outputs: [{ name: "", type: "uint256" }],
   },
   {
-    stateMutability: 'payable',
-    type: 'function',
+    stateMutability: "payable",
+    type: "function",
     inputs: [
-      { name: 'sender', type: 'address' },
-      { name: 'recipient', type: 'address' },
-      { name: 'tokeId', type: 'uint256' },
+      { name: "sender", type: "address" },
+      { name: "recipient", type: "address" },
+      { name: "tokeId", type: "uint256" },
     ],
-    name: 'transferFrom',
+    name: "transferFrom",
     outputs: [],
   },
 ] as const
@@ -184,7 +184,7 @@ export const erc721ABI = [
 /**
  * Wraps __{@link useContract}__ with `abi` set to __{@link erc721ABI}__.
  */
-export function useErc721(config: Omit<UseContractConfig, 'abi'> = {} as any) {
+export function useErc721(config: Omit<UseContractConfig, "abi"> = {} as any) {
   return useContract({ abi: erc721ABI, ...config })
 }
 
@@ -194,8 +194,8 @@ export function useErc721(config: Omit<UseContractConfig, 'abi'> = {} as any) {
 export function useErc721Read<TFunctionName extends string>(
   config: Omit<
     UseContractReadConfig<typeof erc721ABI, TFunctionName>,
-    'abi'
-  > = {} as any,
+    "abi"
+  > = {} as any
 ) {
   return useContractRead({ abi: erc721ABI, ...config } as UseContractReadConfig<
     typeof erc721ABI,
@@ -208,15 +208,15 @@ export function useErc721Read<TFunctionName extends string>(
  */
 export function useErc721BalanceOf(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'balanceOf'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "balanceOf">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'balanceOf',
+    functionName: "balanceOf",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'balanceOf'>)
+  } as UseContractReadConfig<typeof erc721ABI, "balanceOf">)
 }
 
 /**
@@ -224,15 +224,15 @@ export function useErc721BalanceOf(
  */
 export function useErc721GetApproved(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'getApproved'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "getApproved">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'getApproved',
+    functionName: "getApproved",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'getApproved'>)
+  } as UseContractReadConfig<typeof erc721ABI, "getApproved">)
 }
 
 /**
@@ -240,15 +240,15 @@ export function useErc721GetApproved(
  */
 export function useErc721IsApprovedForAll(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'isApprovedForAll'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "isApprovedForAll">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'isApprovedForAll',
+    functionName: "isApprovedForAll",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'isApprovedForAll'>)
+  } as UseContractReadConfig<typeof erc721ABI, "isApprovedForAll">)
 }
 
 /**
@@ -256,15 +256,15 @@ export function useErc721IsApprovedForAll(
  */
 export function useErc721Name(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'name'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "name">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'name',
+    functionName: "name",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'name'>)
+  } as UseContractReadConfig<typeof erc721ABI, "name">)
 }
 
 /**
@@ -272,15 +272,15 @@ export function useErc721Name(
  */
 export function useErc721OwnerOf(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'ownerOf'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "ownerOf">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'ownerOf',
+    functionName: "ownerOf",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'ownerOf'>)
+  } as UseContractReadConfig<typeof erc721ABI, "ownerOf">)
 }
 
 /**
@@ -288,15 +288,15 @@ export function useErc721OwnerOf(
  */
 export function useErc721Symbol(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'symbol'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "symbol">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'symbol',
+    functionName: "symbol",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'symbol'>)
+  } as UseContractReadConfig<typeof erc721ABI, "symbol">)
 }
 
 /**
@@ -304,15 +304,15 @@ export function useErc721Symbol(
  */
 export function useErc721TokenByIndex(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'tokenByIndex'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "tokenByIndex">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'tokenByIndex',
+    functionName: "tokenByIndex",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'tokenByIndex'>)
+  } as UseContractReadConfig<typeof erc721ABI, "tokenByIndex">)
 }
 
 /**
@@ -320,15 +320,15 @@ export function useErc721TokenByIndex(
  */
 export function useErc721TokenUri(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'tokenURI'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "tokenURI">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'tokenURI',
+    functionName: "tokenURI",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'tokenURI'>)
+  } as UseContractReadConfig<typeof erc721ABI, "tokenURI">)
 }
 
 /**
@@ -336,15 +336,15 @@ export function useErc721TokenUri(
  */
 export function useErc721TotalSupply(
   config: Omit<
-    UseContractReadConfig<typeof erc721ABI, 'totalSupply'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UseContractReadConfig<typeof erc721ABI, "totalSupply">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return useContractRead({
     abi: erc721ABI,
-    functionName: 'totalSupply',
+    functionName: "totalSupply",
     ...config,
-  } as UseContractReadConfig<typeof erc721ABI, 'totalSupply'>)
+  } as UseContractReadConfig<typeof erc721ABI, "totalSupply">)
 }
 
 /**
@@ -352,17 +352,17 @@ export function useErc721TotalSupply(
  */
 export function useErc721Write<
   TMode extends WriteContractMode,
-  TFunctionName extends string,
+  TFunctionName extends string
 >(
-  config: TMode extends 'prepared'
+  config: TMode extends "prepared"
     ? UseContractWriteConfig<
         TMode,
-        PrepareWriteContractResult<typeof erc721ABI, string>['abi'],
+        PrepareWriteContractResult<typeof erc721ABI, string>["abi"],
         TFunctionName
       >
     : UseContractWriteConfig<TMode, typeof erc721ABI, TFunctionName> & {
         abi?: never
-      } = {} as any,
+      } = {} as any
 ) {
   return useContractWrite<TMode, typeof erc721ABI, TFunctionName>({
     abi: erc721ABI,
@@ -374,20 +374,20 @@ export function useErc721Write<
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link erc721ABI}__ and `functionName` set to `"approve"`.
  */
 export function useErc721Approve<TMode extends WriteContractMode>(
-  config: TMode extends 'prepared'
+  config: TMode extends "prepared"
     ? UseContractWriteConfig<
         TMode,
-        PrepareWriteContractResult<typeof erc721ABI, 'approve'>['abi'],
-        'approve'
-      > & { functionName?: 'approve' }
-    : UseContractWriteConfig<TMode, typeof erc721ABI, 'approve'> & {
+        PrepareWriteContractResult<typeof erc721ABI, "approve">["abi"],
+        "approve"
+      > & { functionName?: "approve" }
+    : UseContractWriteConfig<TMode, typeof erc721ABI, "approve"> & {
         abi?: never
-        functionName?: 'approve'
-      } = {} as any,
+        functionName?: "approve"
+      } = {} as any
 ) {
-  return useContractWrite<TMode, typeof erc721ABI, 'approve'>({
+  return useContractWrite<TMode, typeof erc721ABI, "approve">({
     abi: erc721ABI,
-    functionName: 'approve',
+    functionName: "approve",
     ...config,
   } as any)
 }
@@ -396,20 +396,20 @@ export function useErc721Approve<TMode extends WriteContractMode>(
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link erc721ABI}__ and `functionName` set to `"safeTransferFrom"`.
  */
 export function useErc721SafeTransferFrom<TMode extends WriteContractMode>(
-  config: TMode extends 'prepared'
+  config: TMode extends "prepared"
     ? UseContractWriteConfig<
         TMode,
-        PrepareWriteContractResult<typeof erc721ABI, 'safeTransferFrom'>['abi'],
-        'safeTransferFrom'
-      > & { functionName?: 'safeTransferFrom' }
-    : UseContractWriteConfig<TMode, typeof erc721ABI, 'safeTransferFrom'> & {
+        PrepareWriteContractResult<typeof erc721ABI, "safeTransferFrom">["abi"],
+        "safeTransferFrom"
+      > & { functionName?: "safeTransferFrom" }
+    : UseContractWriteConfig<TMode, typeof erc721ABI, "safeTransferFrom"> & {
         abi?: never
-        functionName?: 'safeTransferFrom'
-      } = {} as any,
+        functionName?: "safeTransferFrom"
+      } = {} as any
 ) {
-  return useContractWrite<TMode, typeof erc721ABI, 'safeTransferFrom'>({
+  return useContractWrite<TMode, typeof erc721ABI, "safeTransferFrom">({
     abi: erc721ABI,
-    functionName: 'safeTransferFrom',
+    functionName: "safeTransferFrom",
     ...config,
   } as any)
 }
@@ -418,23 +418,23 @@ export function useErc721SafeTransferFrom<TMode extends WriteContractMode>(
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link erc721ABI}__ and `functionName` set to `"setApprovalForAll"`.
  */
 export function useErc721SetApprovalForAll<TMode extends WriteContractMode>(
-  config: TMode extends 'prepared'
+  config: TMode extends "prepared"
     ? UseContractWriteConfig<
         TMode,
         PrepareWriteContractResult<
           typeof erc721ABI,
-          'setApprovalForAll'
-        >['abi'],
-        'setApprovalForAll'
-      > & { functionName?: 'setApprovalForAll' }
-    : UseContractWriteConfig<TMode, typeof erc721ABI, 'setApprovalForAll'> & {
+          "setApprovalForAll"
+        >["abi"],
+        "setApprovalForAll"
+      > & { functionName?: "setApprovalForAll" }
+    : UseContractWriteConfig<TMode, typeof erc721ABI, "setApprovalForAll"> & {
         abi?: never
-        functionName?: 'setApprovalForAll'
-      } = {} as any,
+        functionName?: "setApprovalForAll"
+      } = {} as any
 ) {
-  return useContractWrite<TMode, typeof erc721ABI, 'setApprovalForAll'>({
+  return useContractWrite<TMode, typeof erc721ABI, "setApprovalForAll">({
     abi: erc721ABI,
-    functionName: 'setApprovalForAll',
+    functionName: "setApprovalForAll",
     ...config,
   } as any)
 }
@@ -443,20 +443,20 @@ export function useErc721SetApprovalForAll<TMode extends WriteContractMode>(
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link erc721ABI}__ and `functionName` set to `"transferFrom"`.
  */
 export function useErc721TransferFrom<TMode extends WriteContractMode>(
-  config: TMode extends 'prepared'
+  config: TMode extends "prepared"
     ? UseContractWriteConfig<
         TMode,
-        PrepareWriteContractResult<typeof erc721ABI, 'transferFrom'>['abi'],
-        'transferFrom'
-      > & { functionName?: 'transferFrom' }
-    : UseContractWriteConfig<TMode, typeof erc721ABI, 'transferFrom'> & {
+        PrepareWriteContractResult<typeof erc721ABI, "transferFrom">["abi"],
+        "transferFrom"
+      > & { functionName?: "transferFrom" }
+    : UseContractWriteConfig<TMode, typeof erc721ABI, "transferFrom"> & {
         abi?: never
-        functionName?: 'transferFrom'
-      } = {} as any,
+        functionName?: "transferFrom"
+      } = {} as any
 ) {
-  return useContractWrite<TMode, typeof erc721ABI, 'transferFrom'>({
+  return useContractWrite<TMode, typeof erc721ABI, "transferFrom">({
     abi: erc721ABI,
-    functionName: 'transferFrom',
+    functionName: "transferFrom",
     ...config,
   } as any)
 }
@@ -467,8 +467,8 @@ export function useErc721TransferFrom<TMode extends WriteContractMode>(
 export function usePrepareErc721Write<TFunctionName extends string>(
   config: Omit<
     UsePrepareContractWriteConfig<typeof erc721ABI, TFunctionName>,
-    'abi'
-  > = {} as any,
+    "abi"
+  > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: erc721ABI,
@@ -481,15 +481,15 @@ export function usePrepareErc721Write<TFunctionName extends string>(
  */
 export function usePrepareErc721Approve(
   config: Omit<
-    UsePrepareContractWriteConfig<typeof erc721ABI, 'approve'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UsePrepareContractWriteConfig<typeof erc721ABI, "approve">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: erc721ABI,
-    functionName: 'approve',
+    functionName: "approve",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof erc721ABI, 'approve'>)
+  } as UsePrepareContractWriteConfig<typeof erc721ABI, "approve">)
 }
 
 /**
@@ -497,15 +497,15 @@ export function usePrepareErc721Approve(
  */
 export function usePrepareErc721SafeTransferFrom(
   config: Omit<
-    UsePrepareContractWriteConfig<typeof erc721ABI, 'safeTransferFrom'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UsePrepareContractWriteConfig<typeof erc721ABI, "safeTransferFrom">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: erc721ABI,
-    functionName: 'safeTransferFrom',
+    functionName: "safeTransferFrom",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof erc721ABI, 'safeTransferFrom'>)
+  } as UsePrepareContractWriteConfig<typeof erc721ABI, "safeTransferFrom">)
 }
 
 /**
@@ -513,15 +513,15 @@ export function usePrepareErc721SafeTransferFrom(
  */
 export function usePrepareErc721SetApprovalForAll(
   config: Omit<
-    UsePrepareContractWriteConfig<typeof erc721ABI, 'setApprovalForAll'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UsePrepareContractWriteConfig<typeof erc721ABI, "setApprovalForAll">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: erc721ABI,
-    functionName: 'setApprovalForAll',
+    functionName: "setApprovalForAll",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof erc721ABI, 'setApprovalForAll'>)
+  } as UsePrepareContractWriteConfig<typeof erc721ABI, "setApprovalForAll">)
 }
 
 /**
@@ -529,15 +529,15 @@ export function usePrepareErc721SetApprovalForAll(
  */
 export function usePrepareErc721TransferFrom(
   config: Omit<
-    UsePrepareContractWriteConfig<typeof erc721ABI, 'transferFrom'>,
-    'abi' | 'functionName'
-  > = {} as any,
+    UsePrepareContractWriteConfig<typeof erc721ABI, "transferFrom">,
+    "abi" | "functionName"
+  > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: erc721ABI,
-    functionName: 'transferFrom',
+    functionName: "transferFrom",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof erc721ABI, 'transferFrom'>)
+  } as UsePrepareContractWriteConfig<typeof erc721ABI, "transferFrom">)
 }
 
 /**
@@ -546,8 +546,8 @@ export function usePrepareErc721TransferFrom(
 export function useErc721Event<TEventName extends string>(
   config: Omit<
     UseContractEventConfig<typeof erc721ABI, TEventName>,
-    'abi'
-  > = {} as any,
+    "abi"
+  > = {} as any
 ) {
   return useContractEvent({
     abi: erc721ABI,
@@ -560,15 +560,15 @@ export function useErc721Event<TEventName extends string>(
  */
 export function useErc721ApprovalEvent(
   config: Omit<
-    UseContractEventConfig<typeof erc721ABI, 'Approval'>,
-    'abi' | 'eventName'
-  > = {} as any,
+    UseContractEventConfig<typeof erc721ABI, "Approval">,
+    "abi" | "eventName"
+  > = {} as any
 ) {
   return useContractEvent({
     abi: erc721ABI,
-    eventName: 'Approval',
+    eventName: "Approval",
     ...config,
-  } as UseContractEventConfig<typeof erc721ABI, 'Approval'>)
+  } as UseContractEventConfig<typeof erc721ABI, "Approval">)
 }
 
 /**
@@ -576,15 +576,15 @@ export function useErc721ApprovalEvent(
  */
 export function useErc721ApprovalForAllEvent(
   config: Omit<
-    UseContractEventConfig<typeof erc721ABI, 'ApprovalForAll'>,
-    'abi' | 'eventName'
-  > = {} as any,
+    UseContractEventConfig<typeof erc721ABI, "ApprovalForAll">,
+    "abi" | "eventName"
+  > = {} as any
 ) {
   return useContractEvent({
     abi: erc721ABI,
-    eventName: 'ApprovalForAll',
+    eventName: "ApprovalForAll",
     ...config,
-  } as UseContractEventConfig<typeof erc721ABI, 'ApprovalForAll'>)
+  } as UseContractEventConfig<typeof erc721ABI, "ApprovalForAll">)
 }
 
 /**
@@ -592,13 +592,13 @@ export function useErc721ApprovalForAllEvent(
  */
 export function useErc721TransferEvent(
   config: Omit<
-    UseContractEventConfig<typeof erc721ABI, 'Transfer'>,
-    'abi' | 'eventName'
-  > = {} as any,
+    UseContractEventConfig<typeof erc721ABI, "Transfer">,
+    "abi" | "eventName"
+  > = {} as any
 ) {
   return useContractEvent({
     abi: erc721ABI,
-    eventName: 'Transfer',
+    eventName: "Transfer",
     ...config,
-  } as UseContractEventConfig<typeof erc721ABI, 'Transfer'>)
+  } as UseContractEventConfig<typeof erc721ABI, "Transfer">)
 }

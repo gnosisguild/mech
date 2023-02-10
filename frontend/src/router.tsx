@@ -1,7 +1,7 @@
 import React from "react"
 import { createBrowserRouter } from "react-router-dom"
-import Mech from "./Mech"
-import Landing from "./Landing"
+import Mech from "./routes/Mech"
+import Landing from "./routes/Home"
 
 export default createBrowserRouter([
   {
