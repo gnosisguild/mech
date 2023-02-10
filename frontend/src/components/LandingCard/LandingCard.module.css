@@ -1,0 +1,62 @@
+.landingCard {
+  background-color: var(--box-bg);
+  padding: 30px;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  border-radius: 20px;
+}
+
+.landingCard p {
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.connectButton {
+  font-size: 20px;
+}
+
+.demoCard {
+  background-color: var(--box-bg);
+  padding: 10px;
+  width: 70%;
+  max-width: 280px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: end;
+}
+
+.demoInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 40%;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.demoInfo li {
+  display: flex;
+  flex-direction: column;
+}
+
+.demoInfo label {
+  border: 1px solid var(--button-border);
+  border-radius: 10px;
+  padding: 5px 10px;
+  width: fit-content;
+}
+.demoInfo .infoItem {
+  background-color: var(--box-bg);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+}
+
+.demoInfo p {
+  font-size: 12px;
+  font-family: monospace;
+}

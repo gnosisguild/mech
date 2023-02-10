@@ -1,11 +1,11 @@
 import React from "react"
 import Layout from "../components/Layout"
+import LandingCard from "../components/LandingCard"
 
 const Landing: React.FC = () => {
   return (
     <Layout>
-      Connect your wallet and select one of your mechs to get started
-      <hr />
+      <LandingCard />
     </Layout>
   )
 }

@@ -1,0 +1,14 @@
+.button {
+  background-color: var(--button-bg);
+  border: 2px solid var(--button-border);
+  color: var(--button-text);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 10px 0px rgba(150, 203, 0, 0.44);
+}
+
+.secondary {
+  border-color: var(--button-bg);
+}
