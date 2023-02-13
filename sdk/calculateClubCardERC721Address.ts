@@ -9,8 +9,8 @@ import {
 
 import {
   DEFAULT_SALT,
+  INIT_ADDRESS,
   MODULE_PROXY_FACTORY_ADDRESS,
-  ZERO_ADDRESS,
   ZODIAC_SINGLETON_FACTORY_ADDRESS,
 } from "./constants"
 
@@ -44,7 +44,7 @@ export const calculateClubCardERC721Address = (
 export const calculateClubCardERC721MastercopyAddress = () => {
   const initData = defaultAbiCoder.encode(
     ["address", "uint256"],
-    [ZERO_ADDRESS, 0]
+    [INIT_ADDRESS, 0]
   )
   return getCreate2Address(
     ZODIAC_SINGLETON_FACTORY_ADDRESS,

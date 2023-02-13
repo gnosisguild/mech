@@ -16,10 +16,7 @@ contract ClubCardERC721 is ClubCardBase {
     }
 
     function setUp(bytes memory initParams) public override {
-        require(
-            address(token) == address(0) && tokenId == 0,
-            "Already initialized"
-        );
+        require(address(token) == address(0), "Already initialized");
 
         (address _token, uint256 _tokenId) = abi.decode(
             initParams,

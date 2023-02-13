@@ -13,7 +13,7 @@ import {
   calculateClubCardERC721Address,
   calculateClubCardERC721MastercopyAddress,
 } from "./calculateClubCardERC721Address"
-import { DEFAULT_SALT, ZERO_ADDRESS } from "./constants"
+import { DEFAULT_SALT, INIT_ADDRESS } from "./constants"
 
 export const makeClubCardERC721DeployTransaction = (
   /** Address of the ERC721 token contract */
@@ -87,7 +87,7 @@ export const deployClubCardERC721 = async (
 export const deployClubCardERC721Mastercopy = async (signer: JsonRpcSigner) => {
   const initData = defaultAbiCoder.encode(
     ["address", "uint256"],
-    [ZERO_ADDRESS, 0]
+    [INIT_ADDRESS, 0] // important to use a non-zero address to make sure the mastercopy is considered initialized
   )
   return await deployMastercopyWithInitData(
     signer,

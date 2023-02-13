@@ -1,11 +1,20 @@
 import "@nomicfoundation/hardhat-toolbox"
+import "hardhat-deploy"
+import dotenv from "dotenv"
 
-// The next line is part of the sample project, you don't need it in your
-// project. It imports a Hardhat task definition, that can be used for
-// testing the frontend.
-import "./tasks/faucet"
+// import { HardhatUserConfig } from "hardhat/config"
+import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types"
 
-import { HardhatUserConfig } from "hardhat/config"
+dotenv.config()
+const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env
+const DEFAULT_MNEMONIC =
+  "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat"
+
+const sharedNetworkConfig: HttpNetworkUserConfig = {}
+
+sharedNetworkConfig.accounts = {
+  mnemonic: MNEMONIC || DEFAULT_MNEMONIC,
+}
 
 export default {
   solidity: {
@@ -20,6 +29,30 @@ export default {
   networks: {
     hardhat: {
       chainId: 31337, // This is the value used in the @gnosis.pm/zodiac package (important for looking up the ModuleProxyFactory address)
+    },
+    mainnet: {
+      ...sharedNetworkConfig,
+      url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+    },
+    goerli: {
+      ...sharedNetworkConfig,
+      url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
+    },
+    xdai: {
+      ...sharedNetworkConfig,
+      url: "https://rpc.gnosischain.com/",
+    },
+    matic: {
+      ...sharedNetworkConfig,
+      url: "https://rpc-mainnet.maticvigil.com",
+    },
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY,
+  },
+  verify: {
+    etherscan: {
+      apiKey: ETHERSCAN_API_KEY,
     },
   },
 } satisfies HardhatUserConfig
