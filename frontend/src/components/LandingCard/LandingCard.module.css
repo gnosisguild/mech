@@ -1,38 +1,50 @@
 .landingCard {
   background-color: var(--box-bg);
   padding: 30px;
-  max-width: 480px;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 30px;
   border-radius: 20px;
 }
 
 .landingCard p {
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1.5;
 }
 
 .connectButton {
-  font-size: 20px;
+  font-size: 24px;
+  width: 100%;
 }
 
 .demoCard {
   background-color: var(--box-bg);
+  border: 2px solid var(--button-border);
   padding: 10px;
-  width: 70%;
-  max-width: 280px;
+  width: 80%;
+  max-width: 300px;
   border-radius: 20px;
   display: flex;
   justify-content: end;
+  position: relative;
+  transform: translateX(10%);
+  box-shadow: 1px 1px 4px 0px rgba(157, 212, 0, 0.2);
+}
+
+.mech {
+  position: absolute;
+  inset: 0;
+  left: -35%;
+  height: 100%;
 }
 
 .demoInfo {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 40%;
+  width: 45%;
   font-family: monospace;
   font-size: 12px;
 }
@@ -40,6 +52,7 @@
 .demoInfo li {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
 .demoInfo label {
@@ -47,6 +60,7 @@
   border-radius: 10px;
   padding: 5px 10px;
   width: fit-content;
+  transform: translateX(-30px);
 }
 .demoInfo .infoItem {
   background-color: var(--box-bg);
@@ -54,9 +68,38 @@
   display: flex;
   justify-content: space-between;
   padding: 4px;
+  box-shadow: 1px 1px 4px 0px rgba(157, 212, 0, 0.2);
 }
 
 .demoInfo p {
   font-size: 12px;
   font-family: monospace;
+}
+
+.infoItem img {
+  height: 20px;
+}
+
+.operator > div {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 4px;
+}
+
+.operator p {
+  background-color: var(--box-bg);
+  border-radius: 10px;
+  padding: 2px 4px;
+  text-align: right;
+  display: inline-block;
+}
+.operator img {
+  height: 60px;
+  border-radius: 5px;
+}
+
+.demoInfo .infoItem.address {
+  font-size: 1.2em;
+  justify-content: center;
 }

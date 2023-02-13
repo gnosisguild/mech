@@ -25,6 +25,7 @@
 .cockpit {
   position: absolute;
   width: 45%;
+  max-width: 1000px;
   top: 30px;
   left: 10px;
   mix-blend-mode: color-burn;
