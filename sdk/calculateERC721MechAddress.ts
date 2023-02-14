@@ -3,7 +3,7 @@ import { BigNumberish, ethers } from "ethers"
 import { getCreate2Address, keccak256 } from "ethers/lib/utils"
 
 import {
-  ClubCardERC721__factory,
+  ERC721Mech__factory,
   IFactoryFriendly__factory,
 } from "../typechain-types"
 
@@ -14,7 +14,7 @@ import {
   ZODIAC_SINGLETON_FACTORY_ADDRESS,
 } from "./constants"
 
-export const calculateClubCardERC721Address = (
+export const calculateERC721MechAddress = (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
@@ -28,7 +28,7 @@ export const calculateClubCardERC721Address = (
 
   const byteCode =
     "0x602d8060093d393df3363d3d373d3d3d363d73" +
-    calculateClubCardERC721MastercopyAddress().toLowerCase().slice(2) +
+    calculateERC721MechMastercopyAddress().toLowerCase().slice(2) +
     "5af43d82803e903d91602b57fd5bf3"
 
   return ethers.utils.getCreate2Address(
@@ -40,8 +40,9 @@ export const calculateClubCardERC721Address = (
     ethers.utils.keccak256(byteCode)
   )
 }
+export const calculateERC721MechAddress2 = calculateERC721MechAddress
 
-export const calculateClubCardERC721MastercopyAddress = () => {
+export const calculateERC721MechMastercopyAddress = () => {
   const initData = defaultAbiCoder.encode(
     ["address", "uint256"],
     [INIT_ADDRESS, 0]
@@ -49,6 +50,6 @@ export const calculateClubCardERC721MastercopyAddress = () => {
   return getCreate2Address(
     ZODIAC_SINGLETON_FACTORY_ADDRESS,
     DEFAULT_SALT,
-    keccak256(ClubCardERC721__factory.bytecode + initData.slice(2))
+    keccak256(ERC721Mech__factory.bytecode + initData.slice(2))
   )
 }

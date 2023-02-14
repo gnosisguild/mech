@@ -8,14 +8,14 @@ import hre, { ethers } from "hardhat"
 // advantage or Hardhat Network's snapshot functionality.
 
 import {
-  calculateClubCardERC721Address,
-  calculateClubCardERC721MastercopyAddress,
-} from "../sdk/calculateClubCardERC721Address"
+  calculateERC721MechAddress,
+  calculateERC721MechMastercopyAddress,
+} from "../sdk/calculateERC721MechAddress"
 import { ZERO_ADDRESS } from "../sdk/constants"
 import {
-  deployClubCardERC721,
-  deployClubCardERC721Mastercopy,
-} from "../sdk/deployClubCardERC721"
+  deployERC721Mech,
+  deployERC721MechMastercopy,
+} from "../sdk/deployERC721Mech"
 
 describe("deterministic deployment", () => {
   async function deployModuleFactoryAndMastercopy() {
@@ -26,7 +26,7 @@ describe("deterministic deployment", () => {
       throw new Error("Module proxy factory address is already deployed")
     }
 
-    const mastercopyAddress = await deployClubCardERC721Mastercopy(deployer)
+    const mastercopyAddress = await deployERC721MechMastercopy(deployer)
 
     return {
       moduleProxyFactoryAddress: "0x000000000000aDdB49795b0f9bA5BC298cDda236",
@@ -34,31 +34,26 @@ describe("deterministic deployment", () => {
     }
   }
 
-  describe("calculateClubCardERC721MastercopyAddress", () => {
-    it("returns the address of the ClubCardERC721 mastercopy", async () => {
+  describe("calculateERC721MechMastercopyAddress", () => {
+    it("returns the address of the ERC721Mech mastercopy", async () => {
       const { mastercopyAddress } = await loadFixture(
         deployModuleFactoryAndMastercopy
       )
 
-      expect(calculateClubCardERC721MastercopyAddress()).to.equal(
-        mastercopyAddress
-      )
+      expect(calculateERC721MechMastercopyAddress()).to.equal(mastercopyAddress)
     })
   })
 
-  describe("calculateClubCardERC721Address()", () => {
-    it("returns the address of the club card for a given NFT", async () => {
+  describe("calculateERC721MechAddress()", () => {
+    it("returns the address of the mech for a given NFT", async () => {
       const TestToken = await ethers.getContractFactory("ERC721Token")
       const testToken = await TestToken.deploy()
 
-      const calculatedAddress = calculateClubCardERC721Address(
-        testToken.address,
-        1
-      )
+      const calculatedAddress = calculateERC721MechAddress(testToken.address, 1)
 
       expect(await ethers.provider.getCode(calculatedAddress)).to.equal("0x")
 
-      await deployClubCardERC721(
+      await deployERC721Mech(
         testToken.address,
         1,
         hre.ethers.provider.getSigner()

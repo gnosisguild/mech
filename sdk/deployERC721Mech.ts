@@ -7,15 +7,15 @@ import {
 } from "@gnosis.pm/zodiac"
 import { BigNumberish } from "ethers"
 
-import { ClubCardERC721__factory } from "../typechain-types"
+import { ERC721Mech__factory } from "../typechain-types"
 
 import {
-  calculateClubCardERC721Address,
-  calculateClubCardERC721MastercopyAddress,
-} from "./calculateClubCardERC721Address"
+  calculateERC721MechAddress,
+  calculateERC721MechMastercopyAddress,
+} from "./calculateERC721MechAddress"
 import { DEFAULT_SALT, INIT_ADDRESS } from "./constants"
 
-export const makeClubCardERC721DeployTransaction = (
+export const makeERC721MechDeployTransaction = (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
@@ -26,8 +26,8 @@ export const makeClubCardERC721DeployTransaction = (
   const { chainId } = provider.network
 
   const { transaction } = deployAndSetUpCustomModule(
-    calculateClubCardERC721MastercopyAddress(),
-    ClubCardERC721__factory.abi,
+    calculateERC721MechMastercopyAddress(),
+    ERC721Mech__factory.abi,
     {
       types: ["address", "uint256"],
       values: [token, tokenId],
@@ -40,7 +40,7 @@ export const makeClubCardERC721DeployTransaction = (
   return transaction
 }
 
-export const deployClubCardERC721 = async (
+export const deployERC721Mech = async (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
@@ -48,15 +48,11 @@ export const deployClubCardERC721 = async (
   signer: JsonRpcSigner,
   salt: string = DEFAULT_SALT
 ) => {
-  // make sure the club card does not already exist
-  const deterministicAddress = calculateClubCardERC721Address(
-    token,
-    tokenId,
-    salt
-  )
+  // make sure the mech does not already exist
+  const deterministicAddress = calculateERC721MechAddress(token, tokenId, salt)
   if ((await signer.provider.getCode(deterministicAddress)) !== "0x") {
     throw new Error(
-      `A club card with the same token and token ID already exists at ${deterministicAddress}`
+      `A mech with the same token and token ID already exists at ${deterministicAddress}`
     )
   }
 
@@ -67,14 +63,14 @@ export const deployClubCardERC721 = async (
   }
 
   // make sure the mastercopy is deployed
-  const mastercopyAddress = calculateClubCardERC721MastercopyAddress()
+  const mastercopyAddress = calculateERC721MechMastercopyAddress()
   if ((await signer.provider.getCode(mastercopyAddress)) === "0x") {
     throw new Error(
-      `ClubCardERC721 mastercopy is not deployed on network #${chainId} yet. Please deploy it first.`
+      `ERC721Mech mastercopy is not deployed on network #${chainId} yet. Please deploy it first.`
     )
   }
 
-  const transaction = makeClubCardERC721DeployTransaction(
+  const transaction = makeERC721MechDeployTransaction(
     token,
     tokenId,
     signer.provider,
@@ -84,14 +80,14 @@ export const deployClubCardERC721 = async (
   return signer.sendTransaction(transaction)
 }
 
-export const deployClubCardERC721Mastercopy = async (signer: JsonRpcSigner) => {
+export const deployERC721MechMastercopy = async (signer: JsonRpcSigner) => {
   const initData = defaultAbiCoder.encode(
     ["address", "uint256"],
     [INIT_ADDRESS, 0] // important to use a non-zero address to make sure the mastercopy is considered initialized
   )
   return await deployMastercopyWithInitData(
     signer,
-    ClubCardERC721__factory.bytecode + initData.slice(2),
+    ERC721Mech__factory.bytecode + initData.slice(2),
     DEFAULT_SALT
   )
 }

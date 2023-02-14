@@ -1,6 +1,6 @@
 import { DeployFunction } from "hardhat-deploy/types"
 
-import { deployClubCardERC721Mastercopy } from "../sdk"
+import { deployERC721MechMastercopy } from "../sdk"
 
 const deployMastercopyERC721: DeployFunction = async ({
   ethers,
@@ -12,15 +12,15 @@ const deployMastercopyERC721: DeployFunction = async ({
   const [signer] = await ethers.getSigners()
   const deployer = ethers.provider.getSigner(signer.address)
 
-  await deployClubCardERC721Mastercopy(deployer)
+  await deployERC721MechMastercopy(deployer)
 
-  // await deploy("ClubCardERC721", {
+  // await deploy("ERC721Mech", {
   //   from: deployer,
   //   args: [INIT_ADDRESS, 0], // init mastercopy with non-zero address and 0 tokenId
   //   log: true,
   // })
 }
 
-deployMastercopyERC721.tags = ["ClubCardERC721"]
+deployMastercopyERC721.tags = ["ERC721Mech"]
 
 export default deployMastercopyERC721

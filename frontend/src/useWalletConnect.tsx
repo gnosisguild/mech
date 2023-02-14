@@ -32,8 +32,8 @@ type Session =
   | LegacySession
 
 const metadata = {
-  name: "Club Card",
-  description: "Sign with your club cards",
+  name: "Mech",
+  description: "Sign with your mechs",
   url: "https://clubcard.global",
   icons: [],
 }

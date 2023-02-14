@@ -7,28 +7,25 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 import "./Receiver.sol";
-import "./interfaces/IClubCard.sol";
+import "./interfaces/IMech.sol";
 
 /**
- * @dev This contract implements the authorization and signature validation for a club card. It's unopinionated about what it means to hold a club card. Child contract must define that by implementing the `isCardHolder` function.
+ * @dev This contract implements the authorization and signature validation for a mech. It's unopinionated about what it means to hold a mech. Child contract must define that by implementing the `isOperator` function.
  */
-abstract contract ClubCardBase is IClubCard, Receiver {
+abstract contract MechBase is IMech, Receiver {
     // bytes4(keccak256("isValidSignature(bytes32,bytes)")
     bytes4 internal constant EIP1271_MAGICVALUE = 0x1626ba7e;
 
-    modifier onlyCardHolder() {
-        require(
-            isCardHolder(msg.sender),
-            "Only callable by the club card holder"
-        );
+    modifier onlyOperator() {
+        require(isOperator(msg.sender), "Only callable by the mech operator");
         _;
     }
 
     /**
-     * @dev Return if the passed address is authorized to sign on behalf of the club card, must be implemented by the child contract
+     * @dev Return if the passed address is authorized to sign on behalf of the mech, must be implemented by the child contract
      * @param signer The address to check
      */
-    function isCardHolder(address signer) public view virtual returns (bool);
+    function isOperator(address signer) public view virtual returns (bool);
 
     /**
      * @dev Checks whether the signature provided is valid for the provided hash, complies with EIP-1271
@@ -49,7 +46,7 @@ abstract contract ClubCardBase is IClubCard, Receiver {
             // The address of the contract is encoded into r
             address signingContract = address(uint160(uint256(r)));
 
-            if (!isCardHolder(signingContract)) {
+            if (!isOperator(signingContract)) {
                 return 0xffffffff;
             }
 
@@ -67,7 +64,7 @@ abstract contract ClubCardBase is IClubCard, Receiver {
                 );
         } else {
             // This is an ECDSA signature
-            if (isCardHolder(ECDSA.recover(hash, v, r, s))) {
+            if (isOperator(ECDSA.recover(hash, v, r, s))) {
                 return EIP1271_MAGICVALUE;
             }
         }
@@ -86,7 +83,7 @@ abstract contract ClubCardBase is IClubCard, Receiver {
         uint256 value,
         bytes memory data,
         Enum.Operation operation
-    ) public onlyCardHolder returns (bool success) {
+    ) public onlyOperator returns (bool success) {
         if (operation == Enum.Operation.DelegateCall) {
             // solhint-disable-next-line no-inline-assembly
             assembly {
@@ -115,7 +112,7 @@ abstract contract ClubCardBase is IClubCard, Receiver {
         }
     }
 
-    /// @dev Allows a the card holder to execute arbitrary transaction
+    /// @dev Allows a the mech operator to execute arbitrary transaction
     /// @param to Destination address of transaction.
     /// @param value Ether value of transaction.
     /// @param data Data payload of transaction.
@@ -127,7 +124,7 @@ abstract contract ClubCardBase is IClubCard, Receiver {
         uint256 value,
         bytes memory data,
         Enum.Operation operation
-    ) public onlyCardHolder returns (bool success, bytes memory returnData) {
+    ) public onlyOperator returns (bool success, bytes memory returnData) {
         success = exec(to, value, data, operation);
         // solhint-disable-next-line no-inline-assembly
         assembly {

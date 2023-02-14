@@ -1,6 +1,6 @@
 import React from "react"
 import { createBrowserRouter } from "react-router-dom"
-import Card from "./Card"
+import Mech from "./Mech"
 import Landing from "./Landing"
 
 export default createBrowserRouter([
@@ -9,12 +9,12 @@ export default createBrowserRouter([
     element: <Landing />,
   },
   // {
-  //   path: "cards",
-  //   element: <Cards />,
+  //   path: "mechs",
+  //   element: <Mechs />,
   // },
   {
-    path: "cards/:token/:tokenId",
-    element: <Card />,
+    path: "mechs/:token/:tokenId",
+    element: <Mech />,
   },
   // {
   //   path: "clubs",

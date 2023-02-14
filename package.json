@@ -1,5 +1,5 @@
 {
-  "name": "clubcard",
+  "name": "mech",
   "version": "1.0.2",
   "description": "Programmable ownership: allow holders of designated NFTs to sign transactions",
   "scripts": {
@@ -9,6 +9,7 @@
     "build:evm": "yarn hardhat compile",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
+    "postbuild": "cd frontend && yarn upgrade mech",
     "deploy": "hardhat deploy --network",
     "verify": "hardhat verify --network",
     "check": "yarn check:prettier && yarn check:lint",

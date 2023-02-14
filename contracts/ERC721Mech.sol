@@ -2,9 +2,9 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "./ClubCardBase.sol";
+import "./MechBase.sol";
 
-contract ClubCardERC721 is ClubCardBase {
+contract ERC721Mech is MechBase {
     IERC721 public token;
     uint256 public tokenId;
 
@@ -27,7 +27,7 @@ contract ClubCardERC721 is ClubCardBase {
         tokenId = _tokenId;
     }
 
-    function isCardHolder(address signer) public view override returns (bool) {
+    function isOperator(address signer) public view override returns (bool) {
         return token.ownerOf(tokenId) == signer;
     }
 }

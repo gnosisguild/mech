@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import useWalletConnect from "./useWalletConnect"
 import Spinner from "./components/Spinner"
 
-const CardConnect: React.FC = () => {
+const MechConnect: React.FC = () => {
   const { pair } = useWalletConnect()
   const [loading, setLoading] = useState(false)
   const [uri, setUri] = useState("")
@@ -40,4 +40,4 @@ const CardConnect: React.FC = () => {
     </div>
   )
 }
-export default CardConnect
+export default MechConnect

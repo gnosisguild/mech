@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { calculateClubCardERC721Address } from "clubcard"
+import { calculateERC721MechAddress } from "mech"
 import { useProvider } from "wagmi"
 import Layout from "../Layout"
 import { useErc721OwnerOf } from "../generated"
 import { BigNumber } from "ethers"
 
-const Card: React.FC = () => {
+const Mech: React.FC = () => {
   const provider = useProvider()
 
   const [deployed, setDeployed] = useState(false)
@@ -24,16 +24,16 @@ const Card: React.FC = () => {
     args: [BigNumber.from(tokenId)],
   })
 
-  const cardAddress = calculateClubCardERC721Address(token, tokenId)
+  const mechAddress = calculateERC721MechAddress(token, tokenId)
 
   useEffect(() => {
-    provider.getCode(cardAddress).then((code) => setDeployed(code !== "0x"))
-  }, [provider, cardAddress])
+    provider.getCode(mechAddress).then((code) => setDeployed(code !== "0x"))
+  }, [provider, mechAddress])
 
   return (
     <Layout>
       <h3>
-        Club Card {deployed ? "🟢" : "⚪️"} {cardAddress}
+        Mech {deployed ? "🟢" : "⚪️"} {mechAddress}
       </h3>
       <p>Token address: {token}</p>
       <p>Token ID: {tokenId}</p>
@@ -41,4 +41,4 @@ const Card: React.FC = () => {
     </Layout>
   )
 }
-export default Card
+export default Mech

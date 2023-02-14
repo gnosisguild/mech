@@ -1,8 +1,7 @@
 import "@nomicfoundation/hardhat-toolbox"
 import "hardhat-deploy"
-import dotenv from "dotenv"
 
-// import { HardhatUserConfig } from "hardhat/config"
+import dotenv from "dotenv"
 import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types"
 
 dotenv.config()

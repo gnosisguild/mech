@@ -59,7 +59,7 @@ const wagmiClient = createClient({
   connectors: modalConnectors({
     projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
     version: "2",
-    appName: "Club Card",
+    appName: "Mech",
     chains,
   }),
   provider,
