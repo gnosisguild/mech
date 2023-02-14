@@ -4,6 +4,9 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "./MechBase.sol";
 
+/**
+ * @dev A Mech that is operated by the holder of an ERC721 non-fungible token
+ */
 contract ERC721Mech is MechBase {
     IERC721 public token;
     uint256 public tokenId;

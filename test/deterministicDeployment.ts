@@ -1,3 +1,4 @@
+import { defaultAbiCoder } from "@ethersproject/abi"
 import { deployModuleFactory } from "@gnosis.pm/zodiac"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
@@ -16,6 +17,7 @@ import {
   deployERC721Mech,
   deployERC721MechMastercopy,
 } from "../sdk/deployERC721Mech"
+import { ERC721Mech__factory } from "../typechain-types"
 
 describe("deterministic deployment", () => {
   async function deployModuleFactoryAndMastercopy() {
@@ -31,6 +33,7 @@ describe("deterministic deployment", () => {
     return {
       moduleProxyFactoryAddress: "0x000000000000aDdB49795b0f9bA5BC298cDda236",
       mastercopyAddress,
+      deployer,
     }
   }
 
@@ -62,6 +65,22 @@ describe("deterministic deployment", () => {
       expect(await ethers.provider.getCode(calculatedAddress)).to.not.equal(
         "0x"
       )
+    })
+  })
+
+  describe("deployERC721MechMastercopy()", () => {
+    it("initializes the mastercopy", async () => {
+      const { mastercopyAddress, deployer } = await loadFixture(
+        deployModuleFactoryAndMastercopy
+      )
+
+      const mech = ERC721Mech__factory.connect(mastercopyAddress, deployer)
+      const SOME_ADDRESS = "0x1111111111111111111111111111111111111111"
+      expect(
+        mech.setUp(
+          defaultAbiCoder.encode(["address", "uint256"], [SOME_ADDRESS, 1])
+        )
+      ).to.be.revertedWith("Already initialized")
     })
   })
 })
