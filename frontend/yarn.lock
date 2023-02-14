@@ -3217,7 +3217,7 @@
     "@walletconnect/safe-json" "^1.0.1"
     tslib "1.14.1"
 
-"@walletconnect/jsonrpc-types@^1.0.1", "@walletconnect/jsonrpc-types@^1.0.2":
+"@walletconnect/jsonrpc-types@^1.0.0", "@walletconnect/jsonrpc-types@^1.0.1", "@walletconnect/jsonrpc-types@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@walletconnect/jsonrpc-types/-/jsonrpc-types-1.0.2.tgz#b79519f679cd6a5fa4a1bea888f27c1916689a20"
   integrity sha512-CZe8tjJX73OWdHjrBHy7HtAapJ2tT0Q3TYhPBhRxi3643lwPIQWC9En45ldY14TZwgSewkbZ0FtGBZK0G7Bbyg==
@@ -3252,6 +3252,13 @@
   dependencies:
     safe-json-utils "^1.1.1"
     tslib "1.14.1"
+
+"@walletconnect/legacy-types@^2.0.0-rc.0":
+  version "2.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/@walletconnect/legacy-types/-/legacy-types-2.0.0-rc.0.tgz#a4ee908501b943f5ceae19b3ed13e400c3a09aa0"
+  integrity sha512-9dDfZ+jTOycOSm4+HmcDj5T8qotqY96BaEU/LdQ6H2M/mBoYLkPLMlaNLoqIpSm+ebOj9CF0T6B251ZAZoo7/Q==
+  dependencies:
+    "@walletconnect/jsonrpc-types" "^1.0.0"
 
 "@walletconnect/logger@^2.0.1":
   version "2.0.1"
@@ -3320,7 +3327,7 @@
   dependencies:
     tslib "1.14.1"
 
-"@walletconnect/sign-client@2.3.3", "@walletconnect/sign-client@^2.3.2":
+"@walletconnect/sign-client@2.3.3", "@walletconnect/sign-client@^2.3.2", "@walletconnect/sign-client@^2.3.3":
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/@walletconnect/sign-client/-/sign-client-2.3.3.tgz#62bf395f8817e289d42dc77549f885d834c4b78b"
   integrity sha512-Q+KiqYYecf9prJoQWLIV7zJcEPa69XBzwrad4sQPcDD1BZMWa1f8OZUH3HmlmuCzopqEr4mgXU6v6yFHOasADw==
@@ -4748,7 +4755,7 @@ clsx@^1.1.0, clsx@^1.2.1:
   resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.2.1.tgz#0ddc4a20a549b59c93a4116bb26f5294ca17dc12"
   integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==
 
-clubcard@^1.0.3:
+clubcard@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/clubcard/-/clubcard-1.0.2.tgz#de092a9647f55644e0bd5834872647069e73ff71"
   integrity sha512-3b3VOHzKx6NTwcjqZSwQuBQpFaLaqdA9n1qnBg4j/Gtepq8xFzFYg54/L/a4rk8mIzB+prHARPzN7lkYMvivTg==

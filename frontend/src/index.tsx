@@ -23,6 +23,7 @@ import {
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
 import { infuraProvider } from "@wagmi/core/providers/infura"
 import router from "./router"
+import { ProvideWalletConnect } from "./useWalletConnect"
 
 const { REACT_APP_WALLET_CONNECT_PROJECT_ID } = process.env
 if (!REACT_APP_WALLET_CONNECT_PROJECT_ID) {
@@ -64,6 +65,11 @@ const wagmiClient = createClient({
   provider,
 })
 
+const handleRequest = async (props: any) => {
+  console.log("handle REQUEST", props)
+  return "test"
+}
+
 // Web3Modal Ethereum Client
 const ethereumClient = new EthereumClient(wagmiClient, chains)
 
@@ -75,7 +81,9 @@ const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 root.render(
   <React.StrictMode>
     <WagmiConfig client={wagmiClient}>
-      <RouterProvider router={router} />
+      <ProvideWalletConnect onRequest={handleRequest}>
+        <RouterProvider router={router} />
+      </ProvideWalletConnect>
     </WagmiConfig>
 
     <Web3Modal

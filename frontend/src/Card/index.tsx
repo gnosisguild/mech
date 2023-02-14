@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom"
 import { calculateClubCardERC721Address } from "clubcard"
 import { useProvider } from "wagmi"
 import Layout from "../Layout"
-import { useErc721OwnerOf, useErc721Read } from "../generated"
+import { useErc721OwnerOf } from "../generated"
 import { BigNumber } from "ethers"
 
 const Card: React.FC = () => {
