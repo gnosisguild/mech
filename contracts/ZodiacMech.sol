@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import "hardhat/console.sol";
 import "./MechBase.sol";
 
 /**
@@ -27,6 +28,7 @@ contract ZodiacMech is MechBase, IAvatar {
         setUp(initParams);
     }
 
+    /// @dev This function can be called whenever no modules are enabled, meaning anyone could come and call setUp() then. We keep this behavior to not brick the mech in that case.
     function setUp(bytes memory initParams) public override {
         require(
             modules[address(SENTINEL_MODULES)] == address(0),
@@ -36,12 +38,13 @@ contract ZodiacMech is MechBase, IAvatar {
         address[] memory _modules = abi.decode(initParams, (address[]));
 
         for (uint256 i = 0; i < _modules.length; i++) {
-            enableModule(_modules[i]);
+            console.log("enable mod %s", _modules[i]);
+            _enableModule(_modules[i]);
         }
     }
 
     function isOperator(address signer) public view override returns (bool) {
-        return modules[signer] != address(0);
+        return isModuleEnabled(signer);
     }
 
     /// @dev Passes a transaction to the avatar.
@@ -93,13 +96,20 @@ contract ZodiacMech is MechBase, IAvatar {
     /// @dev Enables a module that can add transactions to the queue
     /// @param module Address of the module to be enabled
     /// @notice This can only be called by the owner
-    function enableModule(address module) public override onlyOperator {
+    function _enableModule(address module) internal {
         if (module == address(0) || module == SENTINEL_MODULES)
             revert InvalidModule(module);
         if (modules[module] != address(0)) revert AlreadyEnabledModule(module);
         modules[module] = modules[SENTINEL_MODULES];
         modules[SENTINEL_MODULES] = module;
         emit EnabledModule(module);
+    }
+
+    /// @dev Enables a module that can add transactions to the queue
+    /// @param module Address of the module to be enabled
+    /// @notice This can only be called by the owner
+    function enableModule(address module) public override onlyOperator {
+        _enableModule(module);
     }
 
     /// @dev Returns if an module is enabled

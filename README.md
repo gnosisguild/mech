@@ -13,6 +13,7 @@ Smart account with programmable ownership
 
 #### Programmable ownership
 
+- [ZodiacMech.sol](contracts/ZodiacMech.sol): allow enabled [zodiac](https://github.com/gnosis/zodiac) modules to sign transactions on behalf of the Mech
 - [MechBase.sol](contracts/MechBase.sol): implement custom ownership terms by extending this abstract contract
 
 ## EIP-1271 signatures
