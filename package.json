@@ -1,7 +1,7 @@
 {
   "name": "mech",
   "version": "1.0.2",
-  "description": "Programmable ownership: allow holders of designated NFTs to sign transactions",
+  "description": "Smart account with programmable ownership",
   "scripts": {
     "prepare": "yarn build",
     "prebuild": "rimraf build",
