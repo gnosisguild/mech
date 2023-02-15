@@ -47,3 +47,10 @@
   border-radius: 10px;
   height: fit-content;
 }
+
+.noImage {
+  width: 50%;
+  height: 100%;
+  background-color: var(--box-bg);
+  border-radius: 10px;
+}
