@@ -1,5 +1,4 @@
 import { Core } from "@walletconnect/core"
-import { IWalletConnectSession } from "@walletconnect/legacy-types"
 import { parseWalletConnectUri } from "@walletconnect/utils"
 import LegacySignClient from "@walletconnect/client"
 import Web3WalletClient, { Web3Wallet } from "@walletconnect/web3wallet"
@@ -13,7 +12,7 @@ import React, {
   useRef,
   useState,
 } from "react"
-import useStickyState from "./useStickyState"
+import useStickyState from "./components/Connect/useStickyState"
 
 const core = new Core({
   projectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID,
