@@ -1,8 +1,10 @@
 import { Nft } from "@ankr.com/ankr.js"
+import { calculateERC721MechAddress } from "mech"
 
 import classes from "./NFTItem.module.css"
 import Button from "../Button"
 import { useEffect, useState } from "react"
+import { shortenAddress } from "../../utils/shortenAddress"
 
 interface Props {
   nft: Nft
@@ -67,7 +69,13 @@ const NFTItem: React.FC<Props> = ({ nft }) => {
             className={classes.image}
           />
         )}
-        <div className={classes.info}></div>
+        <div className={classes.info}>
+          <div className={classes.infoItem}>
+            {shortenAddress(
+              calculateERC721MechAddress(nft.contractAddress, nft.tokenId)
+            )}
+          </div>
+        </div>
       </div>
       <Button onClick={() => {}} secondary>
         Deploy Mech

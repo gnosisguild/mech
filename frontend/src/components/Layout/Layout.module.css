@@ -41,6 +41,7 @@
 
 .cockpit {
   position: fixed;
+  z-index: 1;
   width: 45%;
   max-width: 1000px;
   top: 30px;
@@ -55,6 +56,8 @@
   flex-direction: column;
   align-items: center;
   margin: 100px 0;
+  position: relative;
+  z-index: 100;
 }
 
 .connectedAccount {

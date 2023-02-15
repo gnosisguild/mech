@@ -54,3 +54,25 @@
   background-color: var(--box-bg);
   border-radius: 10px;
 }
+
+.noImage::after {
+  content: "?";
+  height: 100%;
+  width: 100%;
+  font-size: 5em;
+  opacity: 0.2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.infoItem {
+  font-size: 12px;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-radius: 10px;
+  background-color: var(--box-bg);
+  padding: 2px 8px;
+}
