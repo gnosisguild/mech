@@ -47,6 +47,8 @@
     ]
   },
   "dependencies": {
+    "@ankr.com/ankr.js": "^0.3.1",
+    "ankr-react": "^0.3.0",
     "cryptocurrency-icons": "^0.18.1"
   }
 }

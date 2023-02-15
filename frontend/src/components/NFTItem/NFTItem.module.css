@@ -1,0 +1,49 @@
+.itemContainer {
+  border-radius: 20px;
+  background-color: var(--box-bg);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  aspect-ratio: 1/1;
+  width: 250px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header p {
+  display: inline-block;
+  border-radius: 10px;
+  background-color: var(--box-bg);
+  padding: 2px 8px;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+
+.tokenId {
+  max-width: 30%;
+  font-family: monospace;
+}
+
+.tokenName {
+  max-width: 68%;
+}
+
+.main {
+  height: 63%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.main .image {
+  width: 50%;
+  object-fit: contain;
+  object-position: top;
+  border-radius: 10px;
+  height: fit-content;
+}

@@ -5,6 +5,7 @@ import {
   modalConnectors,
   walletConnectProvider,
 } from "@web3modal/ethereum"
+import { Provider } from "ankr-react"
 
 import { Web3Modal } from "@web3modal/react"
 import { RouterProvider } from "react-router-dom"
@@ -54,6 +55,8 @@ const { chains, provider } = configureChains(
   ]
 )
 
+export { chains }
+
 const wagmiClient = createClient({
   autoConnect: true,
   connectors: modalConnectors({
@@ -82,7 +85,9 @@ root.render(
   <React.StrictMode>
     <WagmiConfig client={wagmiClient}>
       <ProvideWalletConnect onRequest={handleRequest}>
-        <RouterProvider router={router} />
+        <Provider>
+          <RouterProvider router={router} />
+        </Provider>
       </ProvideWalletConnect>
     </WagmiConfig>
 

@@ -1,7 +1,8 @@
 import { useWeb3Modal, useWeb3ModalTheme } from "@web3modal/react"
-import { useAccount } from "wagmi"
+import { goerli, useAccount } from "wagmi"
 import { ReactNode } from "react"
 
+import { chains } from "../.."
 import Button from "../Button"
 
 import classes from "./Layout.module.css"
@@ -10,15 +11,16 @@ import Blockie from "../Blockie"
 import clsx from "clsx"
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { theme, setTheme } = useWeb3ModalTheme()
-  const { open } = useWeb3Modal()
+  const { setTheme } = useWeb3ModalTheme()
+  const { open, setDefaultChain } = useWeb3Modal()
   const { address } = useAccount()
 
-  console.log(theme)
   setTheme({
     themeMode: "light",
     themeColor: "green",
   })
+
+  setDefaultChain(goerli)
 
   return (
     <div className={classes.layout}>
