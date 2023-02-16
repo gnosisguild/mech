@@ -58,6 +58,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
             console.log("set page token")
             setPageToken(data?.nextPageToken)
           }}
+          secondary
         >
           Load more
         </Button>

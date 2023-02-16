@@ -12,6 +12,7 @@
 
 .secondary {
   border-color: var(--button-bg);
+  background-color: rgb(192 255 12 / 20%);
 }
 
 .button:hover {
