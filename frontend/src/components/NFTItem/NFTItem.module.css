@@ -40,12 +40,18 @@
   justify-content: space-between;
 }
 
-.main .image {
+.imageContainer {
   width: 50%;
+  display: flex;
+  justify-content: center;
+}
+
+.main .image {
   object-fit: contain;
   object-position: top;
+  height: min-content;
+  max-height: 100%;
   border-radius: 10px;
-  height: fit-content;
 }
 
 .noImage {

@@ -15,8 +15,8 @@ interface Props {
 const NFTGrid: React.FC<Props> = ({ address }) => {
   const [pageToken, setPageToken] = useState<string | undefined>(undefined)
   const { data, isLoading } = useNFTsByOwner({
-    walletAddress: "0xc6B69B579b94Cc2E89Ab37c5Dd4EDe3DF05DF04E",
-    blockchain: "eth",
+    walletAddress: address,
+    blockchain: "eth_goerli",
     pageToken,
   })
 

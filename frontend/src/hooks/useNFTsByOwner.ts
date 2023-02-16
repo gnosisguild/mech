@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 
 interface NFTProps {
   walletAddress: string
-  blockchain: Blockchain
+  blockchain?: Blockchain | Blockchain[]
   pageToken?: string
 }
 

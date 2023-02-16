@@ -32,12 +32,14 @@ const NFTItem: React.FC<Props> = ({ nft }) => {
           <div className={classes.noImage}></div>
         )}
         {!isLoading && !error && !imageError && (
-          <img
-            src={data ? data.image : nft.imageUrl}
-            alt={nft.name}
-            className={classes.image}
-            onError={() => setImageError(true)}
-          />
+          <div className={classes.imageContainer}>
+            <img
+              src={data ? data.image : nft.imageUrl}
+              alt={nft.name}
+              className={classes.image}
+              onError={() => setImageError(true)}
+            />
+          </div>
         )}
         <div className={classes.info}>
           <div className={classes.infoItem}>
