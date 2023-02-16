@@ -82,3 +82,20 @@
   background-color: var(--box-bg);
   padding: 2px 8px;
 }
+
+.address {
+  cursor: pointer;
+  transition: filter 0.1s ease-in-out;
+}
+
+.address:hover {
+  filter: brightness(1.2);
+}
+
+.spinner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40px;
+}

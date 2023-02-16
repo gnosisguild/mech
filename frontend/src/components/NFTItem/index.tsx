@@ -1,22 +1,50 @@
-import { Nft } from "@ankr.com/ankr.js"
-import { calculateERC721MechAddress } from "mech"
+import { calculateERC721MechAddress, deployERC721Mech } from "mech"
 
 import classes from "./NFTItem.module.css"
 import Button from "../Button"
 import { useState } from "react"
 import { shortenAddress } from "../../utils/shortenAddress"
 import useTokenUrl from "../../hooks/useTokenUrl"
+import { useSigner } from "wagmi"
+import { JsonRpcSigner } from "@ethersproject/providers"
+import Spinner from "../Spinner"
+import copy from "copy-to-clipboard"
+import clsx from "clsx"
+import { MechNFT } from "../../hooks/useNFTsByOwner"
 
 interface Props {
-  nft: Nft
+  nft: MechNFT
 }
 
 const NFTItem: React.FC<Props> = ({ nft }) => {
   const [imageError, setImageError] = useState(false)
+  const [deploying, setDeploying] = useState(false)
   const needTokenUrl = !nft.imageUrl
   const { isLoading, data, error } = useTokenUrl(
     needTokenUrl ? nft.tokenUrl : undefined
   )
+  const { data: signer } = useSigner()
+  const mechAddress = calculateERC721MechAddress(
+    nft.contractAddress,
+    nft.tokenId
+  )
+
+  const handleDeploy = async () => {
+    setDeploying(true)
+    try {
+      const deployTx = await deployERC721Mech(
+        nft.contractAddress,
+        nft.tokenId,
+        signer as JsonRpcSigner
+      )
+      console.log("deploy tx", deployTx)
+      setDeploying(false)
+    } catch (e) {
+      console.error(e)
+      setDeploying(false)
+    }
+  }
+
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
@@ -42,16 +70,29 @@ const NFTItem: React.FC<Props> = ({ nft }) => {
           </div>
         )}
         <div className={classes.info}>
-          <div className={classes.infoItem}>
-            {shortenAddress(
-              calculateERC721MechAddress(nft.contractAddress, nft.tokenId)
-            )}
+          <div
+            className={clsx(classes.infoItem, classes.address)}
+            onClick={() => copy(mechAddress)}
+          >
+            {shortenAddress(mechAddress)}
           </div>
         </div>
       </div>
-      <Button onClick={() => {}} secondary>
-        Deploy Mech
-      </Button>
+      {nft.hasMech ? (
+        <Button onClick={() => {}}>Use Mech</Button>
+      ) : (
+        <>
+          {deploying ? (
+            <div className={classes.spinner}>
+              <Spinner />
+            </div>
+          ) : (
+            <Button onClick={handleDeploy} secondary>
+              Deploy Mech
+            </Button>
+          )}
+        </>
+      )}
     </div>
   )
 }

@@ -6,7 +6,6 @@ import NFTGrid from "../components/NFTGrid"
 
 const Landing: React.FC = () => {
   const { address } = useAccount()
-
   return (
     <Layout>{address ? <NFTGrid address={address} /> : <LandingCard />}</Layout>
   )

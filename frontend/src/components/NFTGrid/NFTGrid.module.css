@@ -3,8 +3,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
-  width: 72%;
-  margin: 0 auto;
+  margin-bottom: 20px;
 }
 
 .container {
@@ -12,4 +11,34 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  width: 72%;
+  max-width: 2000px;
+  margin: 0 auto;
+}
+
+.categoryContainer {
+  width: 100%;
+  max-width: 520px;
+}
+
+.category {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--box-bg);
+  padding: 10px 15px 10px 10px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.indicator {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: var(--button-border);
+  filter: blur(4px);
+}
+
+.indicator.undeployed {
+  background-color: rgb(189 192 179);
 }

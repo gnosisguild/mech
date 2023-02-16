@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
-import { Nft } from "@ankr.com/ankr.js"
 
-import useNFTsByOwner from "../../hooks/useNFTsByOwner"
+import useNFTsByOwner, { MechNFT } from "../../hooks/useNFTsByOwner"
 import NFTItem from "../NFTItem"
 import Spinner from "../Spinner"
 import Button from "../Button"
 
 import classes from "./NFTGrid.module.css"
+import clsx from "clsx"
 
 interface Props {
   address: string
@@ -14,16 +14,16 @@ interface Props {
 
 const NFTGrid: React.FC<Props> = ({ address }) => {
   const [pageToken, setPageToken] = useState<string | undefined>(undefined)
+
   const { data, isLoading } = useNFTsByOwner({
     walletAddress: address,
     blockchain: "eth_goerli",
     pageToken,
   })
 
-  const [nftData, setNftData] = useState<Nft[]>([])
+  const [nftData, setNftData] = useState<MechNFT[]>([])
 
   useEffect(() => {
-    console.log("data changed", data?.nextPageToken)
     if (nftData.length === 0) {
       setNftData(data?.assets || [])
       return
@@ -40,10 +40,32 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
 
   return (
     <div className={classes.container}>
+      <div className={classes.categoryContainer}>
+        <div className={classes.category}>
+          <div className={classes.indicator}></div>
+          <h2>Deployed</h2>
+        </div>
+      </div>
       <ul className={classes.grid}>
         {nftData
-          .filter((nft) => nft.tokenUrl)
-          .filter((nft) => nft.tokenId)
+          .filter((nft) => nft.hasMech)
+          .filter((nft) => nft.tokenUrl && nft.tokenId)
+          .map((nft, index) => (
+            <li key={`${index}-${nft.contractAddress}`}>
+              <NFTItem nft={nft} />
+            </li>
+          ))}
+      </ul>
+      <div className={classes.categoryContainer}>
+        <div className={classes.category}>
+          <div className={clsx(classes.indicator, classes.undeployed)}></div>
+          <h2>Undeployed</h2>
+        </div>
+      </div>
+      <ul className={classes.grid}>
+        {nftData
+          .filter((nft) => !nft.hasMech)
+          .filter((nft) => nft.tokenUrl && nft.tokenId)
           .map((nft, index) => (
             <li key={`${index}-${nft.contractAddress}`}>
               <NFTItem nft={nft} />
