@@ -57,7 +57,7 @@
   align-items: center;
   margin: 100px 0;
   position: relative;
-  z-index: 100;
+  z-index: 10;
 }
 
 .connectedAccount {

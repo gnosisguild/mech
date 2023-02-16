@@ -6,3 +6,10 @@
   width: 72%;
   margin: 0 auto;
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
