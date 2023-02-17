@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { calculateERC721MechAddress } from "mech"
 import { useProvider } from "wagmi"
-import Layout from "../components/Layout"
-import { useErc721OwnerOf, useErc721Read } from "../generated"
+import Layout from "../../components/Layout"
+import { useErc721OwnerOf, useErc721Read } from "../../generated"
 import { BigNumber } from "ethers"
+import useNFT from "../../hooks/useNFT"
+import NFTItem from "../../components/NFTItem"
+
+import classes from "./Mech.module.css"
+import Spinner from "../../components/Spinner"
 
 const Mech: React.FC = () => {
   const provider = useProvider()
@@ -19,6 +24,12 @@ const Mech: React.FC = () => {
     throw new Error("token must be a valid address")
   }
 
+  const { data, error, isLoading } = useNFT({
+    contractAddress: token,
+    tokenId: tokenId,
+    blockchain: "eth_goerli",
+  })
+
   const { data: tokenOwner } = useErc721OwnerOf({
     address: token as `0x${string}`,
     args: [BigNumber.from(tokenId)],
@@ -31,13 +42,18 @@ const Mech: React.FC = () => {
   }, [provider, mechAddress])
 
   return (
-    <Layout>
-      <h3>
-        Mech {deployed ? "🟢" : "⚪️"} {mechAddress}
-      </h3>
-      <p>Token address: {token}</p>
-      <p>Token ID: {tokenId}</p>
-      <p>Token owner: {tokenOwner}</p>
+    <Layout mechAddress={mechAddress}>
+      <div className={classes.container}>
+        {isLoading && <Spinner />}
+        {!error && !isLoading && data && (
+          <NFTItem
+            nft={data}
+            mechAddress={mechAddress}
+            operatorAddress={tokenOwner}
+            deployed={deployed}
+          />
+        )}
+      </div>
     </Layout>
   )
 }

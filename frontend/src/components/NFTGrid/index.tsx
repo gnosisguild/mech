@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import useNFTsByOwner, { MechNFT } from "../../hooks/useNFTsByOwner"
-import NFTItem from "../NFTItem"
+import NFTGridItem from "../NFTGridItem"
 import Spinner from "../Spinner"
 import Button from "../Button"
 
@@ -52,7 +52,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
           .filter((nft) => nft.tokenUrl && nft.tokenId)
           .map((nft, index) => (
             <li key={`${index}-${nft.contractAddress}`}>
-              <NFTItem nft={nft} />
+              <NFTGridItem nft={nft} />
             </li>
           ))}
       </ul>
@@ -68,7 +68,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
           .filter((nft) => nft.tokenUrl && nft.tokenId)
           .map((nft, index) => (
             <li key={`${index}-${nft.contractAddress}`}>
-              <NFTItem nft={nft} />
+              <NFTGridItem nft={nft} />
             </li>
           ))}
       </ul>

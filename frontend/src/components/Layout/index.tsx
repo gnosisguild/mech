@@ -9,8 +9,14 @@ import classes from "./Layout.module.css"
 import { shortenAddress } from "../../utils/shortenAddress"
 import Blockie from "../Blockie"
 import clsx from "clsx"
+import { Link } from "react-router-dom"
 
-const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
+interface Props {
+  mechAddress?: string
+  children: ReactNode
+}
+
+const Layout: React.FC<Props> = ({ children, mechAddress }) => {
   const { setTheme } = useWeb3ModalTheme()
   const { open, setDefaultChain } = useWeb3Modal()
   const { address } = useAccount()
@@ -26,7 +32,17 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     <div className={classes.layout}>
       <img src="/cockpit.jpg" alt="cockpit" className={classes.cockpit} />
       <header className={classes.header}>
-        <h1 className={classes.title}>Mech</h1>
+        <div className={classes.nav}>
+          <Link to="/">
+            <h1>Mech</h1>
+          </Link>
+          {mechAddress && (
+            <>
+              <h1>/</h1>
+              <h1>{shortenAddress(mechAddress)}</h1>
+            </>
+          )}
+        </div>
         <div className={classes.buttonGroup}>
           <Button
             onClick={() => open({ route: "SelectNetwork" })}

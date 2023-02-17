@@ -1,13 +1,12 @@
 .itemContainer {
   border-radius: 20px;
   background-color: var(--box-bg);
-  padding: 10px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-
-  aspect-ratio: 1/1;
-  width: 250px;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
 }
 
 .header {
@@ -23,6 +22,7 @@
   text-overflow: ellipsis;
   overflow-x: hidden;
   white-space: nowrap;
+  font-size: 24px;
 }
 
 .tokenId {
@@ -36,6 +36,7 @@
 
 .main {
   height: 63%;
+  max-height: 360px;
   display: flex;
   justify-content: space-between;
 }
@@ -43,7 +44,7 @@
 .imageContainer {
   width: 50%;
   display: flex;
-  justify-content: center;
+  justify-content: start;
 }
 
 .main .image {
@@ -72,15 +73,52 @@
   align-items: center;
 }
 
-.infoItem {
-  font-size: 12px;
-  font-family: monospace;
+.info {
+  width: 45%;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  border-radius: 10px;
+  gap: 30px;
+}
+
+label {
+  border: 2px solid var(--button-border);
+  border-radius: 5px;
+  padding: 5px 10px;
+  width: fit-content;
+}
+
+.info .infoItem {
   background-color: var(--box-bg);
-  padding: 2px 8px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 5px;
+  box-shadow: 1px 1px 4px 0px rgba(157, 212, 0, 0.2);
+  font-family: monospace;
+}
+
+.info li {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  background-color: var(--box-bg);
+  padding: 5px 5px;
+  border-radius: 10px;
+  box-shadow: 1px 1px 4px 0px rgba(157, 212, 0, 0.2);
+}
+
+.indicator {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  filter: blur(4px);
+  background-color: rgb(189 192 179);
+}
+
+.indicator.deployed {
+  background-color: var(--button-border);
 }
 
 .address {
@@ -98,4 +136,50 @@
   justify-content: center;
   align-items: center;
   min-height: 40px;
+}
+.useButton {
+  width: 100%;
+}
+
+.assetsContainer {
+  background-color: var(--box-bg);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.assetsContainer.empty {
+  padding: 20px;
+}
+
+@media (max-width: 800px) {
+  .info label {
+    border: 2px solid var(--button-border);
+    border-radius: 10px;
+    padding: 5px 10px;
+    width: fit-content;
+    transform: translateX(-30px);
+  }
+
+  .info li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: space-between;
+    background: none;
+    padding: 5px 5px;
+    border-radius: 10px;
+    box-shadow: none;
+  }
+
+  .info .infoItem {
+    width: 100%;
+  }
+
+  .info {
+    width: fit-content;
+  }
 }
