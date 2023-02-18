@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import useWalletConnect from "./useWalletConnect"
-import Spinner from "./components/Spinner"
+import useWalletConnect from "../../useWalletConnect"
+import Spinner from "../Spinner"
 
 const MechConnect: React.FC = () => {
   const { pair } = useWalletConnect()

@@ -1,0 +1,90 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  min-height: 100vh;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.buttonGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button {
+  height: 40px;
+  padding: 0 10px;
+}
+
+.connectedButton {
+  padding: 5px 10px 5px 5px;
+}
+
+.connectedButton p {
+  font-family: monospace;
+}
+
+.cockpit {
+  position: fixed;
+  z-index: 1;
+  width: 45%;
+  max-width: 1000px;
+  top: 30px;
+  left: 10px;
+  mix-blend-mode: color-burn;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 100px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.connectedAccount {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.blockie {
+  height: 100%;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--box-bg);
+  border-radius: 20px;
+  padding: 5px 10px;
+}
+
+.nav h1 {
+  font-size: 36px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.nav a:hover {
+  filter: brightness(1.2);
+}

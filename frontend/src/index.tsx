@@ -54,6 +54,8 @@ const { chains, provider } = configureChains(
   ]
 )
 
+export { chains }
+
 const wagmiClient = createClient({
   autoConnect: true,
   connectors: modalConnectors({
