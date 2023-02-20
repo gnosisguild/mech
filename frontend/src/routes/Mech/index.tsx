@@ -10,6 +10,7 @@ import NFTItem from "../../components/NFTItem"
 
 import classes from "./Mech.module.css"
 import Spinner from "../../components/Spinner"
+import MechConnect from "../../components/Connect/Connect"
 
 const Mech: React.FC = () => {
   const provider = useProvider()
@@ -46,12 +47,15 @@ const Mech: React.FC = () => {
       <div className={classes.container}>
         {isLoading && <Spinner />}
         {!error && !isLoading && data && (
-          <NFTItem
-            nft={data}
-            mechAddress={mechAddress}
-            operatorAddress={tokenOwner}
-            deployed={deployed}
-          />
+          <>
+            <NFTItem
+              nft={data}
+              mechAddress={mechAddress}
+              operatorAddress={tokenOwner}
+              deployed={deployed}
+            />
+            <MechConnect />
+          </>
         )}
       </div>
     </Layout>

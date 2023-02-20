@@ -2,8 +2,11 @@ import React, { useState } from "react"
 import useWalletConnect from "../../useWalletConnect"
 import Spinner from "../Spinner"
 
+import classes from "./Connect.module.css"
+import Button from "../Button"
+
 const MechConnect: React.FC = () => {
-  const { pair } = useWalletConnect()
+  const { pair, sessions } = useWalletConnect()
   const [loading, setLoading] = useState(false)
   const [uri, setUri] = useState("")
 
@@ -21,22 +24,36 @@ const MechConnect: React.FC = () => {
   }
 
   return (
-    <div>
-      <h3>Connect</h3>
-      <p>
-        Visit an app and select WalletConnect. Click the "Copy to clipboard"
-        button and paste here:
-      </p>
-      <input type="text" autoFocus value={uri} onChange={handleChange} />
+    <div className={classes.container}>
+      <h3>App Connect</h3>
+      <div className={classes.connectInput}>
+        <label>
+          Copy and paste the Wallet Connect link here to connect this Mech to an
+          app.
+        </label>
+        <input
+          type="text"
+          value={uri}
+          onChange={handleChange}
+          placeholder="wc:9e5b70f5-ddef-4403-999e-"
+        />
+      </div>
       {loading && <Spinner />}
 
-      <h3>Connected sites</h3>
-      <ul>
-        <li>
-          <button>disconnect</button>
-        </li>
+      <h4>Connections</h4>
+      <ul className={classes.sessions}>
+        {sessions.map((session, index) => (
+          <li key={`session-${index}`}>
+            <p>Session</p>
+            <Button secondary onClick={() => {}} className={classes.disconnect}>
+              ✕
+            </Button>
+          </li>
+        ))}
       </ul>
-      <button>disconnect all</button>
+      <Button secondary onClick={() => {}} className={classes.disconnectAll}>
+        Disconnect All
+      </Button>
     </div>
   )
 }
