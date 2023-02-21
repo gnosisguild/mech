@@ -80,7 +80,7 @@
   gap: 30px;
 }
 
-.info label {
+.itemContainer label {
   border: 2px solid var(--button-border);
   border-radius: 7px;
   padding: 5px 10px;
