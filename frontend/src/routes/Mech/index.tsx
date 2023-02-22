@@ -13,9 +13,6 @@ import Spinner from "../../components/Spinner"
 import MechConnect from "../../components/Connect/Connect"
 
 const Mech: React.FC = () => {
-  const provider = useProvider()
-
-  const [deployed, setDeployed] = useState(false)
   const { token, tokenId } = useParams()
 
   if (!token || !tokenId) {
@@ -38,10 +35,6 @@ const Mech: React.FC = () => {
 
   const mechAddress = calculateERC721MechAddress(token, tokenId)
 
-  useEffect(() => {
-    provider.getCode(mechAddress).then((code) => setDeployed(code !== "0x"))
-  }, [provider, mechAddress])
-
   return (
     <Layout mechAddress={mechAddress}>
       <div className={classes.container}>
@@ -49,10 +42,10 @@ const Mech: React.FC = () => {
         {!error && !isLoading && data && (
           <>
             <NFTItem
+              token={token}
+              tokenId={tokenId}
               nft={data}
-              mechAddress={mechAddress}
               operatorAddress={tokenOwner}
-              deployed={deployed}
             />
             <MechConnect />
           </>
