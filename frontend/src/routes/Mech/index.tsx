@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { useParams } from "react-router-dom"
 import { calculateERC721MechAddress } from "mech"
-import { useProvider } from "wagmi"
+
 import Layout from "../../components/Layout"
-import { useErc721OwnerOf, useErc721Read } from "../../generated"
+import { useErc721OwnerOf } from "../../generated"
 import { BigNumber } from "ethers"
 import useNFT from "../../hooks/useNFT"
 import NFTItem from "../../components/NFTItem"

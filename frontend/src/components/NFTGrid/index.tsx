@@ -24,18 +24,19 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
   const [nftData, setNftData] = useState<MechNFT[]>([])
 
   useEffect(() => {
-    if (nftData.length === 0) {
-      setNftData(data?.assets || [])
-      return
-    }
-    const ids = new Set(nftData.map((nft) => nft.tokenId + nft.contractAddress))
-    const mergedDeduped = [
-      ...nftData,
-      ...data?.assets.filter(
-        (nft) => !ids.has(nft.tokenId + nft.contractAddress)
-      ),
-    ]
-    setNftData(mergedDeduped)
+    setNftData((nftData) => {
+      const ids = new Set(
+        nftData.map((nft) => nft.tokenId + nft.contractAddress)
+      )
+
+      // merge and dedupe
+      return [
+        ...nftData,
+        ...data?.assets.filter(
+          (nft) => !ids.has(nft.tokenId + nft.contractAddress)
+        ),
+      ]
+    })
   }, [data])
 
   return (
