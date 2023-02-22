@@ -12,11 +12,18 @@ import React, {
   useRef,
   useState,
 } from "react"
-import useStickyState from "./components/Connect/useStickyState"
+import useStickyState from "../components/Connect/useStickyState"
 
 const core = new Core({
   projectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID,
 })
+
+type Metadata = {
+  name: string
+  description: string
+  url: string
+  icons: string[]
+}
 
 type LegacySession = {
   uri: string
@@ -30,18 +37,23 @@ type Session =
     }
   | LegacySession
 
+export type SessionWithMetadata = Session & { metadata?: Metadata }
+
 const metadata = {
   name: "Mech",
   description: "Sign with your mechs",
   url: "https://clubcard.global",
   icons: [],
-}
+} satisfies Metadata
 
+const PLACEHOLDER_PAIR = async () => {}
+const PLACEHOLDER_DISCONNECT = async () => {}
 const WalletConnectContext = createContext<{
   // client?: Web3WalletClient
-  sessions: Session[]
+  sessions: SessionWithMetadata[]
   pair(uri: string): Promise<void>
-}>({ sessions: [], pair: async () => {} })
+  disconnect(uriOrTopic: string): Promise<void>
+}>({ sessions: [], pair: PLACEHOLDER_PAIR, disconnect: PLACEHOLDER_DISCONNECT })
 
 interface Request {
   method: string
@@ -51,14 +63,24 @@ interface Request {
 interface Props {
   onRequest(props: { session: Session; request: Request }): Promise<string>
   children: ReactNode
+  chainId: number
+  mechAddress: string
 }
 
 export const ProvideWalletConnect: React.FC<Props> = ({
+  chainId,
+  mechAddress,
   onRequest,
   children,
 }) => {
   const [client, setClient] = useState<Web3WalletClient>()
-  const [sessions, setSessions] = useStickyState<Session[]>([], "sessions")
+  const [sessions, setSessions] = useStickyState<Session[]>(
+    [],
+    `sessions-${chainId}:${mechAddress}`
+  )
+  const [sessionsMetadata, setSessionsMetadata] = useState<{
+    [uriOrTopic: string]: Metadata | undefined
+  }>({})
   const legacySignClientsRef = useRef(new Map<string, LegacySignClient>())
 
   const initLegacySignClient = useCallback(
@@ -69,6 +91,15 @@ export const ProvideWalletConnect: React.FC<Props> = ({
 
       console.log("initLegacySignClient", session)
       const legacySignClient = new LegacySignClient({ uri: session.uri })
+      console.log(legacySignClient, legacySignClient.peerMeta)
+
+      const { peerMeta } = legacySignClient
+      if (peerMeta) {
+        setSessionsMetadata((sessionsMetadata) => ({
+          ...sessionsMetadata,
+          [session.uri]: peerMeta,
+        }))
+      }
 
       legacySignClient.on("session_request", (error, payload) => {
         if (error) {
@@ -81,6 +112,17 @@ export const ProvideWalletConnect: React.FC<Props> = ({
         console.log("legacy session_request", {
           payload,
           session,
+        })
+
+        const { peerMeta } = payload.params[0] || {}
+        setSessionsMetadata((sessionsMetadata) => ({
+          ...sessionsMetadata,
+          [session.uri]: peerMeta,
+        }))
+
+        legacySignClient.approveSession({
+          accounts: [mechAddress],
+          chainId,
         })
       })
 
@@ -112,7 +154,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
 
       legacySignClientsRef.current.set(session.uri, legacySignClient)
     },
-    [onRequest, setSessions]
+    [onRequest, setSessions, chainId, mechAddress]
   )
 
   useEffect(() => {
@@ -134,6 +176,8 @@ export const ProvideWalletConnect: React.FC<Props> = ({
           if (!client) {
             throw new Error("client not initialized")
           }
+
+          // TODO wrap in try catch and handle paste of invalid strings
           await client.core.pairing.pair({ uri })
         }
       } catch (err: unknown) {
@@ -141,6 +185,28 @@ export const ProvideWalletConnect: React.FC<Props> = ({
       }
     },
     [client, setSessions]
+  )
+
+  const disconnect = useCallback(
+    async (uriOrTopic: string) => {
+      const legacySession = sessions.find(
+        (session) => session.legacy && session.uri === uriOrTopic
+      ) as LegacySession | undefined
+      if (legacySession) {
+        const legacySignClient = new LegacySignClient({
+          uri: legacySession.uri,
+        })
+        legacySignClient.killSession()
+        setSessions(sessions.filter((s) => s !== legacySession))
+        setSessionsMetadata((sessionsMetadata) => ({
+          ...sessionsMetadata,
+          [legacySession.uri]: undefined,
+        }))
+      }
+
+      // TODO handle V2 disconnect
+    },
+    [sessions, setSessions]
   )
 
   useEffect(() => {
@@ -157,7 +223,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
           namespaces: {},
         })
 
-        const session = {
+        const session: Session = {
           topic: sessionStruct.topic,
         }
 
@@ -169,6 +235,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
         const { request } = params
         const requestSession = client.getActiveSessions()[topic]
         console.log("session_request", event, requestSession, request)
+
         // const requestParamsMessage = request.params[0]
 
         const result = await onRequest({ session: requestSession, request })
@@ -207,9 +274,14 @@ export const ProvideWalletConnect: React.FC<Props> = ({
   const packedContext = useMemo(
     () => ({
       pair,
-      sessions,
+      disconnect,
+      sessions: sessions.map((session) => ({
+        ...session,
+        metadata:
+          sessionsMetadata[session.legacy ? session.uri : session.topic],
+      })),
     }),
-    [pair, sessions]
+    [pair, disconnect, sessions, sessionsMetadata]
   )
 
   if (!client) return null
@@ -223,8 +295,9 @@ export const ProvideWalletConnect: React.FC<Props> = ({
 
 const useWalletConnect = () => {
   const context = useContext(WalletConnectContext)
-  // if (!context.client)
-  //   throw new Error("Must be used within <ProvideWalletConnect />")
+  if (context.pair === PLACEHOLDER_PAIR) {
+    throw new Error("Must be used within <ProvideWalletConnect />")
+  }
 
   return context
 }

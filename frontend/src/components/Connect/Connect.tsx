@@ -1,12 +1,14 @@
 import React, { useState } from "react"
-import useWalletConnect from "../../useWalletConnect"
+import useWalletConnect, {
+  SessionWithMetadata,
+} from "../../hooks/useWalletConnect"
 import Spinner from "../Spinner"
 
 import classes from "./Connect.module.css"
 import Button from "../Button"
 
 const MechConnect: React.FC = () => {
-  const { pair, sessions } = useWalletConnect()
+  const { pair, disconnect, sessions } = useWalletConnect()
   const [loading, setLoading] = useState(false)
   const [uri, setUri] = useState("")
 
@@ -44,10 +46,7 @@ const MechConnect: React.FC = () => {
       <ul className={classes.sessions}>
         {sessions.map((session, index) => (
           <li key={`session-${index}`}>
-            <p>Session</p>
-            <Button secondary onClick={() => {}} className={classes.disconnect}>
-              ✕
-            </Button>
+            <SessionItem session={session} disconnect={disconnect} />
           </li>
         ))}
       </ul>
@@ -57,4 +56,61 @@ const MechConnect: React.FC = () => {
     </div>
   )
 }
+
 export default MechConnect
+
+const SessionItem: React.FC<{
+  session: SessionWithMetadata
+  disconnect: (uriOrTopic: string) => void
+}> = ({ session, disconnect }) => {
+  const disconnectButton = (
+    <Button
+      secondary
+      onClick={() => disconnect(session.legacy ? session.uri : session.topic)}
+      className={classes.disconnect}
+      title="Disconnect"
+    >
+      ✕
+    </Button>
+  )
+
+  if (!session.metadata) {
+    return <p>Session{disconnectButton}</p>
+  }
+  const icon = session.metadata.icons[0]
+  return (
+    <>
+      <p title={session.metadata.description}>
+        {icon && (
+          <img src={icon} alt={session.metadata.name} style={{ height: 24 }} />
+        )}
+        {session.metadata.name}
+        <a
+          href={session.metadata.url}
+          rel="external nofollow noreferrer"
+          target="_blank"
+        >
+          <ExternalLinkIcon />
+        </a>
+        {disconnectButton}
+      </p>
+    </>
+  )
+}
+
+const ExternalLinkIcon = () => (
+  <svg
+    stroke="currentColor"
+    fill="currentColor"
+    strokeWidth="0"
+    viewBox="0 0 24 24"
+    height="1em"
+    width="1em"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g>
+      <path fill="none" d="M0 0h24v24H0z"></path>
+      <path d="M10 6v2H5v11h11v-5h2v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6zm11-3v8h-2V6.413l-7.793 7.794-1.414-1.414L17.585 5H13V3h8z"></path>
+    </g>
+  </svg>
+)

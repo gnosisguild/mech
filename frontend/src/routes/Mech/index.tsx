@@ -1,6 +1,7 @@
 import React from "react"
 import { useParams } from "react-router-dom"
 import { calculateERC721MechAddress } from "mech"
+import { useChainId } from "wagmi"
 
 import Layout from "../../components/Layout"
 import { useErc721OwnerOf } from "../../generated"
@@ -11,6 +12,7 @@ import NFTItem from "../../components/NFTItem"
 import classes from "./Mech.module.css"
 import Spinner from "../../components/Spinner"
 import MechConnect from "../../components/Connect/Connect"
+import { ProvideWalletConnect } from "../../hooks/useWalletConnect"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -27,6 +29,8 @@ const Mech: React.FC = () => {
     tokenId: tokenId,
     blockchain: "eth_goerli",
   })
+
+  const chainId = useChainId()
 
   const { data: tokenOwner } = useErc721OwnerOf({
     address: token as `0x${string}`,
@@ -47,7 +51,14 @@ const Mech: React.FC = () => {
               nft={data}
               operatorAddress={tokenOwner}
             />
-            <MechConnect />
+
+            <ProvideWalletConnect
+              chainId={chainId}
+              mechAddress={mechAddress}
+              onRequest={handleRequest}
+            >
+              <MechConnect />
+            </ProvideWalletConnect>
           </>
         )}
       </div>
@@ -55,3 +66,8 @@ const Mech: React.FC = () => {
   )
 }
 export default Mech
+
+const handleRequest = async (props: any) => {
+  console.log("handle REQUEST", props)
+  return "test"
+}
