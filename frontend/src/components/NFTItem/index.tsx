@@ -7,8 +7,22 @@ import clsx from "clsx"
 import { MechGetNFTMetadataReply } from "../../hooks/useNFT"
 import useAccountBalance from "../../hooks/useAccountBalance"
 import Spinner from "../Spinner"
+import {
+  useChainId,
+  usePrepareContractWrite,
+  useProvider,
+  useSigner,
+} from "wagmi"
+import { deployERC721Mech, makeERC721MechDeployTransaction } from "mech"
+import {
+  JsonRpcProvider,
+  JsonRpcSigner,
+  Web3Provider,
+} from "@ethersproject/providers"
 
 interface Props {
+  contractAddress: string
+  tokenId: string
   nft: MechGetNFTMetadataReply
   mechAddress: string
   operatorAddress?: string
@@ -16,6 +30,8 @@ interface Props {
 }
 
 const NFTItem: React.FC<Props> = ({
+  contractAddress,
+  tokenId,
   nft,
   mechAddress,
   operatorAddress,
@@ -32,6 +48,17 @@ const NFTItem: React.FC<Props> = ({
     data: assetsData,
     error: assetsError,
   } = useAccountBalance({ address: mechAddress })
+
+  const { data: signer } = useSigner()
+  const chainId = useChainId()
+
+  const deploy = async () => {
+    if (!signer) return
+    makeERC721MechDeployTransaction(contractAddress, tokenId, provider)
+  }
+
+  usePrepareContractWrite()
+
   console.log("assetsData", assetsData, assetsError)
   return (
     <div className={classes.itemContainer}>
@@ -70,6 +97,7 @@ const NFTItem: React.FC<Props> = ({
               />
               {deployed ? "Deployed" : "Not Deployed"}
             </div>
+            {!deployed && <button onClick={deploy}>deploy</button>}
           </li>
           <li>
             <label>Mech</label>

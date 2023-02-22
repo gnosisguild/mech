@@ -29,7 +29,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "postinstall": "wagmi generate"
+    "postinstall": "wagmi generate",
+    "upgrade-mech": "yarn remove mech --ignore-scripts && yarn add -D mech@file:.."
   },
   "eslintConfig": {
     "extends": "react-app"

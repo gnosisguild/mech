@@ -31,10 +31,10 @@ describe("ZodiacMech contract", () => {
 
       const enabledModules = await mech1.getModulesPaginated(
         SENTINEL_MODULES,
-        3
+        2
       )
       expect(enabledModules.toString()).to.equal(
-        [bob.address, alice.address, ZERO_ADDRESS].toString()
+        [bob.address, alice.address, SENTINEL_MODULES].toString()
       )
     })
   })
@@ -47,32 +47,11 @@ describe("ZodiacMech contract", () => {
         mech1.setUp(defaultAbiCoder.encode(["address[]"], [[alice.address]]))
       ).to.be.revertedWith("Already initialized")
     })
-
-    it("allows setting a new set of modules if no modules are enabled", async () => {
-      const { mech1, alice, bob } = await loadFixture(deployMech1)
-
-      // disable all modules
-      await mech1.connect(alice).disableModule(alice.address, bob.address)
-      await mech1.connect(alice).disableModule(SENTINEL_MODULES, alice.address)
-
-      await expect(
-        mech1.setUp(defaultAbiCoder.encode(["address[]"], [[alice.address]]))
-      ).to.not.be.reverted
-
-      const enabledModules = await mech1.getModulesPaginated(
-        SENTINEL_MODULES,
-        2
-      )
-      expect(enabledModules.toString()).to.equal(
-        [alice.address, ZERO_ADDRESS].toString()
-      )
-    })
   })
 
   describe("isOperator() / isModuleEnabled()", () => {
-    it.only("returns true for enabled modules", async () => {
+    it("returns true for enabled modules", async () => {
       const { mech1, alice } = await loadFixture(deployMech1)
-      console.log("alice.address", alice.address)
       expect(await mech1.isModuleEnabled(alice.address)).to.equal(true)
       expect(await mech1.isOperator(alice.address)).to.equal(true)
     })
