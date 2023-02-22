@@ -1,5 +1,5 @@
 import classes from "./NFTItem.module.css"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { shortenAddress } from "../../utils/shortenAddress"
 import useTokenUrl from "../../hooks/useTokenUrl"
 import copy from "copy-to-clipboard"
@@ -7,11 +7,8 @@ import clsx from "clsx"
 import { MechGetNFTMetadataReply } from "../../hooks/useNFT"
 import useAccountBalance from "../../hooks/useAccountBalance"
 import Spinner from "../Spinner"
-import { useChainId, useProvider, useSigner } from "wagmi"
-import {
-  calculateERC721MechAddress,
-  makeERC721MechDeployTransaction,
-} from "mech"
+import { calculateERC721MechAddress } from "mech"
+import { useDeployMech } from "../../hooks/useDeployMech"
 
 interface Props {
   token: string
@@ -141,34 +138,3 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
 }
 
 export default NFTItem
-
-const useDeployMech = (token: string, tokenId: string) => {
-  const mechAddress = calculateERC721MechAddress(token, tokenId)
-  const { data: signer } = useSigner()
-  const chainId = useChainId()
-
-  const provider = useProvider()
-  const [deployed, setDeployed] = useState(false)
-  useEffect(() => {
-    provider.getCode(mechAddress).then((code) => setDeployed(code !== "0x"))
-  }, [provider, mechAddress])
-
-  const [deployPending, setDeployPending] = useState(false)
-  const deploy = async () => {
-    if (!signer) return
-    const tx = makeERC721MechDeployTransaction(token, tokenId, chainId)
-    setDeployPending(true)
-    try {
-      const res = await signer.sendTransaction(tx)
-      const receipt = await res.wait()
-      setDeployed(true)
-      return receipt
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setDeployPending(false)
-    }
-  }
-
-  return { deployed, deploy, deployPending }
-}
