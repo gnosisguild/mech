@@ -3,7 +3,6 @@ pragma solidity ^0.8.9;
 
 import "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import "hardhat/console.sol";
 import "./MechBase.sol";
 
 /**
@@ -13,14 +12,17 @@ contract ZodiacMech is MechBase, IAvatar {
     address internal constant SENTINEL_MODULES = address(0x1);
     mapping(address => address) internal modules;
 
-    /// `module` is already disabled.
+    /// @dev `module` is already disabled.
     error AlreadyDisabledModule(address module);
 
-    /// `module` is already enabled.
+    ///@dev `module` is already enabled.
     error AlreadyEnabledModule(address module);
 
-    /// `module` is not a valid address
+    /// @dev `module` is not a valid address
     error InvalidModule(address module);
+
+    /// @dev `setModules()` was already called.
+    error SetupModulesAlreadyCalled();
 
     /// @param _modules Address of the token contract
     constructor(address[] memory _modules) {
@@ -35,10 +37,11 @@ contract ZodiacMech is MechBase, IAvatar {
             "Already initialized"
         );
 
+        modules[SENTINEL_MODULES] = SENTINEL_MODULES;
+
         address[] memory _modules = abi.decode(initParams, (address[]));
 
         for (uint256 i = 0; i < _modules.length; i++) {
-            console.log("enable mod %s", _modules[i]);
             _enableModule(_modules[i]);
         }
     }
