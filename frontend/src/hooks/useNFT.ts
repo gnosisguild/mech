@@ -65,7 +65,7 @@ const useNFT: useNFTType = ({ contractAddress, blockchain, tokenId }) => {
     }
 
     fetchData()
-  }, [contractAddress, blockchain, tokenId])
+  }, [contractAddress, blockchain, tokenId, provider])
 
   return { data, isLoading, error }
 }

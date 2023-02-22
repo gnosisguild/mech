@@ -2,7 +2,6 @@ import { useWeb3Modal, useWeb3ModalTheme } from "@web3modal/react"
 import { goerli, useAccount } from "wagmi"
 import { ReactNode } from "react"
 
-import { chains } from "../.."
 import Button from "../Button"
 
 import classes from "./Layout.module.css"

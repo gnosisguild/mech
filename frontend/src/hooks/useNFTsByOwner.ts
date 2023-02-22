@@ -69,7 +69,7 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
     }
 
     fetchData()
-  }, [walletAddress, blockchain, pageToken])
+  }, [walletAddress, blockchain, pageToken, provider])
 
   return { data, isLoading, error }
 }
