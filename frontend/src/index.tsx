@@ -1,4 +1,4 @@
-import React from "react"
+import React, { Suspense } from "react"
 import ReactDOM from "react-dom/client"
 import {
   EthereumClient,
@@ -84,7 +84,9 @@ root.render(
   <React.StrictMode>
     <WagmiConfig client={wagmiClient}>
       <ProvideWalletConnect onRequest={handleRequest}>
-        <RouterProvider router={router} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <RouterProvider router={router} />
+        </Suspense>
       </ProvideWalletConnect>
     </WagmiConfig>
 

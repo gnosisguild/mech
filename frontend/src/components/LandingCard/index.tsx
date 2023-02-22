@@ -1,4 +1,5 @@
 import { useWeb3Modal } from "@web3modal/react"
+import { Link } from "react-router-dom"
 import usdcIcon from "cryptocurrency-icons/svg/color/usdc.svg"
 import gnoIcon from "cryptocurrency-icons/svg/color/gno.svg"
 
@@ -6,7 +7,9 @@ import Button from "../Button"
 import classes from "./LandingCard.module.css"
 import clsx from "clsx"
 
-const LandingCard: React.FC = () => {
+const LandingCard: React.FC<{ accountAddress?: string }> = ({
+  accountAddress,
+}) => {
   const { open } = useWeb3Modal()
   return (
     <div className={classes.landingCard}>
@@ -45,9 +48,17 @@ const LandingCard: React.FC = () => {
           </li>
         </ul>
       </div>
-      <Button onClick={open} className={classes.connectButton}>
-        Connect wallet to view available Mechs
-      </Button>
+      {accountAddress ? (
+        <Link to={`/${accountAddress}`}>
+          <Button onClick={() => {}} className={classes.connectButton}>
+            View available Mechs
+          </Button>
+        </Link>
+      ) : (
+        <Button onClick={open} className={classes.connectButton}>
+          Connect wallet to view available Mechs
+        </Button>
+      )}
     </div>
   )
 }
