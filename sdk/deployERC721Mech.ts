@@ -20,11 +20,9 @@ export const makeERC721MechDeployTransaction = (
   token: string,
   /** ID of the ERC721 token */
   tokenId: BigNumberish,
-  provider: JsonRpcProvider,
+  chainId: number,
   salt: string = DEFAULT_SALT
 ) => {
-  const { chainId } = provider.network
-
   const { transaction } = deployAndSetUpCustomModule(
     calculateERC721MechMastercopyAddress(),
     ERC721Mech__factory.abi,
@@ -32,7 +30,7 @@ export const makeERC721MechDeployTransaction = (
       types: ["address", "uint256"],
       values: [token, tokenId],
     },
-    provider,
+    new JsonRpcProvider(undefined, chainId), // this provider instance is never really be used in deployAndSetUpCustomModule()
     chainId,
     salt
   )
@@ -73,7 +71,7 @@ export const deployERC721Mech = async (
   const transaction = makeERC721MechDeployTransaction(
     token,
     tokenId,
-    signer.provider,
+    signer.provider.network.chainId,
     salt
   )
 
