@@ -1,5 +1,5 @@
 import { useWeb3Modal, useWeb3ModalTheme } from "@web3modal/react"
-import { goerli, useAccount } from "wagmi"
+import { useAccount } from "wagmi"
 import { ReactNode } from "react"
 
 import Button from "../Button"
@@ -9,6 +9,7 @@ import { shortenAddress } from "../../utils/shortenAddress"
 import Blockie from "../Blockie"
 import clsx from "clsx"
 import { Link } from "react-router-dom"
+import ChainSelect from "../ChainSelect"
 
 interface Props {
   mechAddress?: string
@@ -17,15 +18,13 @@ interface Props {
 
 const Layout: React.FC<Props> = ({ children, mechAddress }) => {
   const { setTheme } = useWeb3ModalTheme()
-  const { open, setDefaultChain } = useWeb3Modal()
+  const { open } = useWeb3Modal()
   const { address } = useAccount()
 
   setTheme({
     themeMode: "light",
     themeColor: "green",
   })
-
-  setDefaultChain(goerli)
 
   return (
     <div className={classes.layout}>
@@ -43,13 +42,7 @@ const Layout: React.FC<Props> = ({ children, mechAddress }) => {
           )}
         </div>
         <div className={classes.buttonGroup}>
-          <Button
-            onClick={() => open({ route: "SelectNetwork" })}
-            secondary
-            className={classes.button}
-          >
-            chains
-          </Button>
+          <ChainSelect />
           <Button
             onClick={open}
             className={clsx(classes.button, address && classes.connectedButton)}
