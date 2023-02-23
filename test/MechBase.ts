@@ -1,5 +1,6 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
+import { BigNumber } from "ethers"
 import { ethers } from "hardhat"
 
 // We use `loadFixture` to share common setups (or fixtures) between tests.
@@ -158,11 +159,49 @@ describe("MechBase contract", () => {
     it("reverts if called from an account that is not the mech operator")
     it("returns true if the call succeeds")
     it("returns false if the call reverts")
+
+    it.only('respects the "txGas" argument', async () => {
+      const { mech1, testToken, alice } = await loadFixture(deployMech1)
+
+      // mint testToken#2 to mech1
+      await testToken.mintToken(mech1.address, 2)
+
+      const transferTx = await testToken.populateTransaction.transferFrom(
+        mech1.address,
+        alice.address,
+        2
+      )
+
+      console.log(transferTx.data)
+
+      // succeeds when enough gas is provided
+      await expect(
+        mech1.exec(
+          testToken.address,
+          0,
+          transferTx.data as string,
+          0,
+          transferTx.gasLimit as BigNumber
+        )
+      ).to.not.be.reverted
+
+      // fails when not enough gas is provided
+      await expect(
+        mech1.exec(
+          testToken.address,
+          0,
+          transferTx.data as string,
+          0,
+          (transferTx.gasLimit as BigNumber).div(2)
+        )
+      ).to.be.revertedWith("revert")
+    })
   })
 
   describe("execReturnData()", () => {
     it("reverts if called from an account that is not the mech operator")
     it("returns true and call result if the call succeeds")
     it("returns false and revert data if the call reverts")
+    it('respects the "txGas" argument')
   })
 })

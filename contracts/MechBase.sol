@@ -77,18 +77,20 @@ abstract contract MechBase is IMech, Receiver {
     /// @param value Ether value.
     /// @param data Data payload.
     /// @param operation Operation type.
+    /// @param txGas Gas to send for executing the meta transaction
     /// @return success boolean flag indicating if the call succeeded
-    function exec(
+    function _exec(
         address to,
         uint256 value,
         bytes memory data,
-        Enum.Operation operation
-    ) public onlyOperator returns (bool success) {
+        Enum.Operation operation,
+        uint256 txGas
+    ) internal returns (bool success) {
         if (operation == Enum.Operation.DelegateCall) {
             // solhint-disable-next-line no-inline-assembly
             assembly {
                 success := delegatecall(
-                    gas(),
+                    txGas,
                     to,
                     add(data, 0x20),
                     mload(data),
@@ -100,7 +102,7 @@ abstract contract MechBase is IMech, Receiver {
             // solhint-disable-next-line no-inline-assembly
             assembly {
                 success := call(
-                    gas(),
+                    txGas,
                     to,
                     value,
                     add(data, 0x20),
@@ -112,20 +114,53 @@ abstract contract MechBase is IMech, Receiver {
         }
     }
 
+    /// @dev Executes either a delegatecall or a call with provided parameters
+    /// @param to Destination address.
+    /// @param value Ether value.
+    /// @param data Data payload.
+    /// @param operation Operation type.
+    /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
+    /// @return success boolean flag indicating if the call succeeded
+    function exec(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation,
+        uint256 txGas
+    ) public onlyOperator returns (bool success) {
+        if (txGas == 0) {
+            txGas = gasleft() - 100; // 100 is the gas needed to execute the rest of this function
+        }
+        require(
+            txGas >= gasleft() - 100,
+            "Not enough gas to execute the transaction"
+        );
+        return _exec(to, value, data, operation, txGas);
+    }
+
     /// @dev Allows a the mech operator to execute arbitrary transaction
     /// @param to Destination address of transaction.
     /// @param value Ether value of transaction.
     /// @param data Data payload of transaction.
     /// @param operation Operation type of transaction.
+    /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
     /// @return success boolean flag indicating if the call succeeded
     /// @return returnData Return data of the call
     function execReturnData(
         address to,
         uint256 value,
         bytes memory data,
-        Enum.Operation operation
+        Enum.Operation operation,
+        uint256 txGas
     ) public onlyOperator returns (bool success, bytes memory returnData) {
-        success = exec(to, value, data, operation);
+        if (txGas == 0) {
+            txGas = gasleft() - 200; // 100 is the gas needed to execute the rest of this function
+        }
+        require(
+            txGas >= gasleft() - 200,
+            "Not enough gas to execute the transaction"
+        );
+        success = _exec(to, value, data, operation, txGas);
         // solhint-disable-next-line no-inline-assembly
         assembly {
             // Load free memory location
