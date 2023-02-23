@@ -4,6 +4,7 @@ import classes from "./Button.module.css"
 
 interface ButtonProps {
   secondary?: boolean
+  disabled?: boolean
   className?: string
   children: React.ReactNode
   onClick: () => void
@@ -14,6 +15,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   secondary,
+  disabled,
   className,
   title,
 }) => {
@@ -26,6 +28,7 @@ const Button: React.FC<ButtonProps> = ({
       )}
       onClick={onClick}
       title={title}
+      disabled={disabled}
     >
       {children}
     </button>

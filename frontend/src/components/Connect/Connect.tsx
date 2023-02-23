@@ -12,6 +12,12 @@ const MechConnect: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [uri, setUri] = useState("")
 
+  const disconnectAll = () => {
+    sessions.forEach((session) => {
+      disconnect(session.legacy ? session.uri : session.topic)
+    })
+  }
+
   const handleChange = async (ev: React.ChangeEvent<HTMLInputElement>) => {
     const uri = ev.target.value
     setUri(uri)
@@ -50,7 +56,12 @@ const MechConnect: React.FC = () => {
           </li>
         ))}
       </ul>
-      <Button secondary onClick={() => {}} className={classes.disconnectAll}>
+      <Button
+        secondary
+        onClick={disconnectAll}
+        className={classes.disconnectAll}
+        disabled={sessions.length === 0}
+      >
         Disconnect All
       </Button>
     </div>
