@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "yarn hardhat compile",
+    "build:all": "yarn build && yarn workspace mech-sdk build && yarn workspace frontend build",
     "deploy": "hardhat deploy --network",
     "verify": "hardhat verify --network",
     "check": "yarn check:prettier && yarn check:lint",
