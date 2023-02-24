@@ -1,8 +1,7 @@
 import React from "react"
 import { useParams } from "react-router-dom"
-import { calculateERC721MechAddress } from "mech"
+import { calculateERC721MechAddress } from "mech-sdk"
 import { useChainId } from "wagmi"
-
 import Layout from "../../components/Layout"
 import { useErc721OwnerOf } from "../../generated"
 import { BigNumber } from "ethers"

@@ -1,4 +1,5 @@
 import "@nomicfoundation/hardhat-toolbox"
+import "hardhat-gas-reporter"
 import "hardhat-deploy"
 
 import dotenv from "dotenv"
@@ -53,5 +54,8 @@ export default {
     etherscan: {
       apiKey: ETHERSCAN_API_KEY,
     },
+  },
+  gasReporter: {
+    enabled: true,
   },
 } satisfies HardhatUserConfig

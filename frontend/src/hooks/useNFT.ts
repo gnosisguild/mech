@@ -1,7 +1,7 @@
 import { AnkrProvider } from "@ankr.com/ankr.js"
 
 import { Blockchain, GetNFTMetadataReply } from "@ankr.com/ankr.js"
-import { calculateERC721MechAddress } from "mech"
+import { calculateERC721MechAddress } from "mech-sdk"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 

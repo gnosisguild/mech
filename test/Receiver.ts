@@ -45,19 +45,18 @@ describe("Mech Account", () => {
       await test20Token.mintToken(mech1.address, 1000)
       expect(await test20Token.balanceOf(mech1.address)).to.equal(1000)
 
-      await alice.sendTransaction({
-        to: mech1.address,
-        value: ethers.utils.parseUnits("0", "ether"),
-        data: mech1.interface.encodeFunctionData("execReturnData", [
+      await mech1
+        .connect(alice)
+        .exec(
           test20Token.address,
-          ethers.utils.parseUnits("0", "ether"),
+          0,
           test20Token.interface.encodeFunctionData("transfer", [
             alice.address,
             500,
           ]),
-          "0",
-        ]),
-      })
+          0,
+          0
+        )
 
       expect(await test20Token.balanceOf(alice.address)).to.equal(500)
     })
@@ -69,7 +68,7 @@ describe("Mech Account", () => {
 
       await alice.sendTransaction({
         to: test721Token.address,
-        value: ethers.utils.parseUnits("0", "ether"),
+        value: 0,
         data: test721Token.interface.encodeFunctionData(
           "safeTransferFrom(address,address,uint256)",
           [alice.address, mech1.address, 2]
@@ -90,7 +89,7 @@ describe("Mech Account", () => {
 
       await alice.sendTransaction({
         to: test1155Token.address,
-        value: ethers.utils.parseUnits("0", "ether"),
+        value: 0,
         data: test1155Token.interface.encodeFunctionData("safeTransferFrom", [
           alice.address,
           mech1.address,

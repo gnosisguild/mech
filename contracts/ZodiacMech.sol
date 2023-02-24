@@ -62,7 +62,7 @@ contract ZodiacMech is MechBase, IAvatar {
         bytes calldata data,
         Enum.Operation operation
     ) public returns (bool success) {
-        return exec(to, value, data, operation);
+        (success, ) = _exec(to, value, data, operation, gasleft());
     }
 
     /// @dev Passes a transaction to the avatar, expects return data.
@@ -77,7 +77,7 @@ contract ZodiacMech is MechBase, IAvatar {
         bytes calldata data,
         Enum.Operation operation
     ) public returns (bool success, bytes memory returnData) {
-        return execReturnData(to, value, data, operation);
+        return _exec(to, value, data, operation, gasleft());
     }
 
     /// @dev Disables a module on the modifier.

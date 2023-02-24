@@ -7,8 +7,8 @@ import clsx from "clsx"
 import { MechGetNFTMetadataReply } from "../../hooks/useNFT"
 import useAccountBalance from "../../hooks/useAccountBalance"
 import Spinner from "../Spinner"
-import { calculateERC721MechAddress } from "mech"
 import { useDeployMech } from "../../hooks/useDeployMech"
+import { calculateERC721MechAddress } from "mech-sdk"
 
 interface Props {
   token: string
@@ -116,10 +116,8 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
         {assetsLoading && <Spinner />}
         {assetsData && (
           <>
-            {assetsData.assets.length === 0 && (
-              <p className={classes.noAssets}>No assets found</p>
-            )}
-            <ul className={classes.assets}>
+            {assetsData.assets.length === 0 && <p>No assets found</p>}
+            <ul>
               {assetsData.assets.map((asset, index) => (
                 <li key={index}>
                   <div>

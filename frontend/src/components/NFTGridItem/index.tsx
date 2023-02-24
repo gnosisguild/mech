@@ -1,4 +1,4 @@
-import { calculateERC721MechAddress, deployERC721Mech } from "mech"
+import { calculateERC721MechAddress, deployERC721Mech } from "mech-sdk"
 
 import classes from "./NFTItem.module.css"
 import Button from "../Button"

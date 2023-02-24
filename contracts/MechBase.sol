@@ -77,68 +77,52 @@ abstract contract MechBase is IMech, Receiver {
     /// @param value Ether value.
     /// @param data Data payload.
     /// @param operation Operation type.
+    /// @param txGas Gas to send for executing the meta transaction
     /// @return success boolean flag indicating if the call succeeded
-    function exec(
+    function _exec(
         address to,
         uint256 value,
         bytes memory data,
-        Enum.Operation operation
-    ) public onlyOperator returns (bool success) {
+        Enum.Operation operation,
+        uint256 txGas
+    ) internal returns (bool success, bytes memory returnData) {
         if (operation == Enum.Operation.DelegateCall) {
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                success := delegatecall(
-                    gas(),
-                    to,
-                    add(data, 0x20),
-                    mload(data),
-                    0,
-                    0
-                )
-            }
+            (success, returnData) = to.delegatecall{gas: txGas}(data);
         } else {
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                success := call(
-                    gas(),
-                    to,
-                    value,
-                    add(data, 0x20),
-                    mload(data),
-                    0,
-                    0
-                )
-            }
+            (success, returnData) = to.call{gas: txGas, value: value}(data);
         }
     }
 
-    /// @dev Allows a the mech operator to execute arbitrary transaction
+    /// @dev Allows a the mech operator to execute arbitrary transactions
     /// @param to Destination address of transaction.
     /// @param value Ether value of transaction.
     /// @param data Data payload of transaction.
     /// @param operation Operation type of transaction.
-    /// @return success boolean flag indicating if the call succeeded
+    /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
     /// @return returnData Return data of the call
-    function execReturnData(
+    function exec(
         address to,
         uint256 value,
         bytes memory data,
-        Enum.Operation operation
-    ) public onlyOperator returns (bool success, bytes memory returnData) {
-        success = exec(to, value, data, operation);
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            // Load free memory location
-            let ptr := mload(0x40)
-            // We allocate memory for the return data by setting the free memory location to
-            // current free memory location + data size + 32 bytes for data size value
-            mstore(0x40, add(ptr, add(returndatasize(), 0x20)))
-            // Store the size
-            mstore(ptr, returndatasize())
-            // Store the data
-            returndatacopy(add(ptr, 0x20), 0, returndatasize())
-            // Point the return data to the correct memory location
-            returnData := ptr
+        Enum.Operation operation,
+        uint256 txGas
+    ) public onlyOperator returns (bytes memory returnData) {
+        // uint256 gasRemaining = gasleft() - 200; // 200 is the gas needed to execute the rest of this function
+        // console.log("remaining gas: %s, txGas: %s", gasRemaining, txGas);
+
+        if (txGas == 0) {
+            // 200 is the gas needed to execute the rest of this function
+            txGas = gasleft() - 200;
+        }
+
+        bool success;
+        (success, returnData) = _exec(to, value, data, operation, txGas);
+
+        if (!success) {
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                revert(add(returnData, 0x20), mload(returnData))
+            }
         }
     }
 
