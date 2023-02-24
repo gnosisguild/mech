@@ -131,8 +131,9 @@ abstract contract MechBase is IMech, Receiver {
         if (txGas == 0) {
             txGas = gasleft() - 100; // 100 is the gas needed to execute the rest of this function
         }
+        console.log("gas: %s, %s", txGas, gasleft());
         require(
-            txGas >= gasleft() - 100,
+            gasleft() - 100 >= txGas,
             "Not enough gas to execute the transaction"
         );
         return _exec(to, value, data, operation, txGas);
