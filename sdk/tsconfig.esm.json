@@ -4,6 +4,5 @@
     "noEmit": false,
     "outDir": "build/esm",
     "module": "esnext"
-  },
-  "include": ["./sdk"]
+  }
 }

@@ -1,7 +1,3 @@
-import { defaultAbiCoder } from "@ethersproject/abi"
-import { BigNumberish, ethers } from "ethers"
-import { getCreate2Address, keccak256 } from "ethers/lib/utils"
-
 import {
   ERC721Mech__factory,
   IFactoryFriendly__factory,
@@ -13,6 +9,10 @@ import {
   MODULE_PROXY_FACTORY_ADDRESS,
   ZODIAC_SINGLETON_FACTORY_ADDRESS,
 } from "./constants"
+
+import { defaultAbiCoder } from "@ethersproject/abi"
+import { BigNumberish, ethers } from "ethers"
+import { getCreate2Address, keccak256 } from "ethers/lib/utils"
 
 export const calculateERC721MechAddress = (
   /** Address of the ERC721 token contract */

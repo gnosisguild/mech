@@ -13,7 +13,7 @@ import {
   useProvider,
   useSigner,
 } from "wagmi"
-import { deployERC721Mech, makeERC721MechDeployTransaction } from "mech"
+import { deployERC721Mech, makeERC721MechDeployTransaction } from "mech-sdk"
 import {
   JsonRpcProvider,
   JsonRpcSigner,
@@ -54,7 +54,7 @@ const NFTItem: React.FC<Props> = ({
 
   const deploy = async () => {
     if (!signer) return
-    makeERC721MechDeployTransaction(contractAddress, tokenId, provider)
+    // makeERC721MechDeployTransaction(contractAddress, tokenId, provider)
   }
 
   usePrepareContractWrite()
@@ -139,9 +139,9 @@ const NFTItem: React.FC<Props> = ({
         {assetsData && (
           <>
             {assetsData.assets.length === 0 && (
-              <p className={classes.noAssets}>No assets found</p>
+              <p>No assets found</p>
             )}
-            <ul className={classes.assets}>
+            <ul>
               {assetsData.assets.map((asset, index) => (
                 <li key={index}>
                   <div>
