@@ -3,9 +3,6 @@ import { BigNumber } from "ethers"
 import { IMech__factory } from "../../typechain-types"
 
 const BASE_TX_GAS = 21000
-
-const EXEC_GAS = 500 // TODO: figure out how much extra gas is needed (will depend on the type of mech)
-
 const IMech = IMech__factory.createInterface()
 
 export const makeExecTransaction = (
@@ -24,6 +21,7 @@ export const makeExecTransaction = (
       0,
       txGas,
     ]),
-    gasLimit: gasLimit && gasLimit.add(EXEC_GAS),
+    // gas for mech's onlyOperator modifier still needs to be calculated (can't be fixed, since it depends on external ERC721 ownerOf() function)
+    gasLimit: undefined,
   }
 }

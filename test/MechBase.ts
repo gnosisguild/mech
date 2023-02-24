@@ -230,6 +230,36 @@ describe("MechBase contract", () => {
       expect(decoded[0]).to.equal(alice.address)
     })
 
+    it.only('uses right gas', async () => {
+      const { mech1, testToken, alice, bob } = await loadFixture(deployMech1)
+
+      // mint testToken#1 to alice to make her the operator of mech1
+      await testToken.mintToken(alice.address, 1)
+
+
+      // mint testToken#2 to alice
+      await testToken.mintToken(alice.address, 2)
+
+      // mint testToken#3 to mech1
+      await testToken.mintToken(mech1.address, 3)
+
+      const aliceTransferTx = await testToken.connect(alice).transferFrom(alice.address, bob.address, 2)
+      const mech1TransferTx = await mech1.connect(alice).exec(testToken.address, 0, testToken.interface.encodeFunctionData("transferFrom", [mech1.address, bob.address, 3]), 0, 0)
+
+      // go sure both transfers happened
+      expect(await testToken.ownerOf(2)).to.equal(bob.address)
+      expect(await testToken.ownerOf(3)).to.equal(bob.address)
+
+      const aliceGasUsed = (await aliceTransferTx.wait()).gasUsed
+      const mech1GasUsed = (await mech1TransferTx.wait()).gasUsed
+
+
+      console.log("aliceGasUsed", aliceGasUsed.toNumber())
+      console.log("mech1GasUsed", mech1GasUsed.toNumber())
+
+      // expect(mech1GasUsed.sub(aliceGasUsed).toNumber()).to.be.lessThan(2500) // 2500 is what we reserve in the exec implementation
+    })
+
     it.skip('respects the "txGas" argument', async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
