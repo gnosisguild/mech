@@ -1,15 +1,13 @@
 {
-  "name": "mech",
+  "name": "mech-contracts",
   "version": "1.0.2",
   "description": "Smart account with programmable ownership",
+  "workspaces": [
+    "sdk",
+    "frontend"
+  ],
   "scripts": {
-    "prepare": "yarn build",
-    "prebuild": "rimraf build",
-    "build": "yarn build:evm && yarn build:cjs && yarn build:esm",
-    "build:evm": "yarn hardhat compile",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "postbuild": "cd frontend && yarn upgrade-mech",
+    "build": "yarn hardhat compile",
     "deploy": "hardhat deploy --network",
     "verify": "hardhat verify --network",
     "check": "yarn check:prettier && yarn check:lint",
@@ -22,26 +20,23 @@
     "test:watch": "mocha -w"
   },
   "files": [
-    "build",
-    "contracts",
+    "contracts/**/*",
     "LICENSE",
     "README.md"
   ],
-  "main": "build/cjs/sdk/index.js",
-  "typings": "build/cjs/sdk/index.d.ts",
-  "module": "build/esm/sdk/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gnosis/clubcard.git"
+    "url": "git+https://github.com/gnosis/mech.git"
   },
   "author": "Gnosis Guild",
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/gnosis/clubcard/issues"
+    "url": "https://github.com/gnosis/mech/issues"
   },
-  "homepage": "https://github.com/gnosis/clubcard#readme",
+  "homepage": "https://github.com/gnosis/mech#readme",
   "devDependencies": {
     "@ethersproject/abi": "^5.7.0",
+    "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
@@ -60,7 +55,6 @@
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "^4.0.0",
-    "ethers": "^5.7.2",
     "hardhat": "^2.12.5",
     "hardhat-deploy": "^0.11.22",
     "hardhat-gas-reporter": "^1.0.9",
@@ -78,6 +72,8 @@
     "@openzeppelin/contracts": "^4.8.1",
     "@safe-global/safe-core-sdk": "^3.3.1",
     "@types/chai": "^4.3.4",
-    "@types/node": "^18.11.18"
-  }
+    "@types/node": "^18.11.18",
+    "ethers": "^5.7.2"
+  },
+  "packageManager": "yarn@3.4.1"
 }

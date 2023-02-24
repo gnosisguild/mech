@@ -1,11 +1,3 @@
-import { defaultAbiCoder } from "@ethersproject/abi"
-import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers"
-import {
-  deployAndSetUpCustomModule,
-  deployMastercopyWithInitData,
-  SupportedNetworks,
-} from "@gnosis.pm/zodiac"
-
 import { ZodiacMech__factory } from "../typechain-types"
 
 import {
@@ -13,6 +5,14 @@ import {
   calculateZodiacMechMastercopyAddress,
 } from "./calculateZodiacMechAddress"
 import { DEFAULT_SALT, INIT_ADDRESS } from "./constants"
+
+import { defaultAbiCoder } from "@ethersproject/abi"
+import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers"
+import {
+  deployAndSetUpCustomModule,
+  deployMastercopyWithInitData,
+  SupportedNetworks,
+} from "@gnosis.pm/zodiac"
 
 export const makeZodiacMechDeployTransaction = (
   /** Addresses of the Zodiac modules */

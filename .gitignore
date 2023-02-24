@@ -6,3 +6,6 @@ typechain-types
 *.log
 .env
 .DS_Store
+
+.pnp.*
+.yarn/*

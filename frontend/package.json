@@ -1,23 +1,29 @@
 {
-  "name": "mech-frontend",
+  "name": "frontend",
   "version": "1.0.0",
   "private": true,
   "devDependencies": {
+    "@ankr.com/ankr.js": "^0.3.1",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@wagmi/cli": "^0.1.3",
+    "@wagmi/core": "^0.9.7",
+    "@walletconnect/client": "^1.8.0",
     "@walletconnect/core": "^2.3.3",
     "@walletconnect/legacy-types": "^2.0.0-rc.0",
     "@walletconnect/sign-client": "^2.3.3",
     "@walletconnect/types": "^2.3.3",
+    "@walletconnect/utils": "^1.6.5",
     "@walletconnect/web3wallet": "^1.1.1",
     "@web3modal/ethereum": "^2.1.0",
     "@web3modal/react": "^2.1.0",
     "buffer": "^6.0.3",
     "clsx": "^1.2.1",
+    "copy-to-clipboard": "^3.3.3",
+    "cryptocurrency-icons": "^0.18.1",
     "ethereum-blockies-base64": "^1.0.2",
-    "ethers": "^5.6.9",
-    "mech": "file:..",
+    "ethers": "^5.7.2",
+    "mech-sdk": "workspace:^",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.0",
@@ -29,8 +35,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "postinstall": "wagmi generate",
-    "upgrade-mech": "yarn remove mech --ignore-scripts && yarn add -D mech@file:.."
+    "postinstall": "wagmi generate"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -47,9 +52,5 @@
       "last 1 safari version"
     ]
   },
-  "dependencies": {
-    "@ankr.com/ankr.js": "^0.3.1",
-    "copy-to-clipboard": "^3.3.3",
-    "cryptocurrency-icons": "^0.18.1"
-  }
+  "packageManager": "yarn@3.4.1"
 }

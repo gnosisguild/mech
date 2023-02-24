@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { calculateERC721MechAddress } from "mech"
+import { calculateERC721MechAddress } from "mech-sdk"
 import { useProvider } from "wagmi"
 import Layout from "../../components/Layout"
 import { useErc721OwnerOf, useErc721Read } from "../../generated"
@@ -48,6 +48,8 @@ const Mech: React.FC = () => {
         {!error && !isLoading && data && (
           <NFTItem
             nft={data}
+            contractAddress={token}
+            tokenId={tokenId}
             mechAddress={mechAddress}
             operatorAddress={tokenOwner}
             deployed={deployed}
