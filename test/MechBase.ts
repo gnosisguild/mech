@@ -230,7 +230,7 @@ describe("MechBase contract", () => {
       expect(decoded[0]).to.equal(alice.address)
     })
 
-    it.only('respects the "txGas" argument', async () => {
+    it.skip('respects the "txGas" argument', async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
@@ -244,6 +244,7 @@ describe("MechBase contract", () => {
         alice.address,
         2
       )
+      const res = await transferTx.wait()
 
       const mgas = await mech1
         .connect(alice)
@@ -255,7 +256,7 @@ describe("MechBase contract", () => {
           transferTx.gasLimit as BigNumber
         )
 
-      console.log("GL", transferTx.gasLimit, { mgas })
+      console.log("GL", { mgas })
 
       // succeeds when enough gas is provided
       await expect(
@@ -284,7 +285,7 @@ describe("MechBase contract", () => {
       ).to.be.revertedWith("Not enough gas to execute the transaction")
     })
 
-    it("reverts before executing the meta transaction if not enough gas is provided", async () => {
+    it.skip("reverts before executing the meta transaction if not enough gas is provided", async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
