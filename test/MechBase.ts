@@ -194,10 +194,43 @@ describe("MechBase contract", () => {
       ).to.be.revertedWith("Only callable by the mech operator")
     })
 
-    it("returns true if the call succeeds")
-    it("returns false if the call reverts")
+    it("reverts with original data if the meta transaction reverts", async () => {
+      const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
-    it('respects the "txGas" argument', async () => {
+      // mint testToken#1 to alice to make her the operator of mech1
+      await testToken.mintToken(alice.address, 1)
+
+      // this tx will revert because mech1 does not own token#1
+      const revertingTxData = testToken.interface.encodeFunctionData(
+        "transferFrom",
+        [mech1.address, alice.address, 1]
+      )
+
+      await expect(
+        mech1.connect(alice).exec(testToken.address, 0, revertingTxData, 0, 0)
+      ).to.be.revertedWith("ERC721: caller is not token owner or approved")
+    })
+
+    it("returns the return data of the meta transaction", async () => {
+      const { mech1, testToken, alice } = await loadFixture(deployMech1)
+
+      // mint testToken#1 to alice to make her the operator of mech1
+      await testToken.mintToken(alice.address, 1)
+
+      // this tx will revert because mech1 does not own token#1
+      const callData = testToken.interface.encodeFunctionData("ownerOf", [1])
+
+      const result = await mech1
+        .connect(alice)
+        .callStatic.exec(testToken.address, 0, callData, 0, 0)
+      const decoded = testToken.interface.decodeFunctionResult(
+        "ownerOf",
+        result
+      )
+      expect(decoded[0]).to.equal(alice.address)
+    })
+
+    it.only('respects the "txGas" argument', async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
@@ -211,6 +244,18 @@ describe("MechBase contract", () => {
         alice.address,
         2
       )
+
+      const mgas = await mech1
+        .connect(alice)
+        .estimateGas.exec(
+          testToken.address,
+          0,
+          transferTx.data as string,
+          0,
+          transferTx.gasLimit as BigNumber
+        )
+
+      console.log("GL", transferTx.gasLimit, { mgas })
 
       // succeeds when enough gas is provided
       await expect(
@@ -266,7 +311,7 @@ describe("MechBase contract", () => {
       ).to.be.revertedWith("Not enough gas to execute the transaction")
     })
 
-    it.only("reserves just enough gas for the exec() function itself", async () => {
+    it.skip("reserves just enough gas for the exec() function itself", async () => {
       // TODO TODO
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
@@ -289,12 +334,5 @@ describe("MechBase contract", () => {
       const { gasUsed } = await res.wait()
       console.log("gasUsed", gasUsed.toString())
     })
-  })
-
-  describe("execReturnData()", () => {
-    it("reverts if called from an account that is not the mech operator")
-    it("returns true and call result if the call succeeds")
-    it("returns false and revert data if the call reverts")
-    it('respects the "txGas" argument')
   })
 })

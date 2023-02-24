@@ -11,12 +11,10 @@ import hre, { ethers } from "hardhat"
 import {
   calculateERC721MechAddress,
   calculateERC721MechMastercopyAddress,
-} from "../sdk/calculateERC721MechAddress"
-import { ZERO_ADDRESS } from "../sdk/constants"
-import {
   deployERC721Mech,
   deployERC721MechMastercopy,
-} from "../sdk/deployERC721Mech"
+} from "../sdk"
+import { ZERO_ADDRESS } from "../sdk/constants"
 import { ERC721Mech__factory } from "../typechain-types"
 
 describe("deterministic deployment", () => {

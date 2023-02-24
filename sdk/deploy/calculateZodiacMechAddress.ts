@@ -1,14 +1,14 @@
 import {
   IFactoryFriendly__factory,
   ZodiacMech__factory,
-} from "../typechain-types"
+} from "../../typechain-types"
 
 import {
   DEFAULT_SALT,
   INIT_ADDRESS,
   MODULE_PROXY_FACTORY_ADDRESS,
   ZODIAC_SINGLETON_FACTORY_ADDRESS,
-} from "./constants"
+} from "../constants"
 
 import { defaultAbiCoder } from "@ethersproject/abi"
 import { ethers } from "ethers"

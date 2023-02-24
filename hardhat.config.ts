@@ -55,4 +55,7 @@ export default {
       apiKey: ETHERSCAN_API_KEY,
     },
   },
+  gasReporter: {
+    enabled: true,
+  },
 } satisfies HardhatUserConfig

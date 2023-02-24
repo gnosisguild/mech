@@ -138,9 +138,7 @@ const NFTItem: React.FC<Props> = ({
         {assetsLoading && <Spinner />}
         {assetsData && (
           <>
-            {assetsData.assets.length === 0 && (
-              <p>No assets found</p>
-            )}
+            {assetsData.assets.length === 0 && <p>No assets found</p>}
             <ul>
               {assetsData.assets.map((asset, index) => (
                 <li key={index}>

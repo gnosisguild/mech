@@ -85,96 +85,44 @@ abstract contract MechBase is IMech, Receiver {
         bytes memory data,
         Enum.Operation operation,
         uint256 txGas
-    ) internal returns (bool success) {
+    ) internal returns (bool success, bytes memory returnData) {
         if (operation == Enum.Operation.DelegateCall) {
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                success := delegatecall(
-                    txGas,
-                    to,
-                    add(data, 0x20),
-                    mload(data),
-                    0,
-                    0
-                )
-            }
+            (success, returnData) = to.delegatecall{gas: txGas}(data);
         } else {
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                success := call(
-                    txGas,
-                    to,
-                    value,
-                    add(data, 0x20),
-                    mload(data),
-                    0,
-                    0
-                )
-            }
+            (success, returnData) = to.call{gas: txGas, value: value}(data);
         }
     }
 
-    /// @dev Executes either a delegatecall or a call with provided parameters
-    /// @param to Destination address.
-    /// @param value Ether value.
-    /// @param data Data payload.
-    /// @param operation Operation type.
+    /// @dev Allows a the mech operator to execute arbitrary transactions
+    /// @param to Destination address of transaction.
+    /// @param value Ether value of transaction.
+    /// @param data Data payload of transaction.
+    /// @param operation Operation type of transaction.
     /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
-    /// @return success boolean flag indicating if the call succeeded
+    /// @return returnData Return data of the call
     function exec(
         address to,
         uint256 value,
         bytes memory data,
         Enum.Operation operation,
         uint256 txGas
-    ) public onlyOperator returns (bool success) {
-        if (txGas == 0) {
-            txGas = gasleft() - 100; // 100 is the gas needed to execute the rest of this function
-        }
-        console.log("gas: %s, %s", txGas, gasleft());
-        require(
-            gasleft() - 100 >= txGas,
-            "Not enough gas to execute the transaction"
-        );
-        return _exec(to, value, data, operation, txGas);
-    }
+    ) public onlyOperator returns (bytes memory returnData) {
+        // uint256 gasRemaining = gasleft() - 200; // 200 is the gas needed to execute the rest of this function
+        // console.log("remaining gas: %s, txGas: %s", gasRemaining, txGas);
 
-    /// @dev Allows a the mech operator to execute arbitrary transaction
-    /// @param to Destination address of transaction.
-    /// @param value Ether value of transaction.
-    /// @param data Data payload of transaction.
-    /// @param operation Operation type of transaction.
-    /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
-    /// @return success boolean flag indicating if the call succeeded
-    /// @return returnData Return data of the call
-    function execReturnData(
-        address to,
-        uint256 value,
-        bytes memory data,
-        Enum.Operation operation,
-        uint256 txGas
-    ) public onlyOperator returns (bool success, bytes memory returnData) {
         if (txGas == 0) {
-            txGas = gasleft() - 200; // 100 is the gas needed to execute the rest of this function
+            // 200 is the gas needed to execute the rest of this function
+            txGas = gasleft() - 200;
         }
-        require(
-            txGas >= gasleft() - 200,
-            "Not enough gas to execute the transaction"
-        );
-        success = _exec(to, value, data, operation, txGas);
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            // Load free memory location
-            let ptr := mload(0x40)
-            // We allocate memory for the return data by setting the free memory location to
-            // current free memory location + data size + 32 bytes for data size value
-            mstore(0x40, add(ptr, add(returndatasize(), 0x20)))
-            // Store the size
-            mstore(ptr, returndatasize())
-            // Store the data
-            returndatacopy(add(ptr, 0x20), 0, returndatasize())
-            // Point the return data to the correct memory location
-            returnData := ptr
+
+        bool success;
+        (success, returnData) = _exec(to, value, data, operation, txGas);
+
+        if (!success) {
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                revert(add(returnData, 0x20), mload(returnData))
+            }
         }
     }
 

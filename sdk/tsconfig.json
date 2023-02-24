@@ -11,5 +11,5 @@
     "target": "es2020",
     "typeRoots": ["node_modules/@types"]
   },
-  "include": ["./*.ts"]
+  "include": ["./*.ts", "deploy/deployZodiacMech.ts"]
 }

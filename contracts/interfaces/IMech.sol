@@ -13,28 +13,12 @@ interface IMech is IERC1271, IFactoryFriendly {
     /// @param data Data payload.
     /// @param operation Operation type.
     /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
-    /// @return success boolean flag indicating if the call succeeded
+    /// @return returnData bytes The return data of the call
     function exec(
         address to,
         uint256 value,
         bytes memory data,
         Enum.Operation operation,
         uint256 txGas
-    ) external returns (bool success);
-
-    /// @dev Allows a the mech operator to execute arbitrary transaction
-    /// @param to Destination address of transaction.
-    /// @param value Ether value of transaction.
-    /// @param data Data payload of transaction.
-    /// @param operation Operation type of transaction.
-    /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
-    /// @return success boolean flag indicating if the call succeeded
-    /// @return returnData Return data of the call
-    function execReturnData(
-        address to,
-        uint256 value,
-        bytes memory data,
-        Enum.Operation operation,
-        uint256 txGas
-    ) external returns (bool success, bytes memory returnData);
+    ) external returns (bytes memory returnData);
 }
