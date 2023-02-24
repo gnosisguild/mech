@@ -1,4 +1,5 @@
 import "@nomicfoundation/hardhat-toolbox"
+import "hardhat-gas-reporter"
 import "hardhat-deploy"
 
 import dotenv from "dotenv"
