@@ -3,7 +3,7 @@ import { useChainId, useProvider, useSigner } from "wagmi"
 import {
   calculateERC721MechAddress,
   makeERC721MechDeployTransaction,
-} from "mech"
+} from "mech-sdk"
 
 export const useDeployMech = (token: string, tokenId: string) => {
   const mechAddress = calculateERC721MechAddress(token, tokenId)

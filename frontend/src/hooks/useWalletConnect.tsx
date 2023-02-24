@@ -89,9 +89,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
         throw new Error("must only be called with legacy sessions")
       }
 
-      console.log("initLegacySignClient", session)
       const legacySignClient = new LegacySignClient({ uri: session.uri })
-      console.log(legacySignClient, legacySignClient.peerMeta)
 
       const { peerMeta } = legacySignClient
       if (peerMeta) {
@@ -109,7 +107,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
             session
           )
         }
-        console.log("legacy session_request", {
+        console.debug("legacy session_request", {
           payload,
           session,
         })
@@ -127,7 +125,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
       })
 
       legacySignClient.on("connect", () => {
-        console.log("legacySignClient > connect")
+        console.debug("legacySignClient > connect")
       })
 
       legacySignClient.on("error", (error) => {
@@ -177,8 +175,11 @@ export const ProvideWalletConnect: React.FC<Props> = ({
             throw new Error("client not initialized")
           }
 
-          // TODO wrap in try catch and handle paste of invalid strings
-          await client.core.pairing.pair({ uri })
+          try {
+            await client.core.pairing.pair({ uri })
+          } catch (err) {
+            console.warn(err)
+          }
         }
       } catch (err: unknown) {
         console.error(err)
@@ -234,8 +235,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
         const { topic, params, id } = event
         const { request } = params
         const requestSession = client.getActiveSessions()[topic]
-        console.log("session_request", event, requestSession, request)
-
+        console.debug("session_request", event, requestSession, request)
         // const requestParamsMessage = request.params[0]
 
         const result = await onRequest({ session: requestSession, request })
@@ -264,7 +264,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
 
       // TODO: handle auth_request
       client.on("auth_request", async (event) => {
-        console.log("auth_request", event)
+        console.debug("auth_request", event)
       })
     }
 
