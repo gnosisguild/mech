@@ -76,11 +76,13 @@
   font-size: 12px;
   font-family: monospace;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   gap: 5px;
   border-radius: 10px;
   background-color: var(--box-bg);
   padding: 2px 8px;
+  height: 30px;
 }
 
 .address {
@@ -101,4 +103,14 @@
 }
 .useButton {
   width: 100%;
+}
+
+.chainIcon {
+  height: 80%;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

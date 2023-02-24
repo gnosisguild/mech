@@ -43,6 +43,14 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
     })
   }, [data])
 
+  const deployed = nftData
+    .filter((nft) => nft.hasMech)
+    .filter((nft) => nft.tokenUrl && nft.tokenId)
+
+  const undeployed = nftData
+    .filter((nft) => !nft.hasMech)
+    .filter((nft) => nft.tokenUrl && nft.tokenId)
+
   return (
     <div className={classes.container}>
       <div className={classes.categoryContainer}>
@@ -51,15 +59,17 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
           <h2>Deployed</h2>
         </div>
       </div>
+      {deployed.length === 0 && (
+        <div className={classes.noDeployed}>
+          <p>No mechs deployed</p>
+        </div>
+      )}
       <ul className={classes.grid}>
-        {nftData
-          .filter((nft) => nft.hasMech)
-          .filter((nft) => nft.tokenUrl && nft.tokenId)
-          .map((nft, index) => (
-            <li key={`${index}-${nft.contractAddress}`}>
-              <NFTGridItem nft={nft} />
-            </li>
-          ))}
+        {deployed.map((nft, index) => (
+          <li key={`${index}-${nft.contractAddress}`}>
+            <NFTGridItem nft={nft} />
+          </li>
+        ))}
       </ul>
       <div className={classes.categoryContainer}>
         <div className={classes.category}>
@@ -67,16 +77,15 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
           <h2>Undeployed</h2>
         </div>
       </div>
-      <ul className={classes.grid}>
-        {nftData
-          .filter((nft) => !nft.hasMech)
-          .filter((nft) => nft.tokenUrl && nft.tokenId)
-          .map((nft, index) => (
+      {undeployed.length > 0 && (
+        <ul className={classes.grid}>
+          {undeployed.map((nft, index) => (
             <li key={`${index}-${nft.contractAddress}`}>
               <NFTGridItem nft={nft} />
             </li>
           ))}
-      </ul>
+        </ul>
+      )}
       {isLoading ? (
         <Spinner />
       ) : (

@@ -12,15 +12,32 @@ import copy from "copy-to-clipboard"
 import clsx from "clsx"
 import { MechNFT } from "../../hooks/useNFTsByOwner"
 import { Link } from "react-router-dom"
+import ChainIcon from "../ChainIcon"
 
 interface Props {
   nft: MechNFT
+}
+
+interface AnkrBlockchainChainId {
+  [key: string]: number
+}
+
+const ankrBlockchainChainId: AnkrBlockchainChainId = {
+  eth: 1,
+  eth_goerli: 5,
+  optimism: 10,
+  bsc: 56,
+  polygon: 137,
+  arbitrum: 42161,
+  avalanche: 43114,
+  gnosis: 100,
 }
 
 const NFTGridItem: React.FC<Props> = ({ nft }) => {
   const [imageError, setImageError] = useState(false)
   const [deploying, setDeploying] = useState(false)
   const needTokenUrl = !nft.imageUrl
+  const chainId = ankrBlockchainChainId[nft.blockchain]
   const { isLoading, data, error } = useTokenUrl(
     needTokenUrl ? nft.tokenUrl : undefined
   )
@@ -76,6 +93,10 @@ const NFTGridItem: React.FC<Props> = ({ nft }) => {
             onClick={() => copy(mechAddress)}
           >
             {shortenAddress(mechAddress)}
+          </div>
+          <div className={classes.infoItem}>
+            <p>Chain:</p>
+            <ChainIcon chainId={chainId} className={classes.chainIcon} />
           </div>
         </div>
       </div>
