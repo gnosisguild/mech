@@ -104,14 +104,15 @@ abstract contract MechBase is IMech, Receiver {
         bytes memory data,
         Enum.Operation operation,
         uint256 txGas
-    ) public returns (bytes memory returnData) {
-        if (txGas == 0) {
-            // 200 is the gas needed to execute the rest of this function
-            txGas = gasleft() - 200;
-        }
-
+    ) public onlyOperator returns (bytes memory returnData) {
         bool success;
-        (success, returnData) = _exec(to, value, data, operation, txGas);
+        (success, returnData) = _exec(
+            to,
+            value,
+            data,
+            operation,
+            txGas == 0 ? gasleft() : txGas
+        );
 
         if (!success) {
             // solhint-disable-next-line no-inline-assembly
