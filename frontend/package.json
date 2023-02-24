@@ -35,7 +35,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "postinstall": "wagmi generate"
+    "postinstall": "cd .. && yarn build && cd frontend && wagmi generate"
   },
   "eslintConfig": {
     "extends": "react-app"
