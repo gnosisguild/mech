@@ -299,11 +299,6 @@ describe("MechBase contract", () => {
       const BASE_TX_GAS = 21000
       const metaTxGasCost = aliceGasUsed.sub(BASE_TX_GAS) // the actual transfer gas
 
-      // const metaTransferTx = await testToken.populateTransaction.transferFrom(
-      //   mech1.address,
-      //   bob.address,
-      //   3
-      // )
 
       // send just enough gas to meta tx -> gas estimation succeed
       const mechTxGas = await mech1
