@@ -7,10 +7,13 @@
     "frontend"
   ],
   "scripts": {
-    "build": "yarn hardhat compile",
-    "build:all": "yarn build && yarn workspace mech-sdk build && yarn workspace frontend build",
+    "build": "yarn hardhat compile && yarn workspace frontend generate",
     "deploy": "hardhat deploy --network",
     "verify": "hardhat verify --network",
+    "build:sdk": "yarn workspace mech-sdk build",
+    "build:frontend": "yarn workspace frontend build",
+    "build:all": "yarn build && yarn build:sdk && yarn build:frontend",
+    "start": "yarn workspace frontend start",
     "check": "yarn check:prettier && yarn check:lint",
     "check:lint": "eslint sdk test --ext .ts",
     "check:prettier": "prettier '**/*.{sol,js,ts,tsx,json}' --ignore-path .gitignore --list-different",

@@ -16,7 +16,51 @@ Smart account with programmable ownership
 - [ZodiacMech.sol](contracts/ZodiacMech.sol): allow enabled [zodiac](https://github.com/gnosis/zodiac) modules to sign transactions on behalf of the Mech
 - [MechBase.sol](contracts/MechBase.sol): implement custom ownership terms by extending this abstract contract
 
-## EIP-1271 signatures
+## Contribute
+
+The repo is structured as a monorepo with `mech-contracts` as the container package exporting the contract sources and artifacts.
+`mech-sdk` is a set of TypeScript functions for interaction with the mech contracts.
+`frontend` is a private package containing the sources for the mech wallet app running at https://mech-omega.vercel.app.
+
+##### Install all dependencies
+
+```
+yarn install
+```
+
+##### Compile contracts and generate TypeScript interfaces for the SDK and front-end
+
+```
+yarn build
+```
+
+##### Build SDK
+
+```
+yarn build:sdk
+```
+
+This step is necessary to make changes in SDK functions available to a locally running front-end.
+
+##### Start front-end
+
+```
+yarn start
+```
+
+Must be restarted after any changes to the SDK functions.
+
+##### Run tests
+
+```
+yarn test
+```
+
+Tests covers both, the contract logic as well as the SDK functions.
+
+## How it works
+
+### EIP-1271 signatures
 
 [MechBase](contracts/MechBase.sol) implements the EIP-1271 interface.
 It validates that a given ECDSA signature is from the expected account where the expected account is derived using the `isOperator` that inheriting contracts must implement.
