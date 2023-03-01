@@ -1,7 +1,7 @@
 import React from "react"
 import { useParams } from "react-router-dom"
-import { calculateERC721MechAddress, makeExecTransaction } from "mech-sdk"
-import { useChainId, useSendTransaction } from "wagmi"
+import { calculateERC721MechAddress } from "mech-sdk"
+import { useChainId } from "wagmi"
 import Layout from "../../components/Layout"
 import { useErc721OwnerOf } from "../../generated"
 import { BigNumber } from "ethers"
@@ -12,6 +12,7 @@ import classes from "./Mech.module.css"
 import Spinner from "../../components/Spinner"
 import MechConnect from "../../components/Connect/Connect"
 import { ProvideWalletConnect } from "../../hooks/useWalletConnect"
+import { useHandleRequest } from "../../hooks/useHandleRequest"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -36,18 +37,9 @@ const Mech: React.FC = () => {
     args: [BigNumber.from(tokenId)],
   })
 
-  const { sendTransaction } = useSendTransaction({
-    mode: "recklesslyUnprepared",
-  })
-
-  const handleRequest = async (props: any) => {
-    console.log("handle REQUEST", props)
-    // sendTransaction({recklesslySetUnpreparedRequest: makeExecTransaction()})
-    // sendTransaction({ recklesslySetUnpreparedRequest: { to } })
-    return "test"
-  }
-
   const mechAddress = calculateERC721MechAddress(token, tokenId)
+
+  const handleRequest = useHandleRequest(mechAddress)
 
   return (
     <Layout mechAddress={mechAddress}>
@@ -75,4 +67,5 @@ const Mech: React.FC = () => {
     </Layout>
   )
 }
+
 export default Mech

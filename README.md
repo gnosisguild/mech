@@ -48,8 +48,6 @@ This step is necessary to make changes in SDK functions available to a locally r
 yarn start
 ```
 
-Must be restarted after any changes to the SDK functions.
-
 ##### Run tests
 
 ```
