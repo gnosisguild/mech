@@ -57,7 +57,6 @@
 
 .sessions li {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   background-color: var(--box-bg);
   padding: 5px 5px 5px 10px;
@@ -67,12 +66,16 @@
 
 .sessions .icon {
   height: 24px;
+  width: 24px;
   margin-right: 4px;
+  object-fit: contain;
+  border-radius: 5px;
 }
 .sessions .name {
   overflow-x: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex-grow: 1;
 }
 
 .disconnect {
