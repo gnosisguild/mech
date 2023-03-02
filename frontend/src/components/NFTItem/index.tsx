@@ -85,10 +85,14 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
           <li>
             <label>Operator</label>
             <div
-              className={clsx(classes.infoItem, classes.address)}
-              onClick={() => copy(operatorAddress || "")}
+              className={clsx(classes.infoItem, {
+                [classes.address]: !!operatorAddress,
+              })}
+              onClick={
+                operatorAddress ? () => copy(operatorAddress) : undefined
+              }
             >
-              {shortenAddress(operatorAddress || "")}
+              {operatorAddress ? shortenAddress(operatorAddress) : "\u2014"}
             </div>
           </li>
           <li>
