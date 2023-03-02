@@ -10,9 +10,11 @@ import NFTItem from "../../components/NFTItem"
 
 import classes from "./Mech.module.css"
 import Spinner from "../../components/Spinner"
-import MechConnect from "../../components/Connect/Connect"
+import MechConnect from "../../components/Connect"
 import { ProvideWalletConnect } from "../../hooks/useWalletConnect"
 import { useHandleRequest } from "../../hooks/useHandleRequest"
+import { useDeployMech } from "../../hooks/useDeployMech"
+import MechDeploy from "../../components/Deploy"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -37,6 +39,8 @@ const Mech: React.FC = () => {
     args: [BigNumber.from(tokenId)],
   })
 
+  const { deployed, deploy, deployPending } = useDeployMech(token, tokenId)
+
   const mechAddress = calculateERC721MechAddress(token, tokenId)
 
   const handleRequest = useHandleRequest(mechAddress)
@@ -59,7 +63,10 @@ const Mech: React.FC = () => {
               mechAddress={mechAddress}
               onRequest={handleRequest}
             >
-              <MechConnect token={token} tokenId={tokenId} />
+              {deployed && <MechConnect />}
+              {!deployed && (
+                <MechDeploy deploy={deploy} deployPending={deployPending} />
+              )}
             </ProvideWalletConnect>
           </>
         )}

@@ -6,19 +6,11 @@ import Spinner from "../Spinner"
 
 import classes from "./Connect.module.css"
 import Button from "../Button"
-import { useDeployMech } from "../../hooks/useDeployMech"
 
-interface Props {
-  token: string
-  tokenId: string
-}
-
-const MechConnect: React.FC<Props> = ({ token, tokenId }) => {
+const MechConnect: React.FC = () => {
   const { pair, disconnect, sessions } = useWalletConnect()
   const [loading, setLoading] = useState(false)
   const [uri, setUri] = useState("")
-
-  const { deployed } = useDeployMech(token, tokenId)
 
   const disconnectAll = () => {
     sessions.forEach((session) => {
@@ -43,20 +35,15 @@ const MechConnect: React.FC<Props> = ({ token, tokenId }) => {
     <div className={classes.container}>
       <h3>App Connect</h3>
       <div className={classes.connectInput}>
-        {deployed ? (
-          <label>
-            Copy and paste the Wallet Connect link here to connect this Mech to
-            an app.
-          </label>
-        ) : (
-          <label>Deploy this Mech to use it for connecting to apps</label>
-        )}
+        <label>
+          Copy and paste the Wallet Connect link here to connect this Mech to an
+          app.
+        </label>
         <input
           type="text"
           value={uri}
           onChange={handleChange}
           placeholder="wc:9e5b70f5-ddef-4403-999e-"
-          disabled={!deployed}
         />
       </div>
       {loading && <Spinner />}

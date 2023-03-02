@@ -32,7 +32,7 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
     error: assetsError,
   } = useAccountBalance({ address: mechAddress })
 
-  const { deploy, deployed, deployPending } = useDeployMech(token, tokenId)
+  const { deployed } = useDeployMech(token, tokenId)
 
   console.log("assetsData", assetsData, assetsError)
   return (
@@ -72,10 +72,6 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
               />
               {deployed ? "Deployed" : "Not Deployed"}
             </div>
-            {!deployed && !deployPending && (
-              <button onClick={deploy}>deploy</button>
-            )}
-            {deployPending && <Spinner />}
           </li>
           <li>
             <label>Mech</label>

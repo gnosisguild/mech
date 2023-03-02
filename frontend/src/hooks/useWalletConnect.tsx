@@ -12,7 +12,7 @@ import React, {
   useRef,
   useState,
 } from "react"
-import useStickyState from "../components/Connect/useStickyState"
+import useStickyState from "./useStickyState"
 
 const core = new Core({
   projectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID,
