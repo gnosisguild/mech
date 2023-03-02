@@ -81,7 +81,7 @@ const SessionItem: React.FC<{
   disconnect: (uriOrTopic: string) => void
 }> = ({ session, disconnect }) => {
   const icon = session.metadata?.icons[0] || walletConnectLogo
-  const name = session.metadata?.name || "Session"
+  const name = session.metadata?.name || "Connection"
   return (
     <li title={session.metadata?.description}>
       <img

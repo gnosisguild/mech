@@ -13,6 +13,7 @@ import React, {
   useState,
 } from "react"
 import useStickyState from "./useStickyState"
+import { useNetwork } from "wagmi"
 
 const core = new Core({
   projectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID,
@@ -170,7 +171,11 @@ export const ProvideWalletConnect: React.FC<Props> = ({
   /**
    *  WALLET CONNECT V2 SUPPORT
    */
+  const { chain } = useNetwork()
+  const sessionsAtMountRef = useRef(sessions)
   useEffect(() => {
+    if (!chain) return
+
     const init = async () => {
       const client = await Web3Wallet.init({
         core,
@@ -178,19 +183,77 @@ export const ProvideWalletConnect: React.FC<Props> = ({
       })
       setClient(client)
 
+      // set metadata for existing sessions
+      const activeSessions = client.getActiveSessions()
+      const metaEntries = sessionsAtMountRef.current
+        .map(
+          (session) =>
+            !session.legacy && [
+              session.topic,
+              activeSessions[session.topic].peer.metadata,
+            ]
+        )
+        .filter(Boolean) as [string, Metadata][]
+      setSessionsMetadata((sessionsMetadata) => ({
+        ...sessionsMetadata,
+        ...Object.fromEntries(metaEntries),
+      }))
+
       client.on("session_proposal", async (proposal) => {
         console.debug("session_proposal", proposal)
+        const { requiredNamespaces } = proposal.params
 
-        const sessionStruct = await client.approveSession({
-          id: proposal.id,
-          namespaces: {},
-        })
-
-        const session: Session = {
-          topic: sessionStruct.topic,
+        // eip155 namespace should be present
+        if (!requiredNamespaces.eip155) {
+          const error = `Unsupported chains. No eip155 namespace present in the session proposal`
+          console.warn(error, proposal)
+          await client.rejectSession({
+            id: proposal.id,
+            reason: {
+              code: UNSUPPORTED_CHAIN_ERROR_CODE,
+              message: error,
+            },
+          })
+          return
         }
 
-        setSessions((sessions) => [...sessions, session])
+        // chain should be present
+        const isChainIdPresent = requiredNamespaces.eip155.chains?.some(
+          (ns) => ns === `eip155:${chain.id}`
+        )
+        if (!isChainIdPresent) {
+          const error = `Unsupported chains. No eip155:${chain.id} namespace present in the session proposal`
+          console.warn(error, proposal)
+          await client.rejectSession({
+            id: proposal.id,
+            reason: {
+              code: UNSUPPORTED_CHAIN_ERROR_CODE,
+              message: error,
+            },
+          })
+          return
+        }
+
+        const accounts = requiredNamespaces.eip155.chains?.map(
+          (chain) => `${chain}:${mechAddress}`
+        )
+
+        const { topic, peer } = await client.approveSession({
+          id: proposal.id,
+          namespaces: {
+            eip155: {
+              accounts: accounts || [`eip155:${chain.id}:${mechAddress}`],
+              methods: requiredNamespaces.eip155.methods,
+              events: requiredNamespaces.eip155.events,
+            },
+          },
+        })
+
+        setSessions((sessions) => [...sessions, { topic }])
+        setSessionsMetadata((sessionsMetadata) => ({
+          ...sessionsMetadata,
+          [topic]: peer.metadata,
+        }))
       })
 
       client.on("session_request", async (event) => {
@@ -199,20 +262,31 @@ export const ProvideWalletConnect: React.FC<Props> = ({
         const requestSession = client.getActiveSessions()[topic]
         console.debug("session_request", event, requestSession, request)
 
-        const result = await onRequest({ session: requestSession, request })
+        const result = await onRequest({ session: { topic }, request })
 
         const response = { id, result, jsonrpc: "2.0" }
         await client.respondSessionRequest({ topic, response })
       })
 
       // TODO: handle auth_request
-      client.on("auth_request", async (event) => {
-        console.debug("auth_request", event)
+      // client.on("auth_request", async (event) => {
+      //   console.debug("auth_request", event)
+      // })
+
+      client.on("session_delete", async (event) => {
+        console.debug("session_delete", event)
+        setSessions((sessions) =>
+          sessions.filter((s) => !s.legacy && s.topic === event.topic)
+        )
+        setSessionsMetadata((sessionsMetadata) => ({
+          ...sessionsMetadata,
+          [event.topic]: undefined,
+        }))
       })
     }
 
     init()
-  }, [setSessions, onRequest])
+  }, [setSessions, onRequest, chain, mechAddress])
 
   /**
    * HANDLERS
@@ -296,3 +370,9 @@ const useWalletConnect = () => {
 }
 
 export default useWalletConnect
+
+// see https://docs.walletconnect.com/2.0/specs/sign/error-codes
+const UNSUPPORTED_CHAIN_ERROR_CODE = 5100
+const INVALID_METHOD_ERROR_CODE = 1001
+const USER_REJECTED_REQUEST_CODE = 4001
+const USER_DISCONNECTED_CODE = 6000
