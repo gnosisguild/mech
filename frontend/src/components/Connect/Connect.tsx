@@ -49,9 +49,7 @@ const MechConnect: React.FC<Props> = ({ token, tokenId }) => {
             an app.
           </label>
         ) : (
-          <label>
-            Deploy this Mech to connect it to apps and sign in its capacity
-          </label>
+          <label>Deploy this Mech to use it for connecting to apps</label>
         )}
         <input
           type="text"
@@ -63,24 +61,28 @@ const MechConnect: React.FC<Props> = ({ token, tokenId }) => {
       </div>
       {loading && <Spinner />}
 
-      <h4>Connections</h4>
-      <ul className={classes.sessions}>
-        {sessions.map((session, index) => (
-          <SessionItem
-            key={`session-${index}`}
-            session={session}
-            disconnect={disconnect}
-          />
-        ))}
-      </ul>
-      <Button
-        secondary
-        onClick={disconnectAll}
-        className={classes.disconnectAll}
-        disabled={sessions.length === 0}
-      >
-        Disconnect All
-      </Button>
+      {sessions.length > 0 && (
+        <>
+          <h4>Connections</h4>
+          <ul className={classes.sessions}>
+            {sessions.map((session, index) => (
+              <SessionItem
+                key={`session-${index}`}
+                session={session}
+                disconnect={disconnect}
+              />
+            ))}
+          </ul>
+          <Button
+            secondary
+            onClick={disconnectAll}
+            className={classes.disconnectAll}
+            disabled={sessions.length === 0}
+          >
+            Disconnect All
+          </Button>
+        </>
+      )}
     </div>
   )
 }
