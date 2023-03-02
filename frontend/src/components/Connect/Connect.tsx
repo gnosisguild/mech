@@ -6,11 +6,19 @@ import Spinner from "../Spinner"
 
 import classes from "./Connect.module.css"
 import Button from "../Button"
+import { useDeployMech } from "../../hooks/useDeployMech"
 
-const MechConnect: React.FC = () => {
+interface Props {
+  token: string
+  tokenId: string
+}
+
+const MechConnect: React.FC<Props> = ({ token, tokenId }) => {
   const { pair, disconnect, sessions } = useWalletConnect()
   const [loading, setLoading] = useState(false)
   const [uri, setUri] = useState("")
+
+  const { deployed } = useDeployMech(token, tokenId)
 
   const disconnectAll = () => {
     sessions.forEach((session) => {
@@ -35,15 +43,22 @@ const MechConnect: React.FC = () => {
     <div className={classes.container}>
       <h3>App Connect</h3>
       <div className={classes.connectInput}>
-        <label>
-          Copy and paste the Wallet Connect link here to connect this Mech to an
-          app.
-        </label>
+        {deployed ? (
+          <label>
+            Copy and paste the Wallet Connect link here to connect this Mech to
+            an app.
+          </label>
+        ) : (
+          <label>
+            Deploy this Mech to connect it to apps and sign in its capacity
+          </label>
+        )}
         <input
           type="text"
           value={uri}
           onChange={handleChange}
           placeholder="wc:9e5b70f5-ddef-4403-999e-"
+          disabled={!deployed}
         />
       </div>
       {loading && <Spinner />}
@@ -51,9 +66,11 @@ const MechConnect: React.FC = () => {
       <h4>Connections</h4>
       <ul className={classes.sessions}>
         {sessions.map((session, index) => (
-          <li key={`session-${index}`}>
-            <SessionItem session={session} disconnect={disconnect} />
-          </li>
+          <SessionItem
+            key={`session-${index}`}
+            session={session}
+            disconnect={disconnect}
+          />
         ))}
       </ul>
       <Button
@@ -74,38 +91,35 @@ const SessionItem: React.FC<{
   session: SessionWithMetadata
   disconnect: (uriOrTopic: string) => void
 }> = ({ session, disconnect }) => {
-  const disconnectButton = (
-    <Button
-      secondary
-      onClick={() => disconnect(session.legacy ? session.uri : session.topic)}
-      className={classes.disconnect}
-      title="Disconnect"
-    >
-      ✕
-    </Button>
-  )
-
-  if (!session.metadata) {
-    return <p>Session{disconnectButton}</p>
-  }
-  const icon = session.metadata.icons[0]
+  const icon = session.metadata?.icons[0]
+  const name = session.metadata?.name || "Session"
   return (
-    <>
-      <p title={session.metadata.description}>
-        {icon && (
-          <img src={icon} alt={session.metadata.name} style={{ height: 24 }} />
-        )}
-        {session.metadata.name}
-        <a
-          href={session.metadata.url}
-          rel="external nofollow noreferrer"
-          target="_blank"
-        >
-          <ExternalLinkIcon />
-        </a>
-        {disconnectButton}
-      </p>
-    </>
+    <li title={session.metadata?.description}>
+      {icon && (
+        <img
+          src={icon}
+          alt={name}
+          className={classes.icon}
+          style={{ height: 24 }}
+        />
+      )}
+      <span className={classes.name}>{name}</span>
+      <a
+        href={session.metadata?.url}
+        rel="external nofollow noreferrer"
+        target="_blank"
+      >
+        <ExternalLinkIcon />
+      </a>
+      <Button
+        secondary
+        onClick={() => disconnect(session.legacy ? session.uri : session.topic)}
+        className={classes.disconnect}
+        title="Disconnect"
+      >
+        ✕
+      </Button>
+    </li>
   )
 }
 

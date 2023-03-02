@@ -65,10 +65,21 @@
   box-shadow: 1px 1px 4px 0px rgba(157, 212, 0, 0.2);
 }
 
+.sessions .icon {
+  height: 24px;
+  margin-right: 4px;
+}
+.sessions .name {
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .disconnect {
   padding: 7px 10px;
   background-color: transparent;
   color: var(--text-color);
+  margin-left: 4px;
 }
 
 .disconnectAll {

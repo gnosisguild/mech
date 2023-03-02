@@ -59,7 +59,7 @@ const Mech: React.FC = () => {
               mechAddress={mechAddress}
               onRequest={handleRequest}
             >
-              <MechConnect />
+              <MechConnect token={token} tokenId={tokenId} />
             </ProvideWalletConnect>
           </>
         )}
