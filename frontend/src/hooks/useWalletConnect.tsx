@@ -81,6 +81,10 @@ export const ProvideWalletConnect: React.FC<Props> = ({
   const [sessionsMetadata, setSessionsMetadata] = useState<{
     [uriOrTopic: string]: Metadata | undefined
   }>({})
+
+  /**
+   * LEGACY WALLET CONNECT V1 SUPPORT
+   */
   const legacySignClientsRef = useRef(new Map<string, LegacySignClient>())
 
   const initLegacySignClient = useCallback(
@@ -163,6 +167,56 @@ export const ProvideWalletConnect: React.FC<Props> = ({
     })
   }, [sessions, initLegacySignClient])
 
+  /**
+   *  WALLET CONNECT V2 SUPPORT
+   */
+  useEffect(() => {
+    const init = async () => {
+      const client = await Web3Wallet.init({
+        core,
+        metadata,
+      })
+      setClient(client)
+
+      client.on("session_proposal", async (proposal) => {
+        console.debug("session_proposal", proposal)
+
+        const sessionStruct = await client.approveSession({
+          id: proposal.id,
+          namespaces: {},
+        })
+
+        const session: Session = {
+          topic: sessionStruct.topic,
+        }
+
+        setSessions((sessions) => [...sessions, session])
+      })
+
+      client.on("session_request", async (event) => {
+        const { topic, params, id } = event
+        const { request } = params
+        const requestSession = client.getActiveSessions()[topic]
+        console.debug("session_request", event, requestSession, request)
+
+        const result = await onRequest({ session: requestSession, request })
+
+        const response = { id, result, jsonrpc: "2.0" }
+        await client.respondSessionRequest({ topic, response })
+      })
+
+      // TODO: handle auth_request
+      client.on("auth_request", async (event) => {
+        console.debug("auth_request", event)
+      })
+    }
+
+    init()
+  }, [setSessions, onRequest])
+
+  /**
+   * HANDLERS
+   */
   const pair = useCallback(
     async (uri: string) => {
       try {
@@ -209,50 +263,6 @@ export const ProvideWalletConnect: React.FC<Props> = ({
     },
     [sessions, setSessions]
   )
-
-  useEffect(() => {
-    const init = async () => {
-      const client = await Web3Wallet.init({
-        core,
-        metadata,
-      })
-      setClient(client)
-
-      client.on("session_proposal", async (proposal) => {
-        console.debug("session_proposal", proposal)
-
-        const sessionStruct = await client.approveSession({
-          id: proposal.id,
-          namespaces: {},
-        })
-
-        const session: Session = {
-          topic: sessionStruct.topic,
-        }
-
-        setSessions((sessions) => [...sessions, session])
-      })
-
-      client.on("session_request", async (event) => {
-        const { topic, params, id } = event
-        const { request } = params
-        const requestSession = client.getActiveSessions()[topic]
-        console.debug("session_request", event, requestSession, request)
-
-        const result = await onRequest({ session: requestSession, request })
-
-        const response = { id, result, jsonrpc: "2.0" }
-        await client.respondSessionRequest({ topic, response })
-      })
-
-      // TODO: handle auth_request
-      client.on("auth_request", async (event) => {
-        console.debug("auth_request", event)
-      })
-    }
-
-    init()
-  }, [setSessions, onRequest])
 
   const packedContext = useMemo(
     () => ({
