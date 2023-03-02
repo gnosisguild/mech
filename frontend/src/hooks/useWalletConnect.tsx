@@ -1,7 +1,10 @@
 import { Core } from "@walletconnect/core"
 import { parseWalletConnectUri } from "@walletconnect/utils"
 import LegacySignClient from "@walletconnect/client"
-import Web3WalletClient, { Web3Wallet } from "@walletconnect/web3wallet"
+import Web3WalletClient, {
+  Web3Wallet,
+  Web3WalletTypes,
+} from "@walletconnect/web3wallet"
 import { useNetwork } from "wagmi"
 import React, {
   createContext,
@@ -68,6 +71,11 @@ interface Props {
   mechAddress: string
 }
 
+const web3WalletPromise = Web3Wallet.init({
+  core,
+  metadata,
+})
+
 export const ProvideWalletConnect: React.FC<Props> = ({
   chainId,
   mechAddress,
@@ -75,6 +83,12 @@ export const ProvideWalletConnect: React.FC<Props> = ({
   children,
 }) => {
   const [client, setClient] = useState<Web3WalletClient>()
+  useEffect(() => {
+    web3WalletPromise.then((web3Wallet) => {
+      setClient(web3Wallet)
+    })
+  }, [])
+
   const [sessions, setSessions] = useStickyState<Session[]>(
     [],
     `sessions-${chainId}:${mechAddress}`
@@ -174,118 +188,125 @@ export const ProvideWalletConnect: React.FC<Props> = ({
   const { chain } = useNetwork()
   const sessionsAtMountRef = useRef(sessions)
   useEffect(() => {
-    if (!chain) return
+    if (!chain || !client) return
 
-    const init = async () => {
-      const client = await Web3Wallet.init({
-        core,
-        metadata,
-      })
-      setClient(client)
+    const handleSessionProposal: (
+      proposal: Web3WalletTypes.SessionProposal
+    ) => Promise<void> | void = async (proposal) => {
+      console.debug("session_proposal", proposal)
+      const { requiredNamespaces } = proposal.params
 
-      // set metadata for existing sessions
-      const activeSessions = client.getActiveSessions()
-      const metaEntries = sessionsAtMountRef.current
-        .map((session) => {
-          if (session.legacy) return undefined
-          const activeSession = activeSessions[session.topic]
-          if (!activeSession) return undefined
-          return [session.topic, activeSession.peer.metadata]
-        })
-        .filter(Boolean) as [string, Metadata][]
-      setSessionsMetadata((sessionsMetadata) => ({
-        ...sessionsMetadata,
-        ...Object.fromEntries(metaEntries),
-      }))
-
-      client.on("session_proposal", async (proposal) => {
-        console.debug("session_proposal", proposal)
-        const { requiredNamespaces } = proposal.params
-
-        // eip155 namespace should be present
-        if (!requiredNamespaces.eip155) {
-          const error = `Unsupported chains. No eip155 namespace present in the session proposal`
-          console.warn(error, proposal)
-          await client.rejectSession({
-            id: proposal.id,
-            reason: {
-              code: UNSUPPORTED_CHAIN_ERROR_CODE,
-              message: error,
-            },
-          })
-          return
-        }
-
-        // chain should be present
-        const isChainIdPresent = requiredNamespaces.eip155.chains?.some(
-          (ns) => ns === `eip155:${chain.id}`
-        )
-        if (!isChainIdPresent) {
-          const error = `Unsupported chains. No eip155:${chain.id} namespace present in the session proposal`
-          console.warn(error, proposal)
-          await client.rejectSession({
-            id: proposal.id,
-            reason: {
-              code: UNSUPPORTED_CHAIN_ERROR_CODE,
-              message: error,
-            },
-          })
-          return
-        }
-
-        const accounts = requiredNamespaces.eip155.chains?.map(
-          (chain) => `${chain}:${mechAddress}`
-        )
-
-        const { topic, peer } = await client.approveSession({
+      // eip155 namespace should be present
+      if (!requiredNamespaces.eip155) {
+        const error = `Unsupported chains. No eip155 namespace present in the session proposal`
+        console.warn(error, proposal)
+        await client.rejectSession({
           id: proposal.id,
-          namespaces: {
-            eip155: {
-              accounts: accounts || [`eip155:${chain.id}:${mechAddress}`],
-              methods: requiredNamespaces.eip155.methods,
-              events: requiredNamespaces.eip155.events,
-            },
+          reason: {
+            code: UNSUPPORTED_CHAIN_ERROR_CODE,
+            message: error,
           },
         })
+        return
+      }
 
-        setSessions((sessions) => [...sessions, { topic }])
-        setSessionsMetadata((sessionsMetadata) => ({
-          ...sessionsMetadata,
-          [topic]: peer.metadata,
-        }))
+      // chain should be present
+      const isChainIdPresent = requiredNamespaces.eip155.chains?.some(
+        (ns) => ns === `eip155:${chain.id}`
+      )
+      if (!isChainIdPresent) {
+        const error = `Unsupported chains. No eip155:${chain.id} namespace present in the session proposal`
+        console.warn(error, proposal)
+        await client.rejectSession({
+          id: proposal.id,
+          reason: {
+            code: UNSUPPORTED_CHAIN_ERROR_CODE,
+            message: error,
+          },
+        })
+        return
+      }
+
+      const accounts = requiredNamespaces.eip155.chains?.map(
+        (chain) => `${chain}:${mechAddress}`
+      )
+
+      const { topic, peer } = await client.approveSession({
+        id: proposal.id,
+        namespaces: {
+          eip155: {
+            accounts: accounts || [`eip155:${chain.id}:${mechAddress}`],
+            methods: requiredNamespaces.eip155.methods,
+            events: requiredNamespaces.eip155.events,
+          },
+        },
       })
 
-      client.on("session_request", async (event) => {
-        const { topic, params, id } = event
-        const { request } = params
-        const requestSession = client.getActiveSessions()[topic]
-        console.debug("session_request", event, requestSession, request)
-
-        const result = await onRequest({ session: { topic }, request })
-
-        const response = { id, result, jsonrpc: "2.0" }
-        await client.respondSessionRequest({ topic, response })
-      })
-
-      // TODO: handle auth_request
-      // client.on("auth_request", async (event) => {
-      //   console.debug("auth_request", event)
-      // })
-
-      client.on("session_delete", async (event) => {
-        console.debug("session_delete", event)
-        setSessions((sessions) =>
-          sessions.filter((s) => s.legacy || s.topic !== event.topic)
-        )
-        setSessionsMetadata((sessionsMetadata) => ({
-          ...sessionsMetadata,
-          [event.topic]: undefined,
-        }))
-      })
+      setSessions((sessions) => [...sessions, { topic }])
+      setSessionsMetadata((sessionsMetadata) => ({
+        ...sessionsMetadata,
+        [topic]: peer.metadata,
+      }))
     }
 
-    init()
-  }, [setSessions, onRequest, chain, mechAddress])
+    const handleSessionRequest: (
+      request: Web3WalletTypes.SessionRequest
+    ) => Promise<void> | void = async (sessionRequest) => {
+      const { topic, params, id } = sessionRequest
+      const { request } = params
+      const requestSession = client.getActiveSessions()[topic]
+      console.debug("session_request", sessionRequest, requestSession, request)
+
+      const result = await onRequest({ session: { topic }, request })
+
+      const response = { id, result, jsonrpc: "2.0" }
+      await client.respondSessionRequest({ topic, response })
+    }
+
+    const handleSessionDelete: (
+      sessionDelete: Web3WalletTypes.SessionDelete
+    ) => Promise<void> | void = async (sessionDelete) => {
+      console.debug("session_delete", sessionDelete)
+      setSessions((sessions) =>
+        sessions.filter((s) => s.legacy || s.topic !== sessionDelete.topic)
+      )
+      setSessionsMetadata((sessionsMetadata) => ({
+        ...sessionsMetadata,
+        [sessionDelete.topic]: undefined,
+      }))
+    }
+
+    // set metadata for existing sessions
+    const activeSessions = client.getActiveSessions()
+    const metaEntries = sessionsAtMountRef.current
+      .map((session) => {
+        if (session.legacy) return undefined
+        const activeSession = activeSessions[session.topic]
+        if (!activeSession) return undefined
+        return [session.topic, activeSession.peer.metadata]
+      })
+      .filter(Boolean) as [string, Metadata][]
+    setSessionsMetadata((sessionsMetadata) => ({
+      ...sessionsMetadata,
+      ...Object.fromEntries(metaEntries),
+    }))
+
+    client.on("session_proposal", handleSessionProposal)
+    client.on("session_request", handleSessionRequest)
+    client.on("session_delete", handleSessionDelete)
+
+    // TODO: handle auth_request
+    // client.on("auth_request", async (event) => {
+    //   console.debug("auth_request", event)
+    // })
+
+    return () => {
+      if (!client) return
+      client.off("session_proposal", handleSessionProposal)
+      client.off("session_request", handleSessionRequest)
+      client.off("session_delete", handleSessionDelete)
+    }
+  }, [client, setSessions, onRequest, chain, mechAddress])
 
   /**
    * HANDLERS
