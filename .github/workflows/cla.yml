@@ -15,8 +15,9 @@ jobs:
         uses: cla-assistant/github-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # the below token should have repo scope and must be manually added by you in the repository's secret
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           path-to-signatures: "signatures/version1/cla.json"
           path-to-document: "https://github.com/gnosis/CLA"
           # branch should not be protected
