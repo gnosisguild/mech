@@ -1,10 +1,10 @@
 import { makeExecTransaction } from "mech-sdk"
 import { useCallback } from "react"
-import { useSigner } from "wagmi"
+import { useJsonRpcSigner } from "./useJsonRpcSigner"
 import { ProvideWalletConnect } from "./useWalletConnect"
 
 export const useHandleRequest = (mechAddress: string) => {
-  const { data: signer } = useSigner()
+  const signer = useJsonRpcSigner()
 
   const handleRequest = useCallback<HandleRequest>(
     async ({ session, request }) => {
@@ -14,8 +14,10 @@ export const useHandleRequest = (mechAddress: string) => {
       }
 
       switch (request.method) {
+        // transaction need to be wrapped
         case "eth_sendTransaction": {
           const txFields = request.params[0] as TransactionFields
+          // use ethers signer to auto-populate gas and nonce rather than using provider.send
           const res = await signer.sendTransaction(
             makeExecTransaction(mechAddress, txFields)
           )
@@ -28,27 +30,29 @@ export const useHandleRequest = (mechAddress: string) => {
           )
         }
 
-        //   case 'eth_sign':
-        //   case 'personal_sign')
-        //     result = onSign({session: requestSession, request})
-        //   case 'eth_signTypedData':
-        //   case 'eth_signTypedData_v3':
-        //   case 'eth_signTypedData_v4':
-        //     result = onSignTypedData?({session: requestSession, request})
-        //   case 'eth_sendTransaction':
-        //   case 'eth_signTransaction':
-        //     result = onSendTransaction?({session: requestSession, request})
-        // }
-
-        // const requestParamsMessage = request.params[0]
-        // convert `requestParamsMessage` by using a method like hexToUtf8
-        // const message = hexToUtf8(requestParamsMessage)
-
-        // sign the message
-        // const signedMessage = await wallet.signMessage(message)
-
         default:
-          throw new Error(`not implemented: ${request.method}`)
+          try {
+            return await signer.provider.send(request.method, request.params)
+          } catch (e: any) {
+            let jsonRpcBody
+            try {
+              jsonRpcBody =
+                typeof e === "object" &&
+                "body" in e &&
+                typeof e.body === "string"
+                  ? JSON.parse(e.body)
+                  : undefined
+            } catch (pe) {}
+
+            if (jsonRpcBody?.error?.code) {
+              throw new JsonRpcError(
+                jsonRpcBody.error.code,
+                jsonRpcBody.error.message
+              )
+            }
+
+            throw e
+          }
       }
     },
     [mechAddress, signer]
@@ -67,4 +71,15 @@ interface TransactionFields {
   gas: string
   to: string
   value: string
+}
+
+export class JsonRpcError extends Error {
+  jsonRpcCode: number
+  jsonRpcMessage: string | null | undefined
+
+  constructor(public code: number, message?: string | null) {
+    super(`JSON-RPC error ${code}: ${message || ""}`)
+    this.jsonRpcCode = code
+    this.jsonRpcMessage = message
+  }
 }

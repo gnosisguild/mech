@@ -97,6 +97,40 @@ export const ProvideWalletConnect: React.FC<Props> = ({
     [uriOrTopic: string]: Metadata | undefined
   }>({})
 
+  // wrap onRequest to add error handling. Return value has either `result` or `error` for failed requests
+  const handleRequest = useCallback(
+    async ({ session, request }: { session: Session; request: Request }) => {
+      console.debug("handleRequest", { session, request })
+      let result = undefined
+      let error = undefined
+      try {
+        result = await onRequest({ session, request })
+      } catch (e: any) {
+        console.debug("handleRequest error", e)
+
+        let code = e?.code || e?.data?.code
+        if (code === "ACTION_REJECTED") {
+          // user rejected the action
+          code = USER_REJECTED_REQUEST_CODE
+        }
+        if (code === "UNSUPPORTED_OPERATION") {
+          code = INVALID_METHOD_ERROR_CODE
+        }
+
+        if (!code) throw e
+
+        error = {
+          code,
+          message:
+            e?.data?.message || e?.reason || e?.message || "unknown error",
+        }
+      }
+      console.log("handleRequest response", { result, error })
+      return { result, error }
+    },
+    [onRequest]
+  )
+
   /**
    * LEGACY WALLET CONNECT V1 SUPPORT
    */
@@ -151,15 +185,27 @@ export const ProvideWalletConnect: React.FC<Props> = ({
         console.error("legacySignClient > on error", error)
       })
 
-      legacySignClient.on("call_request", (error, payload) => {
-        if (error) {
-          console.error(
-            "legacySignClient > call_request failed",
-            error,
-            session
-          )
+      legacySignClient.on("call_request", async (err, payload) => {
+        if (err) {
+          console.error("legacySignClient > call_request failed", err, session)
         }
-        onRequest({ session, request: payload })
+        const { result, error } = await handleRequest({
+          session,
+          request: payload,
+        })
+        if (error) {
+          legacySignClient.rejectRequest({
+            id: payload.id,
+            error,
+            jsonrpc: "2.0",
+          })
+        } else {
+          legacySignClient.approveRequest({
+            id: payload.id,
+            result,
+            jsonrpc: "2.0",
+          })
+        }
       })
 
       legacySignClient.on("disconnect", async () => {
@@ -171,7 +217,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
 
       legacySignClientsRef.current.set(session.uri, legacySignClient)
     },
-    [onRequest, setSessions, chainId, mechAddress]
+    [handleRequest, setSessions, chainId, mechAddress]
   )
 
   useEffect(() => {
@@ -254,13 +300,19 @@ export const ProvideWalletConnect: React.FC<Props> = ({
     ) => Promise<void> | void = async (sessionRequest) => {
       const { topic, params, id } = sessionRequest
       const { request } = params
-      const requestSession = client.getActiveSessions()[topic]
-      console.debug("session_request", sessionRequest, requestSession, request)
-
-      const result = await onRequest({ session: { topic }, request })
-
-      const response = { id, result, jsonrpc: "2.0" }
-      await client.respondSessionRequest({ topic, response })
+      const { result, error } = await handleRequest({
+        session: { topic },
+        request,
+      })
+      await client.respondSessionRequest({
+        topic,
+        response: {
+          id,
+          result,
+          error,
+          jsonrpc: "2.0",
+        },
+      })
     }
 
     const handleSessionDelete: (
@@ -306,7 +358,7 @@ export const ProvideWalletConnect: React.FC<Props> = ({
       client.off("session_request", handleSessionRequest)
       client.off("session_delete", handleSessionDelete)
     }
-  }, [client, setSessions, onRequest, chain, mechAddress])
+  }, [client, setSessions, handleRequest, chain, mechAddress])
 
   /**
    * HANDLERS

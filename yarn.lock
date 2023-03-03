@@ -5233,7 +5233,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@walletconnect/sign-client@npm:^2.3.3, @walletconnect/sign-client@npm:^2.4.6":
+"@walletconnect/sign-client@npm:^2.4.6":
   version: 2.4.6
   resolution: "@walletconnect/sign-client@npm:2.4.6"
   dependencies:
@@ -5401,7 +5401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@walletconnect/web3wallet@npm:^1.1.1":
+"@walletconnect/web3wallet@npm:^1.4.0":
   version: 1.4.0
   resolution: "@walletconnect/web3wallet@npm:1.4.0"
   dependencies:
@@ -10723,10 +10723,9 @@ __metadata:
     "@walletconnect/client": ^1.8.0
     "@walletconnect/core": ^2.3.3
     "@walletconnect/legacy-types": ^2.0.0-rc.0
-    "@walletconnect/sign-client": ^2.3.3
     "@walletconnect/types": ^2.3.3
     "@walletconnect/utils": ^1.6.5
-    "@walletconnect/web3wallet": ^1.1.1
+    "@walletconnect/web3wallet": ^1.4.0
     "@web3modal/ethereum": ^2.1.0
     "@web3modal/react": ^2.1.0
     buffer: ^6.0.3
