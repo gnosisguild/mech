@@ -1,4 +1,4 @@
-import { makeExecTransaction } from "mech-sdk"
+import { makeExecTransaction, signWithMech } from "mech-sdk"
 import { useCallback } from "react"
 import { useJsonRpcSigner } from "./useJsonRpcSigner"
 import { ProvideWalletConnect } from "./useWalletConnect"
@@ -28,6 +28,41 @@ export const useHandleRequest = (mechAddress: string) => {
           return await signer.signTransaction(
             makeExecTransaction(mechAddress, txFields)
           )
+        }
+
+        case "eth_sign": {
+          // replace mech address with signer address in the params
+          const [, message] = request.params
+          const ecdsaSignature = await signer.provider.send(request.method, [
+            await signer.getAddress(),
+            message,
+          ])
+          return signWithMech(mechAddress, ecdsaSignature)
+        }
+        case "personal_sign": {
+          // replace mech address with signer address in the params
+          const [message, , password] = request.params
+          const ecdsaSignature = await signer.provider.send(request.method, [
+            message,
+            await signer.getAddress(),
+            password,
+          ])
+          return signWithMech(mechAddress, ecdsaSignature)
+        }
+
+        case "eth_signTypedData":
+        case "signTypedData_v1":
+        case "eth_signTypedData_v3":
+        case "eth_signTypedData_v4": {
+          const typedData = request.params[1] as any
+          console.log(typeof typedData, { typedData })
+
+          const ecdsaSignature = await signer.provider.send(request.method, [
+            await signer.getAddress(),
+            typedData,
+          ])
+          console.log({ ecdsaSignature })
+          return signWithMech(mechAddress, ecdsaSignature)
         }
 
         default:
