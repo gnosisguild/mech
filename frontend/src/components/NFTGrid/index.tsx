@@ -24,11 +24,11 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
   const [nftData, setNftData] = useState<MechNFT[]>([])
 
   useEffect(() => {
-    if (nftData.length === 0) {
-      setNftData(data?.assets || [])
-      return
-    }
     setNftData((nftData) => {
+      if (nftData.length === 0) {
+        return data?.assets || []
+      }
+
       const ids = new Set(
         nftData.map((nft) => nft.tokenId + nft.contractAddress)
       )

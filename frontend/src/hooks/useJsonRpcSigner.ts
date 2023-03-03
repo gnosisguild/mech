@@ -1,8 +1,4 @@
-import {
-  FallbackProvider,
-  JsonRpcProvider,
-  JsonRpcSigner,
-} from "@ethersproject/providers"
+import { JsonRpcSigner } from "@ethersproject/providers"
 import { useSigner } from "wagmi"
 
 export const useJsonRpcSigner = () => {
