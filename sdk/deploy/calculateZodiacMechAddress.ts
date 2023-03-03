@@ -1,18 +1,17 @@
+import { defaultAbiCoder } from "@ethersproject/abi"
+import { ethers } from "ethers"
+import { getCreate2Address, keccak256 } from "ethers/lib/utils"
+
 import {
   IFactoryFriendly__factory,
   ZodiacMech__factory,
 } from "../../typechain-types"
-
 import {
   DEFAULT_SALT,
   INIT_ADDRESS,
   MODULE_PROXY_FACTORY_ADDRESS,
   ZODIAC_SINGLETON_FACTORY_ADDRESS,
 } from "../constants"
-
-import { defaultAbiCoder } from "@ethersproject/abi"
-import { ethers } from "ethers"
-import { getCreate2Address, keccak256 } from "ethers/lib/utils"
 
 export const calculateZodiacMechAddress = (
   /** Addresses of the Zodiac modules */

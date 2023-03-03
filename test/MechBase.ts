@@ -6,7 +6,7 @@ import { ethers } from "hardhat"
 // We use `loadFixture` to share common setups (or fixtures) between tests.
 // Using this simplifies your tests and makes them run faster, by taking
 // advantage or Hardhat Network's snapshot functionality.
-import { signWithMech } from "../sdk/signWithMech"
+import { signWithMech } from "../sdk/sign/signWithMech"
 
 const EIP1271_MAGIC_VALUE = "0x1626ba7e"
 
@@ -230,110 +230,106 @@ describe("MechBase contract", () => {
       expect(decoded[0]).to.equal(alice.address)
     })
 
-    it.skip('respects the "txGas" argument', async () => {
-      const { mech1, testToken, alice } = await loadFixture(deployMech1)
+    it.skip("uses right gas", async () => {
+      const { mech1, testToken, alice, bob } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
       await testToken.mintToken(alice.address, 1)
 
-      // mint testToken#2 to mech1
-      await testToken.mintToken(mech1.address, 2)
+      // mint testToken#2 to alice
+      await testToken.mintToken(alice.address, 2)
 
-      const transferTx = await testToken.populateTransaction.transferFrom(
-        mech1.address,
-        alice.address,
-        2
-      )
-      const res = await transferTx.wait()
+      // mint testToken#3 to mech1
+      await testToken.mintToken(mech1.address, 3)
 
-      const mgas = await mech1
+      // mint a token to bob, since receiving the first token will cost more gas
+      await testToken.mintToken(bob.address, 4)
+
+      // await testToken.connect(alice).transferFrom(alice.address, bob.address, )
+      const aliceTransferTx = await testToken
+        .connect(alice)
+        .transferFrom(alice.address, bob.address, 2)
+      const mech1TransferTx = await mech1
+        .connect(alice)
+        .exec(
+          testToken.address,
+          0,
+          testToken.interface.encodeFunctionData("transferFrom", [
+            mech1.address,
+            bob.address,
+            3,
+          ]),
+          0,
+          0
+        )
+
+      // go sure both transfers happened
+      expect(await testToken.ownerOf(2)).to.equal(bob.address)
+      expect(await testToken.ownerOf(3)).to.equal(bob.address)
+
+      const aliceGasUsed = (await aliceTransferTx.wait()).gasUsed
+      const mech1GasUsed = (await mech1TransferTx.wait()).gasUsed
+
+      console.log("aliceGasUsed", aliceGasUsed.toNumber())
+      console.log("mech1GasUsed", mech1GasUsed.toNumber())
+
+      // expect(mech1GasUsed.sub(aliceGasUsed).toNumber()).to.be.lessThan(2500) // 2500 is what we reserve in the exec implementation
+    })
+
+    it('respects the "txGas" argument', async () => {
+      const { mech1, testToken, alice, bob } = await loadFixture(deployMech1)
+
+      // mint testToken#1 to alice to make her the operator of mech1
+      await testToken.mintToken(alice.address, 1)
+
+      // mint testToken#2 to alice
+      await testToken.mintToken(alice.address, 2)
+
+      // mint testToken#3 to mech1
+      await testToken.mintToken(mech1.address, 3)
+
+      // mint a token to bob, since receiving the first token will cost more gas
+      await testToken.mintToken(bob.address, 4)
+
+      // measure actual gas of a transfer and subtract the base tx gas to get a good estimate of the required gas for the meta tx
+      const aliceTransferTx = await testToken
+        .connect(alice)
+        .transferFrom(alice.address, bob.address, 2)
+      const aliceGasUsed = (await aliceTransferTx.wait()).gasUsed
+      const BASE_TX_GAS = 21000
+      const metaTxGasCost = aliceGasUsed.sub(BASE_TX_GAS) // the actual transfer gas
+
+
+      // send just enough gas to meta tx -> gas estimation succeed
+      const mechTxGas = await mech1
         .connect(alice)
         .estimateGas.exec(
           testToken.address,
           0,
-          transferTx.data as string,
+          testToken.interface.encodeFunctionData("transferFrom", [
+            mech1.address,
+            bob.address,
+            3,
+          ]),
           0,
-          transferTx.gasLimit as BigNumber
+          metaTxGasCost
         )
 
-      console.log("GL", { mgas })
-
-      // succeeds when enough gas is provided
-      await expect(
-        mech1
-          .connect(alice)
-          .exec(
-            testToken.address,
-            0,
-            transferTx.data as string,
-            0,
-            transferTx.gasLimit as BigNumber
-          )
-      ).to.not.be.reverted
-
-      // fails when not enough gas is provided
-      await expect(
-        mech1
-          .connect(alice)
-          .exec(
-            testToken.address,
-            0,
-            transferTx.data as string,
-            0,
-            (transferTx.gasLimit as BigNumber).div(2)
-          )
-      ).to.be.revertedWith("Not enough gas to execute the transaction")
-    })
-
-    it.skip("reverts before executing the meta transaction if not enough gas is provided", async () => {
-      const { mech1, testToken, alice } = await loadFixture(deployMech1)
-
-      // mint testToken#1 to alice to make her the operator of mech1
-      await testToken.mintToken(alice.address, 1)
-
-      // mint testToken#2 to mech1
-      await testToken.mintToken(mech1.address, 2)
-
-      const transferTx = await testToken.populateTransaction.transferFrom(
-        mech1.address,
-        alice.address,
-        2
-      )
-
+      // send too little gas to the meta tx -> tx fails
       await expect(
         mech1.connect(alice).exec(
           testToken.address,
           0,
-          transferTx.data as string,
+          testToken.interface.encodeFunctionData("transferFrom", [
+            mech1.address,
+            bob.address,
+            3,
+          ]),
           0,
-          transferTx.gasLimit as BigNumber,
-          { gasLimit: transferTx.gasLimit as BigNumber } // same as gas for meta tx, so there won't be enough gas for the rest of the exec() call
+          metaTxGasCost.sub(1000), // send too little gas
+          { gasLimit: mechTxGas } // send enough
         )
-      ).to.be.revertedWith("Not enough gas to execute the transaction")
-    })
-
-    it.skip("reserves just enough gas for the exec() function itself", async () => {
-      // TODO TODO
-      const { mech1, testToken, alice } = await loadFixture(deployMech1)
-
-      // mint testToken#1 to alice to make her the operator of mech1
-      await testToken.mintToken(alice.address, 1)
-
-      // mint testToken#2 to mech1
-      await testToken.mintToken(mech1.address, 2)
-
-      const transferTx = await testToken.populateTransaction.transferFrom(
-        mech1.address,
-        alice.address,
-        2
-      )
-
-      // get actual gas used for the exec() call
-      const res = await mech1
-        .connect(alice)
-        .exec(testToken.address, 0, "0x", 0, 0)
-      const { gasUsed } = await res.wait()
-      console.log("gasUsed", gasUsed.toString())
+      ).to.be.revertedWithoutReason
     })
   })
 })

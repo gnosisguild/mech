@@ -1,8 +1,6 @@
 //SPDX-License-Identifier: LGPL-3.0
 pragma solidity ^0.8.9;
 
-import "hardhat/console.sol";
-
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
@@ -107,16 +105,14 @@ abstract contract MechBase is IMech, Receiver {
         Enum.Operation operation,
         uint256 txGas
     ) public onlyOperator returns (bytes memory returnData) {
-        // uint256 gasRemaining = gasleft() - 200; // 200 is the gas needed to execute the rest of this function
-        // console.log("remaining gas: %s, txGas: %s", gasRemaining, txGas);
-
-        if (txGas == 0) {
-            // 200 is the gas needed to execute the rest of this function
-            txGas = gasleft() - 200;
-        }
-
         bool success;
-        (success, returnData) = _exec(to, value, data, operation, txGas);
+        (success, returnData) = _exec(
+            to,
+            value,
+            data,
+            operation,
+            txGas == 0 ? gasleft() : txGas
+        );
 
         if (!success) {
             // solhint-disable-next-line no-inline-assembly

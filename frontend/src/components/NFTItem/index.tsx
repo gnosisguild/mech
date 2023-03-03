@@ -7,36 +7,19 @@ import clsx from "clsx"
 import { MechGetNFTMetadataReply } from "../../hooks/useNFT"
 import useAccountBalance from "../../hooks/useAccountBalance"
 import Spinner from "../Spinner"
-import {
-  useChainId,
-  usePrepareContractWrite,
-  useProvider,
-  useSigner,
-} from "wagmi"
-import { deployERC721Mech, makeERC721MechDeployTransaction } from "mech-sdk"
-import {
-  JsonRpcProvider,
-  JsonRpcSigner,
-  Web3Provider,
-} from "@ethersproject/providers"
+import { useDeployMech } from "../../hooks/useDeployMech"
+import { calculateERC721MechAddress } from "mech-sdk"
 
 interface Props {
-  contractAddress: string
+  token: string
   tokenId: string
   nft: MechGetNFTMetadataReply
-  mechAddress: string
   operatorAddress?: string
-  deployed?: boolean
 }
 
-const NFTItem: React.FC<Props> = ({
-  contractAddress,
-  tokenId,
-  nft,
-  mechAddress,
-  operatorAddress,
-  deployed,
-}) => {
+const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
+  const mechAddress = calculateERC721MechAddress(token, tokenId)
+
   const [imageError, setImageError] = useState(false)
   const { isLoading, data, error } = useTokenUrl(
     nft.attributes && !nft.attributes.imageUrl
@@ -49,15 +32,7 @@ const NFTItem: React.FC<Props> = ({
     error: assetsError,
   } = useAccountBalance({ address: mechAddress })
 
-  const { data: signer } = useSigner()
-  const chainId = useChainId()
-
-  const deploy = async () => {
-    if (!signer) return
-    // makeERC721MechDeployTransaction(contractAddress, tokenId, provider)
-  }
-
-  usePrepareContractWrite()
+  const { deployed } = useDeployMech(token, tokenId)
 
   console.log("assetsData", assetsData, assetsError)
   return (
@@ -97,7 +72,6 @@ const NFTItem: React.FC<Props> = ({
               />
               {deployed ? "Deployed" : "Not Deployed"}
             </div>
-            {!deployed && <button onClick={deploy}>deploy</button>}
           </li>
           <li>
             <label>Mech</label>
@@ -111,10 +85,14 @@ const NFTItem: React.FC<Props> = ({
           <li>
             <label>Operator</label>
             <div
-              className={clsx(classes.infoItem, classes.address)}
-              onClick={() => copy(operatorAddress || "")}
+              className={clsx(classes.infoItem, {
+                [classes.address]: !!operatorAddress,
+              })}
+              onClick={
+                operatorAddress ? () => copy(operatorAddress) : undefined
+              }
             >
-              {shortenAddress(operatorAddress || "")}
+              {operatorAddress ? shortenAddress(operatorAddress) : "\u2014"}
             </div>
           </li>
           <li>

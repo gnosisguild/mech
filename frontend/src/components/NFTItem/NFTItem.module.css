@@ -44,7 +44,7 @@
 .imageContainer {
   width: 50%;
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
 }
 
 .main .image {
@@ -80,21 +80,21 @@
   gap: 30px;
 }
 
-label {
+.itemContainer label {
   border: 2px solid var(--button-border);
-  border-radius: 5px;
+  border-radius: 7px;
   padding: 5px 10px;
   width: fit-content;
 }
 
 .info .infoItem {
   background-color: var(--box-bg);
-  border-radius: 5px;
+  border-radius: 7px;
   display: flex;
   justify-content: space-between;
   gap: 10px;
   align-items: center;
-  padding: 5px;
+  padding: 5px 7px;
   box-shadow: 1px 1px 4px 0px rgba(157, 212, 0, 0.2);
   font-family: monospace;
 }

@@ -1,11 +1,3 @@
-import { ERC721Mech__factory } from "../../typechain-types"
-
-import {
-  calculateERC721MechAddress,
-  calculateERC721MechMastercopyAddress,
-} from "./calculateERC721MechAddress"
-import { DEFAULT_SALT, INIT_ADDRESS } from "../constants"
-
 import { defaultAbiCoder } from "@ethersproject/abi"
 import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers"
 import {
@@ -14,6 +6,14 @@ import {
   SupportedNetworks,
 } from "@gnosis.pm/zodiac"
 import { BigNumberish } from "ethers"
+
+import { ERC721Mech__factory } from "../../typechain-types"
+import { DEFAULT_SALT, INIT_ADDRESS } from "../constants"
+
+import {
+  calculateERC721MechAddress,
+  calculateERC721MechMastercopyAddress,
+} from "./calculateERC721MechAddress"
 
 export const makeERC721MechDeployTransaction = (
   /** Address of the ERC721 token contract */
