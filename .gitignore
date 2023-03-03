@@ -3,6 +3,7 @@ cache
 artifacts
 build
 coverage
+coverage.json
 typechain-types
 *.log
 .env

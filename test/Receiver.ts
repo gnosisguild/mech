@@ -100,5 +100,39 @@ describe("Mech Account", () => {
       })
       expect(await test1155Token.balanceOf(mech1.address, 1)).to.equal(2)
     })
+
+    it("mech can receive erc1155 token batches", async () => {
+      const { mech1, test1155Token, alice } = await loadFixture(deployMech1)
+      // mint alice some tokens
+      await test1155Token.mintToken(
+        alice.address,
+        1,
+        10,
+        ethers.utils.randomBytes(0)
+      )
+      await test1155Token.mintToken(
+        alice.address,
+        2,
+        20,
+        ethers.utils.randomBytes(0)
+      )
+
+      await alice.sendTransaction({
+        to: test1155Token.address,
+        value: 0,
+        data: test1155Token.interface.encodeFunctionData(
+          "safeBatchTransferFrom",
+          [
+            alice.address,
+            mech1.address,
+            [1, 2],
+            [10, 20],
+            ethers.utils.randomBytes(0),
+          ]
+        ),
+      })
+      expect(await test1155Token.balanceOf(mech1.address, 1)).to.equal(10)
+      expect(await test1155Token.balanceOf(mech1.address, 2)).to.equal(20)
+    })
   })
 })

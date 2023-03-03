@@ -1,6 +1,5 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
-import { BigNumber } from "ethers"
 import { ethers } from "hardhat"
 
 // We use `loadFixture` to share common setups (or fixtures) between tests.
@@ -231,7 +230,7 @@ describe("MechBase contract", () => {
     })
 
     it("allows to execute delegate calls", async () => {
-      const { mech1, testToken, alice, bob } = await loadFixture(deployMech1)
+      const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
       await testToken.mintToken(alice.address, 1)
