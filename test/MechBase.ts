@@ -230,50 +230,27 @@ describe("MechBase contract", () => {
       expect(decoded[0]).to.equal(alice.address)
     })
 
-    it.skip("uses right gas", async () => {
+    it("allows to execute delegate calls", async () => {
       const { mech1, testToken, alice, bob } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
       await testToken.mintToken(alice.address, 1)
 
-      // mint testToken#2 to alice
-      await testToken.mintToken(alice.address, 2)
+      // deploy a contract with a test() function that reverts if not called via delegatecall
+      const DelegateCall = await ethers.getContractFactory("DelegateCall")
+      const delegateCall = await DelegateCall.deploy()
 
-      // mint testToken#3 to mech1
-      await testToken.mintToken(mech1.address, 3)
+      const callData = delegateCall.interface.encodeFunctionData("test")
 
-      // mint a token to bob, since receiving the first token will cost more gas
-      await testToken.mintToken(bob.address, 4)
+      // this should revert because the call is not a delegate call
+      await expect(
+        mech1.connect(alice).exec(delegateCall.address, 0, callData, 0, 0)
+      ).to.be.revertedWith("Can only be called via delegatecall")
 
-      // await testToken.connect(alice).transferFrom(alice.address, bob.address, )
-      const aliceTransferTx = await testToken
-        .connect(alice)
-        .transferFrom(alice.address, bob.address, 2)
-      const mech1TransferTx = await mech1
-        .connect(alice)
-        .exec(
-          testToken.address,
-          0,
-          testToken.interface.encodeFunctionData("transferFrom", [
-            mech1.address,
-            bob.address,
-            3,
-          ]),
-          0,
-          0
-        )
-
-      // go sure both transfers happened
-      expect(await testToken.ownerOf(2)).to.equal(bob.address)
-      expect(await testToken.ownerOf(3)).to.equal(bob.address)
-
-      const aliceGasUsed = (await aliceTransferTx.wait()).gasUsed
-      const mech1GasUsed = (await mech1TransferTx.wait()).gasUsed
-
-      console.log("aliceGasUsed", aliceGasUsed.toNumber())
-      console.log("mech1GasUsed", mech1GasUsed.toNumber())
-
-      // expect(mech1GasUsed.sub(aliceGasUsed).toNumber()).to.be.lessThan(2500) // 2500 is what we reserve in the exec implementation
+      // this should succeed because the call is a delegate call
+      await expect(
+        mech1.connect(alice).exec(delegateCall.address, 0, callData, 1, 0)
+      ).to.not.be.reverted
     })
 
     it('respects the "txGas" argument', async () => {
@@ -298,7 +275,6 @@ describe("MechBase contract", () => {
       const aliceGasUsed = (await aliceTransferTx.wait()).gasUsed
       const BASE_TX_GAS = 21000
       const metaTxGasCost = aliceGasUsed.sub(BASE_TX_GAS) // the actual transfer gas
-
 
       // send just enough gas to meta tx -> gas estimation succeed
       const mechTxGas = await mech1

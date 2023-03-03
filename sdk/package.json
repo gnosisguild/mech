@@ -1,6 +1,6 @@
 {
   "name": "mech-sdk",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "Smart account with programmable ownership",
   "scripts": {
     "prepare": "yarn build",

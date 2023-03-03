@@ -1,6 +1,6 @@
 {
   "name": "mech-contracts",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "Smart account with programmable ownership",
   "workspaces": [
     "sdk",
@@ -21,7 +21,8 @@
     "fix:prettier": "prettier '**/*.{sol,js,ts,tsx,json}' --ignore-path .gitignore --write",
     "fix:lint": "yarn check:lint --fix",
     "test": "hardhat test",
-    "test:watch": "mocha -w"
+    "test:watch": "mocha -w",
+    "coverage": "hardhat coverage"
   },
   "files": [
     "contracts/**/*",
