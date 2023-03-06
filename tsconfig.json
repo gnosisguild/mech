@@ -16,5 +16,5 @@
     ]
   },
   "include": ["./scripts", "./test", "./sdk", "./typechain-types", "./deploy"],
-  "files": ["./hardhat.config.ts"]
+  "files": ["./hardhat.config.ts", "./types.d.ts"]
 }
