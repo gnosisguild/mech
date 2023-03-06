@@ -26,7 +26,10 @@ abstract contract MechBase is IMech, Receiver {
     function isOperator(address signer) public view virtual returns (bool);
 
     /**
-     * @dev Checks whether the signature provided is valid for the provided hash, complies with EIP-1271
+     * @dev Checks whether the signature provided is valid for the provided hash, complies with EIP-1271. A signature is valid if either:
+     *  - It's a valid ECDSA signature by the mech operator
+     *  - It's a valid EIP-1271 signature by the mech operator
+     *  - It's a valid EIP-1271 signature by the mech itself
      * @param hash Hash of the data (could be either a message hash or transaction hash)
      * @param signature Signature to validate. Can be an ECDSA signature or a EIP-1271 contract signature (identified by v=0)
      */
@@ -44,15 +47,18 @@ abstract contract MechBase is IMech, Receiver {
             // The address of the contract is encoded into r
             address signingContract = address(uint160(uint256(r)));
 
-            if (!isOperator(signingContract)) {
-                return 0xffffffff;
-            }
-
             // The signature data to pass for validation to the contract is appended to the signature and the offset is stored in s
             bytes memory contractSignature;
             // solhint-disable-next-line no-inline-assembly
             assembly {
                 contractSignature := add(add(signature, s), 0x20) // add 0x20 to skip over the length of the bytes array
+            }
+
+            // if it's our own signature, we recursively check if it's valid
+            if (
+                !isOperator(signingContract) && signingContract != address(this)
+            ) {
+                return 0xffffffff;
             }
 
             return

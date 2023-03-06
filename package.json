@@ -40,6 +40,7 @@
   },
   "homepage": "https://github.com/gnosis/mech#readme",
   "devDependencies": {
+    "@ambire/signature-validator": "^1.1.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",

@@ -42,7 +42,7 @@ describe("MechBase contract", () => {
   })
 
   describe("isValidSignature()", () => {
-    it("returns magic value for a valid signature of the mech operator EOA", async () => {
+    it("returns magic value for a valid ECDSA signature of the mech operator EOA", async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
       // mech1 is linked to testToken#1
 
@@ -87,7 +87,7 @@ describe("MechBase contract", () => {
       // mint testToken#1 to alice
       await testToken.mintToken(alice.address, 1)
 
-      // mint testToken#2 to mech1
+      // mint testToken#2 to mech1, making mech1 the operator of mech2
       await testToken.mintToken(mech1.address, 2)
 
       const message = "Test message"
@@ -98,6 +98,24 @@ describe("MechBase contract", () => {
 
       expect(
         await mech2.isValidSignature(messageHash, contractSignature)
+      ).to.equal(EIP1271_MAGIC_VALUE)
+    })
+
+    it("returns magic value for a valid EIP-1271 signature of the mech itself", async () => {
+      const { mech1, testToken, alice } = await loadFixture(deployMech1)
+      // mech1 is linked to testToken#1
+
+      // mint testToken#1 to alice
+      await testToken.mintToken(alice.address, 1)
+
+      const message = "Test message"
+      const ecdsaSignature = await alice.signMessage(message)
+      const messageHash = ethers.utils.hashMessage(message)
+
+      const ownContractSignature = signWithMech(mech1.address, ecdsaSignature)
+
+      expect(
+        await mech1.isValidSignature(messageHash, ownContractSignature)
       ).to.equal(EIP1271_MAGIC_VALUE)
     })
 
