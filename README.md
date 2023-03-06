@@ -74,5 +74,10 @@ Additionally, it supports validation of EIP-1271 contract signatures, which are 
   0000000000000000000000000000000000000000000000000000000000000041  // s component: constant 65 bytes offset to signature data
   00                                                                // v component: constant unpadded `0` as recovery identifier
   00000000000000000000000000000000<length of signature data bytes>
-  <bytes of signature data ....>
+  <bytes of signature data>
 ```
+
+AN EIP-1271 signature will be considered valid if it meets the following conditions:
+
+- the signing contract is either the operator of the mech or the mech itself, and
+- the signing contract's `isValidSignature()` function returns `0x1626ba7e` (EIP-1271 magic value) for the given `<bytes of signature data>`.
