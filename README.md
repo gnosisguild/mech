@@ -12,13 +12,12 @@ Smart account with programmable ownership
 
 #### Threshold ownership
 
-- [ERC20Mech.sol](contracts/ERC20Mech.sol): allow holders of a minimum balance of ERC-20 tokens to sign transactions on behalf of the Mech
 - [ERC1155Mech.sol](contracts/ERC1155Mech.sol): allow holders of a minimum balance of ERC-1155 tokens to sign transactions on behalf of the Mech
 
 #### Programmable ownership
 
 - [ZodiacMech.sol](contracts/ZodiacMech.sol): allow enabled [zodiac](https://github.com/gnosis/zodiac) modules to sign transactions on behalf of the Mech
-- [MechBase.sol](contracts/MechBase.sol): implement custom ownership terms by extending this abstract contract
+- [Mech.sol](contracts/base/Mech.sol): implement custom ownership terms by extending this abstract contract
 
 ## Contribute
 
@@ -62,9 +61,15 @@ Tests covers both, the contract logic as well as the SDK functions.
 
 ## How it works
 
+## EIP-4337 account
+
+Mechs implement the EIP-4337 [Account](contracts/base/Account.sol) interface meaning they allow bundlers to execute account-abstracted user operations from the Mech's address.
+For this purpose the EIP-4337 entry point contract first calls the Mech's `validateUserOp()` function for checking if a user operation has a valid signature by the mech operator.
+The entry point then calls the `exec` function, or any other function using the `onlyOperator` modifier, to trigger execution.
+
 ### EIP-1271 signatures
 
-[MechBase](contracts/MechBase.sol) implements the EIP-1271 interface.
+[Mech](contracts/base/Mech.sol) implements the EIP-1271 interface.
 It validates that a given ECDSA signature is from the expected account where the expected account is derived using the `isOperator` that inheriting contracts must implement.
 
 Additionally, it supports validation of EIP-1271 contract signatures, which are expected to be given in the following format based on ECDSA {r, s, v} components with `v = 0` as the recovery identifier:
@@ -77,7 +82,7 @@ Additionally, it supports validation of EIP-1271 contract signatures, which are 
   <bytes of signature data>
 ```
 
-AN EIP-1271 signature will be considered valid if it meets the following conditions:
+An EIP-1271 signature will be considered valid if it meets the following conditions:
 
 - the signing contract is either the operator of the mech or the mech itself, and
 - the signing contract's `isValidSignature()` function returns `0x1626ba7e` (EIP-1271 magic value) for the given `<bytes of signature data>`.

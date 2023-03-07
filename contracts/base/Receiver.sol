@@ -1,15 +1,20 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.12;
 
 import "@gnosis.pm/safe-contracts/contracts/interfaces/ERC721TokenReceiver.sol";
 import "@gnosis.pm/safe-contracts/contracts/interfaces/ERC1155TokenReceiver.sol";
 import "@gnosis.pm/safe-contracts/contracts/interfaces/ERC777TokensRecipient.sol";
 
+/**
+ * @dev This contract implements the functions necessary to receive ether as well as ERC721, ERC1155 and ERC777 tokens.
+ */
 contract Receiver is
     ERC1155TokenReceiver,
     ERC777TokensRecipient,
     ERC721TokenReceiver
 {
+    receive() external payable {}
+
     function onERC1155Received(
         address,
         address,
@@ -47,6 +52,6 @@ contract Receiver is
         bytes calldata,
         bytes calldata
     ) external pure override {
-        // Implemented for ERC-777, although we don't use it
+        // for ERC-777 compatibility
     }
 }

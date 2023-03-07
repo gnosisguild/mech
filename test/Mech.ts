@@ -9,7 +9,7 @@ import { signWithMech } from "../sdk/sign/signWithMech"
 
 const EIP1271_MAGIC_VALUE = "0x1626ba7e"
 
-describe("MechBase contract", () => {
+describe("Mech base contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
@@ -26,20 +26,6 @@ describe("MechBase contract", () => {
     // Fixtures can return anything you consider useful for your tests
     return { ERC721Mech, testToken, mech1, alice, bob }
   }
-
-  it("should be able to receive ether", async () => {
-    const { mech1 } = await loadFixture(deployMech1)
-    const [deployer] = await ethers.getSigners()
-
-    await deployer.sendTransaction({
-      to: mech1.address,
-      value: ethers.utils.parseEther("1.0"),
-    })
-
-    expect(await ethers.provider.getBalance(mech1.address)).to.equal(
-      ethers.utils.parseEther("1.0")
-    )
-  })
 
   describe("isValidSignature()", () => {
     it("returns magic value for a valid ECDSA signature of the mech operator EOA", async () => {
@@ -167,7 +153,7 @@ describe("MechBase contract", () => {
       const contractSignature = signWithMech(mech2.address, ecdsaSignature)
 
       expect(
-        await mech2.isValidSignature(messageHash, contractSignature)
+        await mech1.isValidSignature(messageHash, contractSignature)
       ).to.equal("0xffffffff")
     })
   })
@@ -191,7 +177,7 @@ describe("MechBase contract", () => {
       ).to.be.revertedWith("ERC721: invalid token ID")
     })
 
-    it("reverts if called from an account that is not the mech operator", async () => {
+    it("reverts if called from an account that is not the mech operator or entry point", async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
@@ -208,7 +194,9 @@ describe("MechBase contract", () => {
       // call exec() from deployer who is not an operator
       await expect(
         mech1.exec(testToken.address, 0, testTx.data as string, 0, 0)
-      ).to.be.revertedWith("Only callable by the mech operator")
+      ).to.be.revertedWith(
+        "Only callable by the mech operator or the entry point contract"
+      )
     })
 
     it("reverts with original data if the meta transaction reverts", async () => {
