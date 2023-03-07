@@ -55,7 +55,11 @@ abstract contract Account is IAccount {
         if (userOp.initCode.length == 0) {
             _validateAndUpdateNonce(userOp);
         }
-        _payPrefund(missingAccountFunds);
+
+        // only pay pre-fund if the signature is valid
+        if (address(uint160(validationData)) == address(0)) {
+            _payPrefund(missingAccountFunds);
+        }
     }
 
     /**

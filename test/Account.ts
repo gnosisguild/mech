@@ -71,7 +71,7 @@ describe("Account base contract", () => {
       ).to.be.revertedWith("Only callable from the entry point contract")
     })
 
-    it("returns 0 if the user op has a valid ECDSA signature by alice and uses the right nonce", async () => {
+    it("returns 0 if the user op has a valid ECDSA signature and uses the right nonce", async () => {
       const { mech1, alice, entryPointSigner } = await loadFixture(deployMech1)
 
       const userOp = await signUserOp(
@@ -156,8 +156,67 @@ describe("Account base contract", () => {
       ).to.be.revertedWith("Invalid nonce")
     })
 
-    it("sends the pre-fund to sender if the user op has valid signature", async () => {})
-    it("does not send the pre-fund if the signature is invalid", async () => {})
+    it("sends the pre-fund to sender if the user op has valid signature", async () => {
+      const { mech1, alice, entryPointSigner } = await loadFixture(deployMech1)
+
+      const userOp = await signUserOp(
+        await fillUserOp(
+          {
+            callData: BURN_1_ETH,
+          },
+          mech1
+        ),
+        alice
+      )
+
+      // fund mech1 with 1 ETH
+      await alice.sendTransaction({
+        to: mech1.address,
+        value: parseEther("1.0"),
+      })
+
+      // pre-fund the entry point with 0.123 ETH
+      await expect(
+        mech1
+          .connect(entryPointSigner)
+          .validateUserOp(userOp, getUserOpHash(userOp), parseEther("0.123"))
+      ).to.changeEtherBalances(
+        [mech1.address, entryPointSigner.address],
+        [parseEther("-0.123"), parseEther("0.123")]
+      )
+    })
+
+    it("does not send the pre-fund if the signature is invalid", async () => {
+      const { mech1, alice, bob, entryPointSigner } = await loadFixture(
+        deployMech1
+      )
+
+      const userOp = await signUserOp(
+        await fillUserOp(
+          {
+            callData: BURN_1_ETH,
+          },
+          mech1
+        ),
+        bob
+      )
+
+      // fund mech1 with 1 ETH
+      await alice.sendTransaction({
+        to: mech1.address,
+        value: parseEther("1.0"),
+      })
+
+      // pre-fund the entry point with 0.123 ETH
+      await expect(
+        mech1
+          .connect(entryPointSigner)
+          .validateUserOp(userOp, getUserOpHash(userOp), parseEther("0.123"))
+      ).to.changeEtherBalances(
+        [mech1.address, entryPointSigner.address],
+        [0, 0]
+      )
+    })
   })
 })
 
@@ -192,7 +251,7 @@ const signUserOp = async (
 }
 
 function getUserOpHash(op: UserOperation): string {
-  const { chainId } = ethers.getDefaultProvider().network
+  const { chainId } = network.config
 
   const userOpHash = keccak256(packUserOp(op))
   const enc = defaultAbiCoder.encode(
