@@ -47,7 +47,7 @@ abstract contract Mech is IMech, Account, Receiver {
         bytes32 r;
         bytes32 s;
         uint8 v;
-        (v, r, s) = splitSignature(signature);
+        (v, r, s) = _splitSignature(signature);
 
         if (v == 0) {
             // This is an EIP-1271 contract signature
@@ -139,7 +139,7 @@ abstract contract Mech is IMech, Account, Receiver {
      * @dev Divides bytes signature into `uint8 v, bytes32 r, bytes32 s`.
      * @param signature The signature bytes
      */
-    function splitSignature(
+    function _splitSignature(
         bytes memory signature
     ) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
         // The signature format is a compact form of:

@@ -191,7 +191,7 @@ describe("Mech contract", () => {
       ).to.be.revertedWith("ERC721: invalid token ID")
     })
 
-    it("reverts if called from an account that is not the mech operator", async () => {
+    it("reverts if called from an account that is not the mech operator or entry point", async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
@@ -208,7 +208,9 @@ describe("Mech contract", () => {
       // call exec() from deployer who is not an operator
       await expect(
         mech1.exec(testToken.address, 0, testTx.data as string, 0, 0)
-      ).to.be.revertedWith("Only callable by the mech operator")
+      ).to.be.revertedWith(
+        "Only callable by the mech operator or the entry point contract"
+      )
     })
 
     it("reverts with original data if the meta transaction reverts", async () => {

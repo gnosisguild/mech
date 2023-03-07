@@ -12,7 +12,6 @@ Smart account with programmable ownership
 
 #### Threshold ownership
 
-- [ERC20Mech.sol](contracts/ERC20Mech.sol): allow holders of a minimum balance of ERC-20 tokens to sign transactions on behalf of the Mech
 - [ERC1155Mech.sol](contracts/ERC1155Mech.sol): allow holders of a minimum balance of ERC-1155 tokens to sign transactions on behalf of the Mech
 
 #### Programmable ownership
@@ -65,6 +64,8 @@ Tests covers both, the contract logic as well as the SDK functions.
 ## EIP-4337 account
 
 Mechs implement the EIP-4337 [Account](contracts/base/Account.sol) interface meaning they allow bundlers to execute account-abstracted user operations from the Mech's address.
+For this purpose the EIP-4337 entry point contract first calls the Mech's `validateUserOp()` function for checking if a user operation has a valid signature by the mech operator.
+The entry point then calls the `exec` function, or any other function using the `onlyOperator` modifier, to trigger execution.
 
 ### EIP-1271 signatures
 
