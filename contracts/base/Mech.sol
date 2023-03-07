@@ -20,7 +20,7 @@ abstract contract Mech is IMech, Account, Receiver {
      */
     modifier onlyOperator() {
         require(
-            isOperator(msg.sender) || msg.sender == entryPoint,
+            isOperator(msg.sender) || msg.sender == address(entryPoint()),
             "Only callable by the mech operator or the entry point contract"
         );
         _;

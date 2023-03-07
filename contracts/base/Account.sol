@@ -2,64 +2,34 @@
 pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-
-import "../interfaces/erc4337/IAccount.sol";
+import "@account-abstraction/contracts/core/BaseAccount.sol";
 
 /**
  * @dev This contract provides the basic logic for implementing the ERC4337 IAccount interface
  */
-abstract contract Account is IAccount {
-    // using UserOperationLib for UserOperation;
-
+abstract contract Account is BaseAccount {
     // magic value indicating successfull EIP1271 signature validation.
     bytes4 private constant EIP1271_MAGICVALUE = 0x1626ba7e;
 
     // return value in case of signature validation success, with no time-range.
     uint256 private constant SIG_VALIDATION_SUCCEEDED = 0;
 
-    // return value in case of signature validation failure, with no time-range.
-    uint256 private constant SIG_VALIDATION_FAILED = 1;
-
-    uint256 internal _nonce = 0;
+    uint256 private _nonce = 0;
 
     /**
      * @dev Hard-code the ERC4337 entry point contract address for gas efficiency
      */
-    address public constant entryPoint =
-        0x0576a174D229E3cFA37253523E645A78A0C91B57;
+    IEntryPoint private constant _entryPoint =
+        IEntryPoint(0x0576a174D229E3cFA37253523E645A78A0C91B57);
 
-    /**
-     * @dev Returns the account nonce, by default the _nonce field. Child contracts can override this function to provide a different nonce value.
-     */
-    function nonce() public view virtual returns (uint256) {
+    /// @inheritdoc BaseAccount
+    function nonce() public view virtual override returns (uint256) {
         return _nonce;
     }
 
-    /**
-     * @dev The central function of the ERC4337 IAccount interface. Checks that the user operation has a valid signature and that the nonce is correct.
-     * @param userOp The user operation, including a signature field
-     * @param userOpHash The userOpHash is a hash over the userOp (except signature), entryPoint and chainId
-     * @param missingAccountFunds The amount of funds that are missing to cover the user operation. This is used to pay the pre-fund to the entry point contract.
-     */
-    function validateUserOp(
-        UserOperation calldata userOp,
-        bytes32 userOpHash,
-        uint256 missingAccountFunds
-    ) external override returns (uint256 validationData) {
-        require(
-            msg.sender == entryPoint,
-            "Only callable from the entry point contract"
-        );
-
-        validationData = _validateSignature(userOp, userOpHash);
-        if (userOp.initCode.length == 0) {
-            _validateAndUpdateNonce(userOp);
-        }
-
-        // only pay pre-fund if the signature is valid
-        if (address(uint160(validationData)) == address(0)) {
-            _payPrefund(missingAccountFunds);
-        }
+    /// @inheritdoc BaseAccount
+    function entryPoint() public view virtual override returns (IEntryPoint) {
+        return _entryPoint;
     }
 
     /**
@@ -77,7 +47,7 @@ abstract contract Account is IAccount {
     function _validateSignature(
         UserOperation calldata userOp,
         bytes32 userOpHash
-    ) internal view virtual returns (uint256 validationData) {
+    ) internal view virtual override returns (uint256 validationData) {
         bytes32 hash = ECDSA.toEthSignedMessageHash(userOpHash);
         if (isValidSignature(hash, userOp.signature) != EIP1271_MAGICVALUE) {
             return SIG_VALIDATION_FAILED;
@@ -97,23 +67,7 @@ abstract contract Account is IAccount {
      */
     function _validateAndUpdateNonce(
         UserOperation calldata userOp
-    ) internal virtual {
+    ) internal virtual override {
         require(_nonce++ == userOp.nonce, "Invalid nonce");
-    }
-
-    /**
-     * @dev Sends missing funds for executing a user operation to the entry point (msg.sender)
-     * @param missingAccountFunds the minimum value this method should send the entry point.
-     *  This value MAY be zero, in case there is enough deposit, or the userOp has a paymaster.
-     */
-    function _payPrefund(uint256 missingAccountFunds) internal {
-        if (missingAccountFunds != 0) {
-            (bool success, ) = payable(msg.sender).call{
-                value: missingAccountFunds,
-                gas: type(uint256).max
-            }("");
-            (success);
-            //ignore failure (its EntryPoint's job to verify, not ours.)
-        }
     }
 }

@@ -7,12 +7,14 @@
     "frontend"
   ],
   "scripts": {
-    "build": "yarn hardhat compile && yarn workspace frontend generate",
-    "deploy": "hardhat deploy --network",
-    "verify": "hardhat verify --network",
+    "clean": "yarn rimraf artifacts cache typechain-types",
+    "build:contracts": "yarn hardhat compile",
     "build:sdk": "yarn workspace mech-sdk build",
     "build:frontend": "yarn workspace frontend build",
-    "build:all": "yarn build && yarn build:sdk && yarn build:frontend",
+    "build": "yarn build:contracts && yarn build:sdk && yarn workspace frontend generate",
+    "build:all": "yarn build && yarn build:frontend",
+    "deploy": "hardhat deploy --network",
+    "verify": "hardhat verify --network",
     "start": "yarn workspace frontend start",
     "check": "yarn check:prettier && yarn check:lint",
     "check:lint": "eslint sdk test --ext .ts",
@@ -40,6 +42,7 @@
   },
   "homepage": "https://github.com/gnosis/mech#readme",
   "devDependencies": {
+    "@account-abstraction/contracts": "^0.5.0",
     "@ambire/signature-validator": "^1.1.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",

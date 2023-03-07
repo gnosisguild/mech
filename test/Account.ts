@@ -44,7 +44,14 @@ describe("Account base contract", () => {
     await deployer.sendTransaction({ to: entryPoint, value: parseEther("1.0") })
 
     // Fixtures can return anything you consider useful for your tests
-    return { ERC721Mech, testToken, mech1, alice, bob, entryPointSigner }
+    return {
+      ERC721Mech,
+      testToken,
+      mech1,
+      alice,
+      bob,
+      entryPointSigner,
+    }
   }
 
   const BURN_1_ETH = Mech__factory.createInterface().encodeFunctionData(
@@ -68,7 +75,7 @@ describe("Account base contract", () => {
 
       await expect(
         mech1.validateUserOp(userOp, getUserOpHash(userOp), 0)
-      ).to.be.revertedWith("Only callable from the entry point contract")
+      ).to.be.revertedWith("account: not from EntryPoint")
     })
 
     it("returns 0 if the user op has a valid ECDSA signature and uses the right nonce", async () => {
@@ -183,38 +190,6 @@ describe("Account base contract", () => {
       ).to.changeEtherBalances(
         [mech1.address, entryPointSigner.address],
         [parseEther("-0.123"), parseEther("0.123")]
-      )
-    })
-
-    it("does not send the pre-fund if the signature is invalid", async () => {
-      const { mech1, alice, bob, entryPointSigner } = await loadFixture(
-        deployMech1
-      )
-
-      const userOp = await signUserOp(
-        await fillUserOp(
-          {
-            callData: BURN_1_ETH,
-          },
-          mech1
-        ),
-        bob
-      )
-
-      // fund mech1 with 1 ETH
-      await alice.sendTransaction({
-        to: mech1.address,
-        value: parseEther("1.0"),
-      })
-
-      // pre-fund the entry point with 0.123 ETH
-      await expect(
-        mech1
-          .connect(entryPointSigner)
-          .validateUserOp(userOp, getUserOpHash(userOp), parseEther("0.123"))
-      ).to.changeEtherBalances(
-        [mech1.address, entryPointSigner.address],
-        [0, 0]
       )
     })
   })
