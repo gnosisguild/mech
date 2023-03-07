@@ -1,21 +1,28 @@
 //SPDX-License-Identifier: LGPL-3.0
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 import "./Receiver.sol";
-import "./interfaces/IMech.sol";
+import "./Account.sol";
+import "../interfaces/IMech.sol";
 
 /**
  * @dev This contract implements the authorization and signature validation for a mech. It's unopinionated about what it means to hold a mech. Child contract must define that by implementing the `isOperator` function.
  */
-abstract contract MechBase is IMech, Receiver {
+abstract contract Mech is IMech, Account, Receiver {
     // bytes4(keccak256("isValidSignature(bytes32,bytes)")
     bytes4 internal constant EIP1271_MAGICVALUE = 0x1626ba7e;
 
+    /**
+     * @dev Modifier to make a function callable only by the mech operator or the ERC4337 entry point contract
+     */
     modifier onlyOperator() {
-        require(isOperator(msg.sender), "Only callable by the mech operator");
+        require(
+            isOperator(msg.sender) || msg.sender == entryPoint,
+            "Only callable by the mech operator or the entry point contract"
+        );
         _;
     }
 
@@ -36,7 +43,7 @@ abstract contract MechBase is IMech, Receiver {
     function isValidSignature(
         bytes32 hash,
         bytes memory signature
-    ) external view returns (bytes4 magicValue) {
+    ) public view override(IERC1271, Account) returns (bytes4 magicValue) {
         bytes32 r;
         bytes32 s;
         uint8 v;
@@ -97,7 +104,7 @@ abstract contract MechBase is IMech, Receiver {
         }
     }
 
-    /// @dev Allows a the mech operator to execute arbitrary transactions
+    /// @dev Allows the mech operator to execute arbitrary transactions
     /// @param to Destination address of transaction.
     /// @param value Ether value of transaction.
     /// @param data Data payload of transaction.
@@ -145,6 +152,4 @@ abstract contract MechBase is IMech, Receiver {
             v := byte(0, mload(add(signature, 0x60)))
         }
     }
-
-    receive() external payable {}
 }

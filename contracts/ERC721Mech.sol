@@ -1,13 +1,13 @@
 //SPDX-License-Identifier: LGPL-3.0
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "./MechBase.sol";
+import "./base/Mech.sol";
 
 /**
  * @dev A Mech that is operated by the holder of an ERC721 non-fungible token
  */
-contract ERC721Mech is MechBase {
+contract ERC721Mech is Mech {
     IERC721 public token;
     uint256 public tokenId;
 

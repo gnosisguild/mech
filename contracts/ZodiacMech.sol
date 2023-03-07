@@ -1,16 +1,16 @@
 //SPDX-License-Identifier: LGPL-3.0
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.12;
 
 import "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import "./MechBase.sol";
+import "./base/Mech.sol";
+import "./interfaces/SafeStorage.sol";
 
 /**
- * @dev A Mech that is operated by zodiac modules
+ * @dev A Mech that is operated by enabled zodiac modules
  */
-contract ZodiacMech is MechBase, IAvatar {
+contract ZodiacMech is SafeStorage, Mech, IAvatar {
     address internal constant SENTINEL_MODULES = address(0x1);
-    mapping(address => address) internal modules;
 
     /// @dev `module` is already disabled.
     error AlreadyDisabledModule(address module);
@@ -46,6 +46,18 @@ contract ZodiacMech is MechBase, IAvatar {
         }
     }
 
+    function nonce() public view override returns (uint256) {
+        // Here we use the nonce variable of the SafeStorage contract rather than that of the Mech contract.
+        // This is for keeping the nonce sequence of Safes that got upgraded to ZodiacMechs.
+        return safeNonce;
+    }
+
+    function _validateAndUpdateNonce(
+        UserOperation calldata userOp
+    ) internal override {
+        require(safeNonce++ == userOp.nonce, "Invalid nonce");
+    }
+
     function isOperator(address signer) public view override returns (bool) {
         return isModuleEnabled(signer);
     }
@@ -61,7 +73,7 @@ contract ZodiacMech is MechBase, IAvatar {
         uint256 value,
         bytes calldata data,
         Enum.Operation operation
-    ) public returns (bool success) {
+    ) public onlyOperator returns (bool success) {
         (success, ) = _exec(to, value, data, operation, gasleft());
     }
 
@@ -76,7 +88,7 @@ contract ZodiacMech is MechBase, IAvatar {
         uint256 value,
         bytes calldata data,
         Enum.Operation operation
-    ) public returns (bool success, bytes memory returnData) {
+    ) public onlyOperator returns (bool success, bytes memory returnData) {
         return _exec(to, value, data, operation, gasleft());
     }
 
