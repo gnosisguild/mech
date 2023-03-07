@@ -100,7 +100,7 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
             <div className={clsx(classes.infoItem)}>
               {assetsError || !assetsData
                 ? "n/a"
-                : `$ ${assetsData.totalBalanceUsd}`}
+                : `$ ${assetsData.totalBalanceUSD}`}
             </div>
           </li>
         </ul>
@@ -117,13 +117,13 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
         {assetsData && (
           <>
             {assetsData.assets.length === 0 && <p>No assets found</p>}
-            <ul>
+            <ul className={classes.assetList}>
               {assetsData.assets.map((asset, index) => (
-                <li key={index}>
-                  <div>
-                    <p>{asset.thumbnail}</p>
-                    <p>{asset.balance}</p>
-                    <p>{asset.tokenSymbol}</p>
+                <li key={index} className={classes.asset}>
+                  <div className={classes.name}>{asset.name}</div>
+                  <div className={classes.value}>
+                    <p>{asset.pretty}</p>
+                    <p>{asset.symbol}</p>
                   </div>
                 </li>
               ))}
