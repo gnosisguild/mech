@@ -9,7 +9,7 @@ import { signWithMech } from "../sdk/sign/signWithMech"
 
 const EIP1271_MAGIC_VALUE = "0x1626ba7e"
 
-describe("Mech contract", () => {
+describe("Mech base contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
@@ -26,20 +26,6 @@ describe("Mech contract", () => {
     // Fixtures can return anything you consider useful for your tests
     return { ERC721Mech, testToken, mech1, alice, bob }
   }
-
-  it("should be able to receive ether", async () => {
-    const { mech1 } = await loadFixture(deployMech1)
-    const [deployer] = await ethers.getSigners()
-
-    await deployer.sendTransaction({
-      to: mech1.address,
-      value: ethers.utils.parseEther("1.0"),
-    })
-
-    expect(await ethers.provider.getBalance(mech1.address)).to.equal(
-      ethers.utils.parseEther("1.0")
-    )
-  })
 
   describe("isValidSignature()", () => {
     it("returns magic value for a valid ECDSA signature of the mech operator EOA", async () => {

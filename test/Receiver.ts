@@ -2,11 +2,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
 import { ethers } from "hardhat"
 
-// We use `loadFixture` to share common setups (or fixtures) between tests.
-// Using this simplifies your tests and makes them run faster, by taking
-// advantage or Hardhat Network's snapshot functionality.
-
-describe("Mech Account", () => {
+describe("Receiver base contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
@@ -39,8 +35,22 @@ describe("Mech Account", () => {
     }
   }
 
-  describe("Send and Receive tokens", () => {
-    it("mech can receive and send erc20 tokens", async () => {
+  describe("send and receive tokens", () => {
+    it("is able to receive ether", async () => {
+      const { mech1 } = await loadFixture(deployMech1)
+      const [deployer] = await ethers.getSigners()
+
+      await deployer.sendTransaction({
+        to: mech1.address,
+        value: ethers.utils.parseEther("1.0"),
+      })
+
+      expect(await ethers.provider.getBalance(mech1.address)).to.equal(
+        ethers.utils.parseEther("1.0")
+      )
+    })
+
+    it("can receive and send erc20 tokens", async () => {
       const { mech1, test20Token, alice } = await loadFixture(deployMech1)
       await test20Token.mintToken(mech1.address, 1000)
       expect(await test20Token.balanceOf(mech1.address)).to.equal(1000)
@@ -61,7 +71,7 @@ describe("Mech Account", () => {
       expect(await test20Token.balanceOf(alice.address)).to.equal(500)
     })
 
-    it("mech can receive erc721 tokens", async () => {
+    it("can receive erc721 tokens", async () => {
       const { mech1, test721Token, alice } = await loadFixture(deployMech1)
       // mint alice another nft to send to the mech
       await test721Token.mintToken(alice.address, 2)
@@ -77,7 +87,7 @@ describe("Mech Account", () => {
       expect(await test721Token.ownerOf(2)).to.equal(mech1.address)
     })
 
-    it("mech can receive erc1155 tokens", async () => {
+    it("can receive erc1155 tokens", async () => {
       const { mech1, test1155Token, alice } = await loadFixture(deployMech1)
       // mint alice an 1155 nft to send to the mech
       await test1155Token.mintToken(
@@ -101,7 +111,7 @@ describe("Mech Account", () => {
       expect(await test1155Token.balanceOf(mech1.address, 1)).to.equal(2)
     })
 
-    it("mech can receive erc1155 token batches", async () => {
+    it("can receive erc1155 token batches", async () => {
       const { mech1, test1155Token, alice } = await loadFixture(deployMech1)
       // mint alice some tokens
       await test1155Token.mintToken(
