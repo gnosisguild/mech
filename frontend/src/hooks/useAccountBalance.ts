@@ -72,9 +72,8 @@ const useAccountBalance: useAccountBalanceType = ({ address }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<any>(null)
 
-  const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${address}/balances/fungibles?chainID=gor&filterDust=true&filterSpam=true`
-
   useEffect(() => {
+    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${address}/balances/fungibles?chainID=gor&filterDust=true&filterSpam=true`
     const fetchData = async () => {
       try {
         setIsLoading(true)
