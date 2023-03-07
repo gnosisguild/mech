@@ -153,7 +153,7 @@ describe("Mech base contract", () => {
       const contractSignature = signWithMech(mech2.address, ecdsaSignature)
 
       expect(
-        await mech2.isValidSignature(messageHash, contractSignature)
+        await mech1.isValidSignature(messageHash, contractSignature)
       ).to.equal("0xffffffff")
     })
   })
