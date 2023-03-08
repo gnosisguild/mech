@@ -1,22 +1,18 @@
-import { AnkrProvider } from "@ankr.com/ankr.js"
-
-import { Blockchain, GetNFTMetadataReply } from "@ankr.com/ankr.js"
 import { calculateERC721MechAddress } from "mech-sdk"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 
+import { nxyzNFT, nxyzSupportedChains } from "../types/nxyzApiTypes"
+import { MechNFT } from "./useNFTsByOwner"
+
 interface NFTProps {
   contractAddress: string
-  blockchain: Blockchain
+  blockchain: nxyzSupportedChains
   tokenId: string
 }
 
-export interface MechGetNFTMetadataReply extends GetNFTMetadataReply {
-  hasMech?: boolean
-}
-
 interface NFTResult {
-  data: MechGetNFTMetadataReply
+  data: MechNFT
   isLoading: boolean
   error: any
 }
@@ -31,32 +27,29 @@ const useNFT: useNFTType = ({ contractAddress, blockchain, tokenId }) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/nfts/${contractAddress}/${tokenId}?chainID=gor&limit=20&filterSpam=false`
       try {
         setIsLoading(true)
-        const ankr = new AnkrProvider()
-        const mechRes: MechGetNFTMetadataReply = await ankr.getNFTMetadata({
-          contractAddress,
-          blockchain,
-          tokenId,
-          forceFetch: true,
-        })
+        const res = await fetch(apiUrl)
+        const data: nxyzNFT[] = await res.json()
+        const mechData = data[0] as MechNFT
 
         try {
-          if (!mechRes.metadata) throw new Error("No metadata")
+          if (!mechData) throw new Error("No metadata")
 
           const hasMech =
             (await provider.getCode(
               calculateERC721MechAddress(
-                mechRes.metadata.contractAddress,
-                mechRes.metadata.tokenId
+                mechData.contractAddress,
+                mechData.nft.tokenID
               )
             )) !== "0x"
-          mechRes.hasMech = hasMech
+          mechData.hasMech = hasMech
         } catch (error) {
           console.log(error)
-          mechRes.hasMech = false
+          mechData.hasMech = false
         }
-        setData(mechRes)
+        setData(mechData)
         setIsLoading(false)
       } catch (e) {
         setError(e)

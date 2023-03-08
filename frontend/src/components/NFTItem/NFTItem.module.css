@@ -155,6 +155,20 @@
   padding: 20px;
 }
 
+.assetList {
+  width: 100%;
+}
+
+.asset {
+  display: flex;
+  justify-content: space-between;
+}
+
+.asset .value {
+  display: flex;
+  gap: 10px;
+}
+
 @media (max-width: 800px) {
   .info label {
     border: 2px solid var(--button-border);
