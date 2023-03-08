@@ -17,7 +17,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
 
   const { data, isLoading } = useNFTsByOwner({
     walletAddress: address,
-    blockchain: "eth_goerli",
+    blockchain: "gor",
     pageToken,
   })
 
@@ -28,20 +28,23 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
       if (nftData.length === 0) {
         return data?.assets || []
       }
-
       const ids = new Set(
-        nftData.map((nft) => nft.tokenId + nft.contractAddress)
+        nftData.map((nft) => nft.nft.tokenID + nft.contractAddress)
       )
 
       // merge and dedupe
       return [
         ...nftData,
         ...data?.assets.filter(
-          (nft) => !ids.has(nft.tokenId + nft.contractAddress)
+          (nft) => !ids.has(nft.nft.tokenID + nft.contractAddress)
         ),
       ]
     })
   }, [data])
+
+  const deployed = nftData.filter((nft) => nft.hasMech)
+
+  const undeployed = nftData.filter((nft) => !nft.hasMech)
 
   return (
     <div className={classes.container}>
@@ -51,15 +54,17 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
           <h2>Deployed</h2>
         </div>
       </div>
+      {deployed.length === 0 && (
+        <div className={classes.noDeployed}>
+          <p>No mechs deployed</p>
+        </div>
+      )}
       <ul className={classes.grid}>
-        {nftData
-          .filter((nft) => nft.hasMech)
-          .filter((nft) => nft.tokenUrl && nft.tokenId)
-          .map((nft, index) => (
-            <li key={`${index}-${nft.contractAddress}`}>
-              <NFTGridItem nft={nft} />
-            </li>
-          ))}
+        {deployed.map((nft, index) => (
+          <li key={`${index}-${nft.contractAddress}`}>
+            <NFTGridItem nftData={nft} />
+          </li>
+        ))}
       </ul>
       <div className={classes.categoryContainer}>
         <div className={classes.category}>
@@ -67,16 +72,15 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
           <h2>Undeployed</h2>
         </div>
       </div>
-      <ul className={classes.grid}>
-        {nftData
-          .filter((nft) => !nft.hasMech)
-          .filter((nft) => nft.tokenUrl && nft.tokenId)
-          .map((nft, index) => (
+      {undeployed.length > 0 && (
+        <ul className={classes.grid}>
+          {undeployed.map((nft, index) => (
             <li key={`${index}-${nft.contractAddress}`}>
-              <NFTGridItem nft={nft} />
+              <NFTGridItem nftData={nft} />
             </li>
           ))}
-      </ul>
+        </ul>
+      )}
       {isLoading ? (
         <Spinner />
       ) : (

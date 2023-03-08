@@ -29,7 +29,7 @@ const Mech: React.FC = () => {
   const { data, error, isLoading } = useNFT({
     contractAddress: token,
     tokenId: tokenId,
-    blockchain: "eth_goerli",
+    blockchain: "gor",
   })
 
   const chainId = useChainId()
@@ -54,7 +54,7 @@ const Mech: React.FC = () => {
             <NFTItem
               token={token}
               tokenId={tokenId}
-              nft={data}
+              nftData={data}
               operatorAddress={tokenOwner}
             />
 

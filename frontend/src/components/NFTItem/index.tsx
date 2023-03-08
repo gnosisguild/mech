@@ -1,31 +1,32 @@
 import classes from "./NFTItem.module.css"
 import { useState } from "react"
 import { shortenAddress } from "../../utils/shortenAddress"
-import useTokenUrl from "../../hooks/useTokenUrl"
 import copy from "copy-to-clipboard"
 import clsx from "clsx"
-import { MechGetNFTMetadataReply } from "../../hooks/useNFT"
+
 import useAccountBalance from "../../hooks/useAccountBalance"
 import Spinner from "../Spinner"
 import { useDeployMech } from "../../hooks/useDeployMech"
 import { calculateERC721MechAddress } from "mech-sdk"
+import { MechNFT } from "../../hooks/useNFTsByOwner"
 
 interface Props {
   token: string
   tokenId: string
-  nft: MechGetNFTMetadataReply
+  nftData: MechNFT
   operatorAddress?: string
 }
 
-const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
+const NFTItem: React.FC<Props> = ({
+  token,
+  tokenId,
+  nftData,
+  operatorAddress,
+}) => {
   const mechAddress = calculateERC721MechAddress(token, tokenId)
 
   const [imageError, setImageError] = useState(false)
-  const { isLoading, data, error } = useTokenUrl(
-    nft.attributes && !nft.attributes.imageUrl
-      ? nft.attributes.tokenUrl
-      : undefined
-  )
+
   const {
     isLoading: assetsLoading,
     data: assetsData,
@@ -34,26 +35,25 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
 
   const { deployed } = useDeployMech(token, tokenId)
 
-  console.log("assetsData", assetsData, assetsError)
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
         <p className={classes.tokenName}>
-          {nft.attributes?.name || nft.metadata?.collectionName || "..."}
+          {nftData.nft.title || nftData.nft.contractTitle || "..."}
         </p>
-        {nft.metadata && nft.metadata.tokenId.length < 5 && (
-          <p className={classes.tokenId}>{nft.metadata.tokenId || "..."}</p>
+        {nftData.nft.tokenID.length < 5 && (
+          <p className={classes.tokenId}>{nftData.nft.tokenID || "..."}</p>
         )}
       </div>
       <div className={classes.main}>
-        {(error || imageError || isLoading) && (
+        {(imageError || !nftData.nft.previews) && (
           <div className={classes.noImage}></div>
         )}
-        {!isLoading && !error && !imageError && (
+        {!imageError && nftData.nft.previews && (
           <div className={classes.imageContainer}>
             <img
-              src={data ? data.image : nft.attributes?.imageUrl}
-              alt={nft.attributes?.name}
+              src={nftData.nft.previews[0].URI}
+              alt={nftData.nft.contractTitle}
               className={classes.image}
               onError={() => setImageError(true)}
             />
@@ -100,7 +100,7 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
             <div className={clsx(classes.infoItem)}>
               {assetsError || !assetsData
                 ? "n/a"
-                : `$ ${assetsData.totalBalanceUsd}`}
+                : `$ ${assetsData.totalBalanceUSD}`}
             </div>
           </li>
         </ul>
@@ -117,13 +117,13 @@ const NFTItem: React.FC<Props> = ({ token, tokenId, nft, operatorAddress }) => {
         {assetsData && (
           <>
             {assetsData.assets.length === 0 && <p>No assets found</p>}
-            <ul>
+            <ul className={classes.assetList}>
               {assetsData.assets.map((asset, index) => (
-                <li key={index}>
-                  <div>
-                    <p>{asset.thumbnail}</p>
-                    <p>{asset.balance}</p>
-                    <p>{asset.tokenSymbol}</p>
+                <li key={index} className={classes.asset}>
+                  <div className={classes.name}>{asset.name}</div>
+                  <div className={classes.value}>
+                    <p>{asset.pretty}</p>
+                    <p>{asset.symbol}</p>
                   </div>
                 </li>
               ))}

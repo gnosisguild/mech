@@ -42,3 +42,15 @@
 .indicator.undeployed {
   background-color: rgb(189 192 179);
 }
+
+.noDeployed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: var(--box-bg);
+  padding: 10px 15px 10px 10px;
+  border-radius: 20px;
+  aspect-ratio: 2/1;
+  width: 250px;
+}

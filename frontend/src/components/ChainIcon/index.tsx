@@ -8,16 +8,19 @@ import classes from "./ChainIcon.module.css"
 import clsx from "clsx"
 
 interface IconList {
-  [key: number]: string
+  [key: number]: {
+    src: string
+    name: string
+  }
 }
 
 const icons: IconList = {
-  1: mainnet,
-  42161: arbitrum,
-  43114: avalanche,
-  56: bsc,
-  137: polygon,
-  100: gnosis,
+  1: { src: mainnet, name: "mainnet" },
+  42161: { src: arbitrum, name: "arbitrum" },
+  43114: { src: avalanche, name: "avalanche" },
+  56: { src: bsc, name: "bsc" },
+  137: { src: polygon, name: "polygon" },
+  100: { src: gnosis, name: "gnosis" },
 }
 
 interface IconProps {
@@ -56,6 +59,7 @@ const ChainIcon: React.FC<ChainIconProps> = ({
       height={height}
       className={clsx(classes.icon, className)}
     >
+      <title>{icons[chainId].src}</title>
       <defs>
         <clipPath id="mask">
           <path d="M17.033 4.964c3.852-2.262 5.778-3.393 7.84-3.77a11.807 11.807 0 0 1 4.254 0c2.062.377 3.988 1.508 7.84 3.77l6.066 3.562c3.852 2.263 5.777 3.394 7.13 5.022a12.268 12.268 0 0 1 2.127 3.747c.71 2.006.71 4.268.71 8.793v7.124c0 4.525 0 6.787-.71 8.793a12.268 12.268 0 0 1-2.126 3.747c-1.354 1.628-3.28 2.76-7.131 5.022l-6.066 3.562c-3.852 2.262-5.778 3.393-7.84 3.771a11.814 11.814 0 0 1-4.254 0c-2.062-.378-3.988-1.509-7.84-3.77l-6.066-3.563c-3.852-2.263-5.778-3.394-7.13-5.022a12.268 12.268 0 0 1-2.127-3.747C1 40 1 37.737 1 33.212v-7.124c0-4.525 0-6.787.71-8.793a12.268 12.268 0 0 1 2.127-3.747c1.352-1.628 3.278-2.76 7.13-5.022l6.066-3.562Z"></path>
@@ -67,7 +71,7 @@ const ChainIcon: React.FC<ChainIconProps> = ({
         height="59"
         x="-2"
         y="0"
-        href={icons[chainId]}
+        href={icons[chainId].src}
       ></image>
     </svg>
   )
@@ -83,6 +87,7 @@ const DefaultIcon: React.FC<IconProps> = ({ width, height, className }) => {
       height={height}
       className={clsx(classes.icon, className)}
     >
+      <title>Testnet</title>
       <mask
         id="p"
         width="26"
