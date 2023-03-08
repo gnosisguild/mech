@@ -17,7 +17,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
 
   const { data, isLoading } = useNFTsByOwner({
     walletAddress: address,
-    blockchain: "eth_goerli",
+    blockchain: "gor",
     pageToken,
   })
 
@@ -28,28 +28,23 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
       if (nftData.length === 0) {
         return data?.assets || []
       }
-
       const ids = new Set(
-        nftData.map((nft) => nft.tokenId + nft.contractAddress)
+        nftData.map((nft) => nft.nft.tokenID + nft.contractAddress)
       )
 
       // merge and dedupe
       return [
         ...nftData,
         ...data?.assets.filter(
-          (nft) => !ids.has(nft.tokenId + nft.contractAddress)
+          (nft) => !ids.has(nft.nft.tokenID + nft.contractAddress)
         ),
       ]
     })
   }, [data])
 
-  const deployed = nftData
-    .filter((nft) => nft.hasMech)
-    .filter((nft) => nft.tokenUrl && nft.tokenId)
+  const deployed = nftData.filter((nft) => nft.hasMech)
 
-  const undeployed = nftData
-    .filter((nft) => !nft.hasMech)
-    .filter((nft) => nft.tokenUrl && nft.tokenId)
+  const undeployed = nftData.filter((nft) => !nft.hasMech)
 
   return (
     <div className={classes.container}>
@@ -67,7 +62,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
       <ul className={classes.grid}>
         {deployed.map((nft, index) => (
           <li key={`${index}-${nft.contractAddress}`}>
-            <NFTGridItem nft={nft} />
+            <NFTGridItem nftData={nft} />
           </li>
         ))}
       </ul>
@@ -81,7 +76,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
         <ul className={classes.grid}>
           {undeployed.map((nft, index) => (
             <li key={`${index}-${nft.contractAddress}`}>
-              <NFTGridItem nft={nft} />
+              <NFTGridItem nftData={nft} />
             </li>
           ))}
         </ul>

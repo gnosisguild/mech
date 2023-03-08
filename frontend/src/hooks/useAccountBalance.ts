@@ -1,49 +1,8 @@
 import { useEffect, useState } from "react"
+import { nxyzFungibleBalance } from "../types/nxyzApiTypes"
 
 interface Props {
   address: string
-}
-
-interface nxyzBlockchain {
-  name: string
-  shortName: string
-  chainId: string
-  shortChainId: string
-}
-
-interface nxyzTokenSymbol {
-  uri?: string
-  duration?: string
-  format?: string
-  height?: number
-  width?: number
-  kind?: string
-}
-
-interface nxyzFiat {
-  decimals: number
-  name?: string
-  percentChange24hour?: number
-  pretty: string
-  symbol?: string
-  symbolLogos?: nxyzTokenSymbol[]
-  tokenValue: number
-  updateTime?: string
-  value: string
-}
-
-interface nxyzFungibleBalance {
-  value: string
-  tokenValue: number
-  pretty: string
-  decimals: number
-  symbol: string
-  contractAddress: string
-  name: string
-  blockchain: nxyzBlockchain
-  fiat?: nxyzFiat[]
-  historicalFiat?: nxyzFiat[]
-  symbolLogos?: nxyzTokenSymbol[]
 }
 
 interface AccountResult {
@@ -79,7 +38,7 @@ const useAccountBalance: useAccountBalanceType = ({ address }) => {
         setIsLoading(true)
         const res = await fetch(apiUrl)
         const data = await res.json()
-        console.log(sumNxyzFiatBalances(data))
+
         setData({
           assets: data,
           totalBalanceUSD: sumNxyzFiatBalances(data),

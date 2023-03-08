@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "devDependencies": {
-    "@ankr.com/ankr.js": "^0.3.1",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@wagmi/cli": "^0.1.3",

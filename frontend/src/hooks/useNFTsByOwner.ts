@@ -1,22 +1,21 @@
-import { AnkrProvider, Nft } from "@ankr.com/ankr.js"
-
-import { Blockchain, GetNFTsByOwnerReply } from "@ankr.com/ankr.js"
 import { calculateERC721MechAddress } from "mech-sdk"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
+import { nxyzNFT, nxyzSupportedChains } from "../types/nxyzApiTypes"
 
 interface NFTProps {
   walletAddress: string
-  blockchain?: Blockchain | Blockchain[]
+  blockchain?: nxyzSupportedChains
   pageToken?: string
 }
 
-export interface MechNFT extends Nft {
+export interface MechNFT extends nxyzNFT {
   hasMech?: boolean
 }
 
-interface MechGetNFTsByOwnerReply extends GetNFTsByOwnerReply {
+interface MechGetNFTsByOwnerReply {
   assets: MechNFT[]
+  nextPageToken?: string
 }
 
 interface NFTResult {
@@ -38,21 +37,22 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
   const provider = useProvider()
 
   useEffect(() => {
+    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${walletAddress}/balances/nfts?chainID=gor&limit=20&filterSpam=false${
+      pageToken ? `&cursor=${pageToken}` : ""
+    }`
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const ankr = new AnkrProvider()
-        const data: MechGetNFTsByOwnerReply = await ankr.getNFTsByOwner({
-          walletAddress,
-          blockchain,
-          pageToken,
-        })
-        for (let index = 0; index < data.assets.length; index++) {
-          const nft = data.assets[index]
+        const res = await fetch(apiUrl)
+        const cursor = res.headers.get("X-Doc-Next-Cursor")
+        const nfts: nxyzNFT[] = await res.json()
+
+        for (let index = 0; index < nfts.length; index++) {
+          const nft = nfts[index] as MechNFT
           try {
             const hasMech =
               (await provider.getCode(
-                calculateERC721MechAddress(nft.contractAddress, nft.tokenId)
+                calculateERC721MechAddress(nft.contractAddress, nft.nft.tokenID)
               )) !== "0x"
             nft.hasMech = hasMech
           } catch (error) {
@@ -60,7 +60,8 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
             nft.hasMech = false
           }
         }
-        setData(data)
+
+        setData({ assets: nfts, nextPageToken: cursor })
         setIsLoading(false)
       } catch (e) {
         setError(e)
