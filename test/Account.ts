@@ -16,7 +16,7 @@ import {
   UserOperationStruct,
 } from "../typechain-types/contracts/base/Account"
 
-const entryPoint = "0x0576a174D229E3cFA37253523E645A78A0C91B57"
+export const entryPoint = "0x0576a174D229E3cFA37253523E645A78A0C91B57"
 
 describe("Account base contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
@@ -196,7 +196,7 @@ describe("Account base contract", () => {
 })
 
 type UserOperation = Omit<UserOperationStruct, "signature">
-const fillUserOp = async (
+export const fillUserOp = async (
   op: Partial<UserOperation>,
   account: Account
 ): Promise<UserOperation> => ({
@@ -213,7 +213,7 @@ const fillUserOp = async (
   nonce: op.nonce || (await account.nonce()),
 })
 
-const signUserOp = async (
+export const signUserOp = async (
   op: UserOperation,
   signer: SignerWithAddress
 ): Promise<UserOperationStruct> => {
@@ -225,7 +225,7 @@ const signUserOp = async (
   }
 }
 
-function getUserOpHash(op: UserOperation): string {
+export function getUserOpHash(op: UserOperation): string {
   const { chainId } = network.config
 
   const userOpHash = keccak256(packUserOp(op))
