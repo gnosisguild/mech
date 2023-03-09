@@ -61,7 +61,7 @@ Tests covers both, the contract logic as well as the SDK functions.
 
 ## How it works
 
-## EIP-4337 account
+### EIP-4337 account
 
 Mechs implement the EIP-4337 [Account](contracts/base/Account.sol) interface meaning they allow bundlers to execute account-abstracted user operations from the Mech's address.
 For this purpose the EIP-4337 entry point contract first calls the Mech's `validateUserOp()` function for checking if a user operation has a valid signature by the mech operator.
@@ -70,7 +70,7 @@ The entry point then calls the `exec` function, or any other function using the 
 ### EIP-1271 signatures
 
 [Mech](contracts/base/Mech.sol) implements the EIP-1271 interface.
-It validates that a given ECDSA signature is from the expected account where the expected account is derived using the `isOperator` that inheriting contracts must implement.
+It validates that a given ECDSA signature is from the expected account where the expected account is derived using the `isOperator` function implemented by the sub contract.
 
 Additionally, it supports validation of EIP-1271 contract signatures, which are expected to be given in the following format based on ECDSA {r, s, v} components with `v = 0` as the recovery identifier:
 
