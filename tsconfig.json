@@ -15,6 +15,13 @@
       "typechain-types/hardhat.d.ts"
     ]
   },
-  "include": ["./scripts", "./test", "./sdk", "./typechain-types", "./deploy"],
+  "include": [
+    "./scripts",
+    "./test",
+    "./integrationTest",
+    "./sdk",
+    "./typechain-types",
+    "./deploy"
+  ],
   "files": ["./hardhat.config.ts", "./types.d.ts"]
 }

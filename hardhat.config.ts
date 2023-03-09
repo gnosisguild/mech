@@ -16,7 +16,13 @@ sharedNetworkConfig.accounts = {
   mnemonic: MNEMONIC || DEFAULT_MNEMONIC,
 }
 
-export default {
+const { INTEGRATION_TEST } = process.env
+
+if (INTEGRATION_TEST) {
+  console.log("Running integration tests on mainnet fork")
+}
+
+let config: HardhatUserConfig = {
   solidity: {
     version: "0.8.17",
     settings: {
@@ -58,4 +64,24 @@ export default {
   gasReporter: {
     enabled: true,
   },
-} satisfies HardhatUserConfig
+}
+
+if (INTEGRATION_TEST) {
+  config = {
+    ...config,
+    networks: {
+      ...config.networks,
+      hardhat: {
+        forking: {
+          ...sharedNetworkConfig,
+          url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+        },
+      },
+    },
+    paths: {
+      tests: "./integrationTest",
+    },
+  }
+}
+
+export default config
