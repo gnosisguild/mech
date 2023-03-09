@@ -71,11 +71,12 @@ describe("SafeMigration", () => {
       defaultAbiCoder.encode(["address"], [zodiacMechMastercopyAddress])
     )
 
-    // the enabled modules did not change
-    expect(await zodiacMech.isModuleEnabled(enabledModule)).to.be.true // TODO: why is this false?
-
     // make sure the Safe is now a ZodiacMech
-    await expect(zodiacMech.exec(ZERO_ADDRESS, parseEther("1.0"), "0x", 0, 0))
-      .to.not.be.reverted
+    await expect(
+      zodiacMech.exec(ZERO_ADDRESS, parseEther("1.0"), "0x", 0, 0)
+    ).to.changeEtherBalance(safeAddress, parseEther("-1.0")) // TODO something is wrong with the proxy
+
+    // the enabled modules did not change
+    expect(await zodiacMech.isModuleEnabled(enabledModule)).to.be.true
   })
 })

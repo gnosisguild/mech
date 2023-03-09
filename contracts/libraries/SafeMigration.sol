@@ -7,6 +7,8 @@ import "../interfaces/SafeStorage.sol";
  * Migrates a Safe proxy instance to a ZodiacMech
  */
 contract SafeMigration is SafeStorage {
+    address internal constant SENTINEL_MODULES = address(0x1);
+
     address public immutable migrationSingleton;
     address public immutable zodiacMechMastercopy;
 
@@ -30,6 +32,12 @@ contract SafeMigration is SafeStorage {
         require(
             address(this) != migrationSingleton,
             "Migration should only be called via delegatecall"
+        );
+
+        // Check that the Safe has at least one module enabled so it won't be bricked after the migration
+        require(
+            modules[address(SENTINEL_MODULES)] != address(0),
+            "No modules enabled"
         );
 
         singleton = zodiacMechMastercopy;
