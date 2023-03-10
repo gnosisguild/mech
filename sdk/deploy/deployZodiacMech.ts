@@ -12,6 +12,7 @@ import { DEFAULT_SALT, INIT_ADDRESS } from "../constants"
 import {
   calculateZodiacMechAddress,
   calculateZodiacMechMastercopyAddress,
+  ZODIAC_MASTERCOPY_INIT_DATA,
 } from "./calculateZodiacMechAddress"
 
 export const makeZodiacMechDeployTransaction = (
@@ -77,7 +78,7 @@ export const deployZodiacMech = async (
 export const deployZodiacMechMastercopy = async (signer: JsonRpcSigner) => {
   const initData = defaultAbiCoder.encode(
     ["address[]"],
-    [[INIT_ADDRESS]] // important to use a non-empty set of addresses, so noone can take ownership of the mastercopy
+    ZODIAC_MASTERCOPY_INIT_DATA
   )
   return await deployMastercopyWithInitData(
     signer,

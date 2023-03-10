@@ -13,6 +13,7 @@ import { DEFAULT_SALT, INIT_ADDRESS } from "../constants"
 import {
   calculateERC1155MechAddress,
   calculateERC1155MechMastercopyAddress,
+  ERC1155_MASTERCOPY_INIT_DATA,
 } from "./calculateERC1155MechAddress"
 
 export const makeERC1155MechDeployTransaction = (
@@ -91,7 +92,7 @@ export const deployERC1155Mech = async (
 export const deployERC1155MechMastercopy = async (signer: JsonRpcSigner) => {
   const initData = defaultAbiCoder.encode(
     ["address", "uint256[]", "uint256[]"],
-    [INIT_ADDRESS, [0], [0]] // important to use a non-zero address to make sure the mastercopy is considered initialized
+    ERC1155_MASTERCOPY_INIT_DATA
   )
   return await deployMastercopyWithInitData(
     signer,

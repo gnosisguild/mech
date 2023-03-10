@@ -45,10 +45,11 @@ export const calculateERC1155MechAddress = (
   )
 }
 
+export const ERC1155_MASTERCOPY_INIT_DATA = [INIT_ADDRESS, [0], [0]]
 export const calculateERC1155MechMastercopyAddress = () => {
   const initData = defaultAbiCoder.encode(
     ["address", "uint256[]", "uint256[]"],
-    [INIT_ADDRESS, [0], [0]]
+    ERC1155_MASTERCOPY_INIT_DATA
   )
   return getCreate2Address(
     ZODIAC_SINGLETON_FACTORY_ADDRESS,

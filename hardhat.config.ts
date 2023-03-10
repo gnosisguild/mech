@@ -56,11 +56,11 @@ let config: HardhatUserConfig = {
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
   },
-  verify: {
-    etherscan: {
-      apiKey: ETHERSCAN_API_KEY,
-    },
-  },
+  // verify: {
+  //   etherscan: {
+  //     apiKey: ETHERSCAN_API_KEY,
+  //   },
+  // },
   gasReporter: {
     enabled: true,
   },

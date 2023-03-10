@@ -1,22 +1,22 @@
 import { DeployFunction } from "hardhat-deploy/types"
 
 import {
-  calculateERC721MechMastercopyAddress,
-  deployERC721MechMastercopy,
-  ERC721_MASTERCOPY_INIT_DATA,
+  calculateZodiacMechMastercopyAddress,
+  deployZodiacMechMastercopy,
+  ZODIAC_MASTERCOPY_INIT_DATA,
 } from "../sdk"
 
-const deployMastercopyERC721: DeployFunction = async (hre) => {
+const deployMastercopyZodiac: DeployFunction = async (hre) => {
   const [signer] = await hre.ethers.getSigners()
   const deployer = hre.ethers.provider.getSigner(signer.address)
 
-  await deployERC721MechMastercopy(deployer)
-  const address = calculateERC721MechMastercopyAddress()
+  await deployZodiacMechMastercopy(deployer)
+  const address = calculateZodiacMechMastercopyAddress()
 
   try {
     await hre.run("verify:verify", {
       address,
-      constructorArguments: ERC721_MASTERCOPY_INIT_DATA,
+      constructorArguments: ZODIAC_MASTERCOPY_INIT_DATA,
     })
   } catch (e) {
     if (
@@ -32,6 +32,6 @@ const deployMastercopyERC721: DeployFunction = async (hre) => {
   }
 }
 
-deployMastercopyERC721.tags = ["ERC721Mech"]
+deployMastercopyZodiac.tags = ["ZodiacMech"]
 
-export default deployMastercopyERC721
+export default deployMastercopyZodiac
