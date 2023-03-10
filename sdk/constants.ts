@@ -11,6 +11,6 @@ export const ZODIAC_SINGLETON_FACTORY_ADDRESS =
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 /** Non-zero address used to initialize mastercopies */
-export const INIT_ADDRESS = "0x0000000000000000000000000000000000000001"
+export const INIT_ADDRESS = "0xffffffffffffffffffffffffffffffffffffffff"
 
 export const SENTINEL_MODULES = "0x0000000000000000000000000000000000000001"

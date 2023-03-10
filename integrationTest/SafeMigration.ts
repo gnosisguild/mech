@@ -44,8 +44,11 @@ describe("SafeMigration", () => {
       .to.be.reverted
 
     // deploy ZodiacMech mastercopy
-    await deployZodiacMechMastercopy(deployer)
     const zodiacMechMastercopyAddress = calculateZodiacMechMastercopyAddress()
+    await deployZodiacMechMastercopy(deployer)
+    expect(
+      await ethers.provider.getCode(zodiacMechMastercopyAddress)
+    ).to.not.equal("0x")
 
     // deploy migration contract
     const SafeMigration = await ethers.getContractFactory("SafeMigration")
@@ -74,7 +77,7 @@ describe("SafeMigration", () => {
     // make sure the Safe is now a ZodiacMech
     await expect(
       zodiacMech.exec(ZERO_ADDRESS, parseEther("1.0"), "0x", 0, 0)
-    ).to.changeEtherBalance(safeAddress, parseEther("-1.0")) // TODO something is wrong with the proxy
+    ).to.changeEtherBalance(safeAddress, parseEther("-1.0"))
 
     // the enabled modules did not change
     expect(await zodiacMech.isModuleEnabled(enabledModule)).to.be.true
