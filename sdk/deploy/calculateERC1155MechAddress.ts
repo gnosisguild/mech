@@ -1,10 +1,10 @@
 import { defaultAbiCoder } from "@ethersproject/abi"
-import { ethers } from "ethers"
+import { BigNumberish, ethers } from "ethers"
 import { getCreate2Address, keccak256 } from "ethers/lib/utils"
 
 import {
+  ERC1155Mech__factory,
   IFactoryFriendly__factory,
-  ZodiacMech__factory,
 } from "../../typechain-types"
 import {
   DEFAULT_SALT,
@@ -13,19 +13,26 @@ import {
   ZODIAC_SINGLETON_FACTORY_ADDRESS,
 } from "../constants"
 
-export const calculateZodiacMechAddress = (
-  /** Addresses of the Zodiac modules */
-  modules: string[],
+export const calculateERC1155MechAddress = (
+  /** Address of the ERC1155 token contract */
+  token: string,
+  /** IDs of the tokens */
+  tokenIds: BigNumberish[],
+  /** minimum balances of the tokens */
+  minBalances: BigNumberish[],
   salt: string = DEFAULT_SALT
 ) => {
   const initData =
     IFactoryFriendly__factory.createInterface().encodeFunctionData("setUp", [
-      defaultAbiCoder.encode(["address[]"], [modules]),
+      defaultAbiCoder.encode(
+        ["address", "uint256[]", "uint256[]"],
+        [token, tokenIds, minBalances]
+      ),
     ])
 
   const byteCode =
     "0x602d8060093d393df3363d3d373d3d3d363d73" +
-    calculateZodiacMechMastercopyAddress().toLowerCase().slice(2) +
+    calculateERC1155MechMastercopyAddress().toLowerCase().slice(2) +
     "5af43d82803e903d91602b57fd5bf3"
 
   return ethers.utils.getCreate2Address(
@@ -38,11 +45,14 @@ export const calculateZodiacMechAddress = (
   )
 }
 
-export const calculateZodiacMechMastercopyAddress = () => {
-  const initData = defaultAbiCoder.encode(["address[]"], [[INIT_ADDRESS]])
+export const calculateERC1155MechMastercopyAddress = () => {
+  const initData = defaultAbiCoder.encode(
+    ["address", "uint256[]", "uint256[]"],
+    [INIT_ADDRESS, [0], [0]]
+  )
   return getCreate2Address(
     ZODIAC_SINGLETON_FACTORY_ADDRESS,
     DEFAULT_SALT,
-    keccak256(ZodiacMech__factory.bytecode + initData.slice(2))
+    keccak256(ERC1155Mech__factory.bytecode + initData.slice(2))
   )
 }

@@ -1,2 +1,6 @@
 export * from "./calculateERC721MechAddress"
+export * from "./calculateERC1155MechAddress"
+export * from "./calculateZodiacMechAddress"
 export * from "./deployERC721Mech"
+export * from "./deployERC1155Mech"
+export * from "./deployZodiacMech"

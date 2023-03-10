@@ -175,6 +175,52 @@ describe("ZodiacMech contract", () => {
       await expect(array).to.deep.equal([bob.address, alice.address])
       expect(next).to.equal(SENTINEL_MODULES)
     })
+
+    it("requires page size to be greater than 0", async () => {
+      const { mech1 } = await loadFixture(deployMech1)
+
+      await expect(
+        mech1.getModulesPaginated(SENTINEL_MODULES, 0)
+      ).to.be.revertedWith("Page size has to be greater than 0")
+    })
+
+    it("requires start to be an enabled module or zero address", async () => {
+      const { mech1, alice, bob, eve } = await loadFixture(deployMech1)
+
+      await expect(
+        mech1.getModulesPaginated(ZERO_ADDRESS, 1)
+      ).to.be.revertedWith("Invalid start address")
+
+      expect(await mech1.getModulesPaginated(bob.address, 1)).to.be.deep.equal([
+        [alice.address],
+        SENTINEL_MODULES,
+      ])
+      await expect(
+        mech1.getModulesPaginated(eve.address, 1)
+      ).to.be.revertedWith("Invalid start address")
+    })
+
+    it("returns all modules over multiple pages", async () => {
+      const { mech1, alice, bob } = await loadFixture(deployMech1)
+
+      await expect(
+        await mech1.getModulesPaginated(SENTINEL_MODULES, 1)
+      ).to.be.deep.equal([[bob.address], bob.address])
+      await expect(
+        await mech1.getModulesPaginated(bob.address, 1)
+      ).to.be.deep.equal([[alice.address], SENTINEL_MODULES])
+    })
+
+    it("returns an empty array for a bricked mech", async () => {
+      const { mech1, alice, bob } = await loadFixture(deployMech1)
+
+      await mech1.connect(alice).disableModule(SENTINEL_MODULES, bob.address)
+      await mech1.connect(alice).disableModule(SENTINEL_MODULES, alice.address)
+
+      expect(
+        await mech1.getModulesPaginated(SENTINEL_MODULES, 10)
+      ).to.be.deep.equal([[], SENTINEL_MODULES])
+    })
   })
 
   describe("execTransactionFromModule", async () => {

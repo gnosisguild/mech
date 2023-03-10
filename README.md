@@ -86,3 +86,7 @@ An EIP-1271 signature will be considered valid if it meets the following conditi
 
 - the signing contract is either the operator of the mech or the mech itself, and
 - the signing contract's `isValidSignature()` function returns `0x1626ba7e` (EIP-1271 magic value) for the given `<bytes of signature data>`.
+
+### Migrate a Safe to a ZodiacMech
+
+The ZodiacMech uses the same storage layout at the Safe contracts, meaning that an existing Safe instance can be migrated to the ZodiacMech implementation.

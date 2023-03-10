@@ -23,6 +23,7 @@
     "fix:prettier": "prettier '**/*.{sol,js,ts,tsx,json}' --ignore-path .gitignore --write",
     "fix:lint": "yarn check:lint --fix",
     "test": "hardhat test",
+    "integrationTest": "INTEGRATION_TEST=true && hardhat test",
     "test:watch": "mocha -w",
     "coverage": "hardhat coverage"
   },
