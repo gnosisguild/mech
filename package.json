@@ -14,7 +14,6 @@
     "build": "yarn build:contracts && yarn build:sdk && yarn workspace frontend generate",
     "build:all": "yarn build && yarn build:frontend",
     "deploy": "hardhat deploy --network",
-    "verify": "hardhat verify --network",
     "start": "yarn workspace frontend start",
     "check": "yarn check:prettier && yarn check:lint",
     "check:lint": "eslint sdk test --ext .ts",

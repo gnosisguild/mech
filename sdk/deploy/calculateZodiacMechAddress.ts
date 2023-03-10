@@ -38,8 +38,12 @@ export const calculateZodiacMechAddress = (
   )
 }
 
+export const ZODIAC_MASTERCOPY_INIT_DATA = [[INIT_ADDRESS]]
 export const calculateZodiacMechMastercopyAddress = () => {
-  const initData = defaultAbiCoder.encode(["address[]"], [[INIT_ADDRESS]])
+  const initData = defaultAbiCoder.encode(
+    ["address[]"],
+    ZODIAC_MASTERCOPY_INIT_DATA
+  )
   return getCreate2Address(
     ZODIAC_SINGLETON_FACTORY_ADDRESS,
     DEFAULT_SALT,
