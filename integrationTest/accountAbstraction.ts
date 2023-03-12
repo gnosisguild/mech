@@ -127,7 +127,7 @@ export const fillUserOp = async (
   sender: account.address,
   callData: "0x",
   initCode: "0x",
-  callGasLimit: 0,
+  callGasLimit: 100000,
   maxFeePerGas: 0,
   maxPriorityFeePerGas: 1e9,
   preVerificationGas: 21000,
