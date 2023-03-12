@@ -1,3 +1,4 @@
+import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { expect } from "chai"
 import { arrayify, defaultAbiCoder, keccak256 } from "ethers/lib/utils"
@@ -36,26 +37,29 @@ describe.only("account abstraction", () => {
     const entryPoint = IEntryPoint__factory.connect(entryPointAddress, deployer)
 
     // enable another module on the Mech via the entry point
-    await expect(
-      entryPoint.handleOps(
-        [
-          await signUserOp(
-            await fillUserOp(
-              {
-                callData: zodiacMech.interface.encodeFunctionData(
-                  "enableModule",
-                  [anotherModule.address]
-                ),
-                // initCode,
-              },
-              zodiacMech
-            ),
-            enabledModule
-          ),
-        ],
-        signer.address
+    const userOp = await signUserOp(
+      await fillUserOp(
+        {
+          callData: zodiacMech.interface.encodeFunctionData("enableModule", [
+            anotherModule.address,
+          ]),
+          // initCode,
+        },
+        zodiacMech
+      ),
+      enabledModule
+    )
+    await expect(entryPoint.handleOps([userOp], signer.address))
+      .to.emit(entryPoint, "UserOperationEvent")
+      .withArgs(
+        getUserOpHash(userOp),
+        userOp.sender,
+        "0x0000000000000000000000000000000000000000", // paymaster
+        userOp.nonce,
+        true, // success
+        anyValue,
+        anyValue
       )
-    ).to.not.be.reverted
 
     // make sure the module is enabled
     expect(await zodiacMech.isModuleEnabled(anotherModule.address)).to.be.true
