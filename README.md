@@ -90,3 +90,5 @@ An EIP-1271 signature will be considered valid if it meets the following conditi
 ### Migrate a Safe to a ZodiacMech
 
 The ZodiacMech uses the same storage layout at the Safe contracts, meaning that an existing Safe instance can be migrated to the ZodiacMech implementation.
+For migrating a Safe it needs to delegate call the [SafeMigration.sol](contracts/libraries/SafeMigration.sol) contract's `migrate()` function.
+This will revoke access for the Safe owners so that the account will only be controlled by enabled modules going forwards.

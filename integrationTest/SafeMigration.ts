@@ -10,7 +10,7 @@ import { ZERO_ADDRESS } from "../sdk/constants"
 import { ZodiacMech__factory } from "../typechain-types"
 import { IAvatar__factory } from "../typechain-types/factories/@gnosis.pm/zodiac/contracts/interfaces/IAvatar__factory"
 
-describe("SafeMigration", () => {
+describe("Safe migration", () => {
   it("supports migrating an existing Safe to a ZodiacMech", async () => {
     const [signer] = await ethers.getSigners()
     const deployer = ethers.provider.getSigner(signer.address)

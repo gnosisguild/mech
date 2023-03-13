@@ -210,7 +210,7 @@ export const fillUserOp = async (
   verificationGasLimit: 100000,
   paymasterAndData: "0x",
   ...op,
-  nonce: op.nonce || (await account.nonce()),
+  nonce: op.nonce === undefined ? await account.nonce() : op.nonce,
 })
 
 export const signUserOp = async (
