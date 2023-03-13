@@ -37,19 +37,15 @@ export const calculateERC1155MechAddress = (
     [token, tokenIds, minBalances]
   )
 
-  const bytecode =
-    "0x602d8060093d393df3363d3d373d3d3d363d73" +
-    calculateERC1155MechMastercopyAddress().toLowerCase().slice(2) +
-    "5af43d82803e903d91602b57fd5bf3"
-
   return getCreate2Address(
     ERC2470_SINGLETON_FACTORY_ADDRESS,
     salt,
-    keccak256(bytecode + initData.slice(2))
+    keccak256(PROXY_BYTECODE + initData.slice(2))
   )
 }
 
 export const ERC1155_MASTERCOPY_INIT_DATA = [ZERO_ADDRESS, [0], [0]]
+
 export const calculateERC1155MechMastercopyAddress = () => {
   const initData = defaultAbiCoder.encode(
     ["address", "uint256[]", "uint256[]"],

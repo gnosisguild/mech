@@ -28,16 +28,10 @@ export const calculateERC721MechAddress = (
   salt = DEFAULT_SALT
 ) => {
   const initData = solidityKeccak256(["address", "uint256"], [token, tokenId])
-
-  const bytecode =
-    "0x602d8060093d393df3363d3d373d3d3d363d73" +
-    calculateERC721MechMastercopyAddress().toLowerCase().slice(2) +
-    "5af43d82803e903d91602b57fd5bf3"
-
   return getCreate2Address(
     ERC2470_SINGLETON_FACTORY_ADDRESS,
     salt,
-    keccak256(bytecode + initData.slice(2))
+    keccak256(PROXY_BYTECODE + initData.slice(2))
   )
 }
 

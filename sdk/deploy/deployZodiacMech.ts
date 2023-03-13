@@ -24,20 +24,15 @@ export const calculateZodiacMechAddress = (
   salt: string = DEFAULT_SALT
 ) => {
   const initData = solidityKeccak256(["address[]"], [modules])
-
-  const bytecode =
-    "0x602d8060093d393df3363d3d373d3d3d363d73" +
-    calculateZodiacMechMastercopyAddress().toLowerCase().slice(2) +
-    "5af43d82803e903d91602b57fd5bf3"
-
   return getCreate2Address(
     ERC2470_SINGLETON_FACTORY_ADDRESS,
     salt,
-    keccak256(bytecode + initData.slice(2))
+    keccak256(PROXY_BYTECODE + initData.slice(2))
   )
 }
 
 export const ZODIAC_MASTERCOPY_INIT_DATA = [[]]
+
 export const calculateZodiacMechMastercopyAddress = () => {
   const initData = defaultAbiCoder.encode(
     ["address[]"],
