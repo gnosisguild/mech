@@ -18,7 +18,7 @@ describe("ZodiacMech contract", () => {
   // Network to that snapshot in every test.
   async function deployMech1() {
     const ZodiacMech = await ethers.getContractFactory("ZodiacMech")
-    const [deployer, alice, bob, eve] = await ethers.getSigners()
+    const [, alice, bob, eve] = await ethers.getSigners()
 
     const mech1 = await ZodiacMech.deploy([alice.address, bob.address])
 
@@ -39,16 +39,6 @@ describe("ZodiacMech contract", () => {
       expect(enabledModules.toString()).to.equal(
         [bob.address, alice.address, SENTINEL_MODULES].toString()
       )
-    })
-  })
-
-  describe("setUp()", () => {
-    it("reverts if called when modules are enabled", async () => {
-      const { mech1, alice } = await loadFixture(deployMech1)
-
-      await expect(
-        mech1.setUp(defaultAbiCoder.encode(["address[]"], [[alice.address]]))
-      ).to.be.revertedWith("Already initialized")
     })
   })
 

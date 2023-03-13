@@ -8,7 +8,7 @@ import "./base/Mech.sol";
  * @dev A Mech that is operated by the holder of a defined set of minimum ERC1155 token balances
  */
 contract ERC1155Mech is Mech {
-    IERC1155 public token;
+    IERC1155 public immutable token;
     uint256[] public tokenIds;
     uint256[] public minBalances;
 
@@ -20,19 +20,6 @@ contract ERC1155Mech is Mech {
         uint256[] memory _tokenIds,
         uint256[] memory _minBalances
     ) {
-        bytes memory initParams = abi.encode(_token, _tokenIds, _minBalances);
-        setUp(initParams);
-    }
-
-    function setUp(bytes memory initParams) public override {
-        require(address(token) == address(0), "Already initialized");
-
-        (
-            address _token,
-            uint256[] memory _tokenIds,
-            uint256[] memory _minBalances
-        ) = abi.decode(initParams, (address, uint256[], uint256[]));
-
         require(_tokenIds.length > 0, "No token IDs provided");
         require(_tokenIds.length == _minBalances.length, "Length mismatch");
 

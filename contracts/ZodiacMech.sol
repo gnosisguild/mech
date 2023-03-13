@@ -26,20 +26,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
 
     /// @param _modules Address of the token contract
     constructor(address[] memory _modules) {
-        bytes memory initParams = abi.encode(_modules);
-        setUp(initParams);
-    }
-
-    /// @dev This function can be called whenever no modules are enabled, meaning anyone could come and call setUp() then. We keep this behavior to not brick the mech in that case.
-    function setUp(bytes memory initParams) public override {
-        require(
-            modules[address(SENTINEL_MODULES)] == address(0),
-            "Already initialized"
-        );
-
         modules[SENTINEL_MODULES] = SENTINEL_MODULES;
-
-        address[] memory _modules = abi.decode(initParams, (address[]));
 
         for (uint256 i = 0; i < _modules.length; i++) {
             _enableModule(_modules[i]);

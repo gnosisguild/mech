@@ -14,7 +14,7 @@ describe("ERC1155Mech contract", () => {
   async function deployMech1() {
     const TestToken = await ethers.getContractFactory("ERC1155Token")
     const ERC1155Mech = await ethers.getContractFactory("ERC1155Mech")
-    const [deployer, alice, bob] = await ethers.getSigners()
+    const [, alice, bob] = await ethers.getSigners()
 
     const testToken = await TestToken.deploy()
     const mech1 = await ERC1155Mech.deploy(
@@ -42,19 +42,6 @@ describe("ERC1155Mech contract", () => {
       expect(await mech1.minBalances(0)).to.equal(1)
       expect(await mech1.minBalances(1)).to.equal(2)
       expect(await mech1.minBalances(2)).to.equal(3)
-    })
-
-    it("should not allow any calls to setUp() afterwards", async () => {
-      const { mech1, testToken } = await loadFixture(deployMech1)
-
-      expect(
-        mech1.setUp(
-          defaultAbiCoder.encode(
-            ["address", "uint256[]", "uint256[]"],
-            [testToken.address, [4], [4]]
-          )
-        )
-      ).to.be.revertedWith("Already initialized")
     })
   })
 
