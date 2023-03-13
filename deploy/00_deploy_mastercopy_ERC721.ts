@@ -27,6 +27,9 @@ const deployMastercopyERC721: DeployFunction = async (hre) => {
     ) {
       console.log("  ✔ Mastercopy is already verified")
     } else {
+      console.log(
+        "  ✘ Verifying the mastercopy failed. This is probably because Etherscan is still indexing the contract. Try running this same command again in a few seconds."
+      )
       throw e
     }
   }

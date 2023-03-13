@@ -1,42 +1,79 @@
 import { defaultAbiCoder } from "@ethersproject/abi"
-import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers"
-import {
-  deployAndSetUpCustomModule,
-  deployMastercopyWithInitData,
-  SupportedNetworks,
-} from "@gnosis.pm/zodiac"
+import { JsonRpcSigner } from "@ethersproject/providers"
+import { SupportedNetworks } from "@gnosis.pm/zodiac"
 import { BigNumberish } from "ethers"
+import {
+  getCreate2Address,
+  keccak256,
+  solidityKeccak256,
+} from "ethers/lib/utils"
 
 import { ERC721Mech__factory } from "../../typechain-types"
-import { DEFAULT_SALT, INIT_ADDRESS } from "../constants"
+import {
+  DEFAULT_SALT,
+  ERC2470_SINGLETON_FACTORY_ADDRESS,
+  ZERO_ADDRESS,
+} from "../constants"
 
 import {
-  calculateERC721MechAddress,
-  calculateERC721MechMastercopyAddress,
-  ERC721_MASTERCOPY_INIT_DATA,
-} from "./calculateERC721MechAddress"
+  deterministicDeploy,
+  makeDeterministicDeployTransaction,
+} from "./deterministicDeploy"
+
+export const calculateERC721MechAddress = (
+  /** Address of the ERC721 token contract */
+  token: string,
+  /** ID of the ERC721 token */
+  tokenId: BigNumberish,
+  salt = DEFAULT_SALT
+) => {
+  const initData = solidityKeccak256(["address", "uint256"], [token, tokenId])
+
+  const bytecode =
+    "0x602d8060093d393df3363d3d373d3d3d363d73" +
+    calculateERC721MechMastercopyAddress().toLowerCase().slice(2) +
+    "5af43d82803e903d91602b57fd5bf3"
+
+  return getCreate2Address(
+    ERC2470_SINGLETON_FACTORY_ADDRESS,
+    salt,
+    keccak256(bytecode + initData.slice(2))
+  )
+}
+
+export const ERC721_MASTERCOPY_INIT_DATA = [ZERO_ADDRESS, 0]
+
+export const calculateERC721MechMastercopyAddress = () => {
+  const initData = defaultAbiCoder.encode(
+    ["address", "uint256"],
+    ERC721_MASTERCOPY_INIT_DATA
+  )
+  return getCreate2Address(
+    ERC2470_SINGLETON_FACTORY_ADDRESS,
+    DEFAULT_SALT,
+    keccak256(ERC721Mech__factory.bytecode + initData.slice(2))
+  )
+}
+
+// ERC-1167 minimal proxy bytecode
+const PROXY_BYTECODE =
+  "0x602d8060093d393df3363d3d373d3d3d363d73" +
+  calculateERC721MechMastercopyAddress().toLowerCase().slice(2) +
+  "5af43d82803e903d91602b57fd5bf3"
 
 export const makeERC721MechDeployTransaction = (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
   tokenId: BigNumberish,
-  chainId: number,
   salt: string = DEFAULT_SALT
 ) => {
-  const { transaction } = deployAndSetUpCustomModule(
-    calculateERC721MechMastercopyAddress(),
-    ERC721Mech__factory.abi,
-    {
-      types: ["address", "uint256"],
-      values: [token, tokenId],
-    },
-    new JsonRpcProvider(undefined, chainId), // this provider instance is never really be used in deployAndSetUpCustomModule()
-    chainId,
+  const initData = solidityKeccak256(["address", "uint256"], [token, tokenId])
+
+  return makeDeterministicDeployTransaction(
+    PROXY_BYTECODE + initData.slice(2),
     salt
   )
-
-  return transaction
 }
 
 export const deployERC721Mech = async (
@@ -69,14 +106,13 @@ export const deployERC721Mech = async (
     )
   }
 
-  const transaction = makeERC721MechDeployTransaction(
-    token,
-    tokenId,
-    signer.provider.network.chainId,
-    salt
-  )
+  const initData = solidityKeccak256(["address", "uint256"], [token, tokenId])
 
-  return signer.sendTransaction(transaction)
+  return await deterministicDeploy(
+    signer,
+    PROXY_BYTECODE + initData.slice(2),
+    DEFAULT_SALT
+  )
 }
 
 export const deployERC721MechMastercopy = async (signer: JsonRpcSigner) => {
@@ -84,7 +120,7 @@ export const deployERC721MechMastercopy = async (signer: JsonRpcSigner) => {
     ["address", "uint256"],
     ERC721_MASTERCOPY_INIT_DATA
   )
-  return await deployMastercopyWithInitData(
+  return await deterministicDeploy(
     signer,
     ERC721Mech__factory.bytecode + initData.slice(2),
     DEFAULT_SALT

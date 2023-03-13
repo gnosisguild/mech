@@ -1,4 +1,3 @@
-import { defaultAbiCoder } from "@ethersproject/abi"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
 import { ethers } from "hardhat"
@@ -14,7 +13,7 @@ describe("ERC721Mech contract", () => {
   async function deployMech1() {
     const TestToken = await ethers.getContractFactory("ERC721Token")
     const ERC721Mech = await ethers.getContractFactory("ERC721Mech")
-    const [deployer, alice, bob] = await ethers.getSigners()
+    const [, alice, bob] = await ethers.getSigners()
 
     const testToken = await TestToken.deploy()
     const mech1 = await ERC721Mech.deploy(testToken.address, 1)
@@ -31,16 +30,6 @@ describe("ERC721Mech contract", () => {
 
       expect(await mech1.token()).to.equal(testToken.address)
       expect(await mech1.tokenId()).to.equal(1)
-    })
-
-    it("should not allow any calls to setUp() afterwards", async () => {
-      const { mech1, testToken } = await loadFixture(deployMech1)
-
-      expect(
-        mech1.setUp(
-          defaultAbiCoder.encode(["address", "uint256"], [testToken.address, 2])
-        )
-      ).to.be.revertedWith("Already initialized")
     })
   })
 
