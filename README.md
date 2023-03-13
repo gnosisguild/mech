@@ -1,7 +1,7 @@
 # Mech
 
 [![Build Status](https://github.com/gnosis/mech/actions/workflows/ci.yml/badge.svg)](https://github.com/gnosis/mech/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/mech/badge.svg?branch=main)](https://coveralls.io/github/gnosis/mech?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/mech/badge.svg?branch=main&bust=1)](https://coveralls.io/github/gnosis/mech?branch=main)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://github.com/gnosis/CODE_OF_CONDUCT)
 
 Smart account with programmable ownership
