@@ -59,6 +59,12 @@ yarn test
 
 Tests covers both, the contract logic as well as the SDK functions.
 
+```
+yarn integrationTest
+```
+
+Integration tests are run on a mainnet fork and cover the interaction of mech contracts with external contracts (Safe and EIP-4337 entry point).
+
 ## How it works
 
 ### EIP-4337 account
