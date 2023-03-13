@@ -114,6 +114,7 @@ contract ERC1155Mech is Mech {
     }
 
     function tokenIds(uint256 index) public view returns (uint256) {
+        require(index < length, "Index out of bounds");
         if (index == 0) return tokenId0;
         if (index == 1) return tokenId1;
         if (index == 2) return tokenId2;
@@ -129,11 +130,11 @@ contract ERC1155Mech is Mech {
         if (index == 12) return tokenId12;
         if (index == 13) return tokenId13;
         if (index == 14) return tokenId14;
-        if (index == 15) return tokenId15;
-        revert("Index out of bounds");
+        return tokenId15;
     }
 
     function minBalances(uint256 index) public view returns (uint256) {
+        require(index < length, "Index out of bounds");
         if (index == 0) return minBalance0;
         if (index == 1) return minBalance1;
         if (index == 2) return minBalance2;
@@ -149,8 +150,7 @@ contract ERC1155Mech is Mech {
         if (index == 12) return minBalance12;
         if (index == 13) return minBalance13;
         if (index == 14) return minBalance14;
-        if (index == 15) return minBalance15;
-        revert("Index out of bounds");
+        return minBalance15;
     }
 
     function isOperator(address signer) public view override returns (bool) {
