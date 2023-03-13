@@ -8,19 +8,17 @@ import {
   singletonFactory,
 } from "./erc2470SingletonFactory"
 
-export const makeDeterministicDeployTransaction = async (
+export const makeDeterministicDeployTransaction = (
   initCode: BytesLike,
   salt: string
-) => {
-  return {
-    to: singletonFactory.address,
-    data: singletonFactory.interface.encodeFunctionData("deploy", [
-      initCode,
-      salt,
-    ]),
-    value: 0,
-  }
-}
+) => ({
+  to: singletonFactory.address,
+  data: singletonFactory.interface.encodeFunctionData("deploy", [
+    initCode,
+    salt,
+  ]),
+  value: 0,
+})
 
 export const deterministicDeploy = async (
   signer: Signer,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useChainId, useProvider, useSigner } from "wagmi"
+import { useProvider, useSigner } from "wagmi"
 import {
   calculateERC721MechAddress,
   makeERC721MechDeployTransaction,
@@ -8,7 +8,6 @@ import {
 export const useDeployMech = (token: string, tokenId: string) => {
   const mechAddress = calculateERC721MechAddress(token, tokenId)
   const { data: signer } = useSigner()
-  const chainId = useChainId()
 
   const provider = useProvider()
   const [deployed, setDeployed] = useState(false)
@@ -19,7 +18,7 @@ export const useDeployMech = (token: string, tokenId: string) => {
   const [deployPending, setDeployPending] = useState(false)
   const deploy = async () => {
     if (!signer) return
-    const tx = makeERC721MechDeployTransaction(token, tokenId, chainId)
+    const tx = makeERC721MechDeployTransaction(token, tokenId)
     setDeployPending(true)
     try {
       const res = await signer.sendTransaction(tx)
