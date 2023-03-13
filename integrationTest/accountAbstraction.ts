@@ -1,7 +1,12 @@
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { expect } from "chai"
-import { arrayify, defaultAbiCoder, keccak256 } from "ethers/lib/utils"
+import {
+  arrayify,
+  defaultAbiCoder,
+  hexConcat,
+  keccak256,
+} from "ethers/lib/utils"
 import { ethers, network } from "hardhat"
 
 import {
@@ -19,7 +24,7 @@ import { UserOperationStruct } from "../typechain-types/@account-abstraction/con
 
 const entryPointAddress = "0x0576a174D229E3cFA37253523E645A78A0C91B57"
 
-describe.only("account abstraction", () => {
+describe("account abstraction", () => {
   it("implements ERC-4337 account abstraction", async () => {
     const [signer, enabledModule, anotherModule] = await ethers.getSigners()
     const deployer = ethers.provider.getSigner(signer.address)
@@ -43,7 +48,6 @@ describe.only("account abstraction", () => {
           callData: zodiacMech.interface.encodeFunctionData("enableModule", [
             anotherModule.address,
           ]),
-          // initCode,
         },
         zodiacMech
       ),
@@ -65,8 +69,9 @@ describe.only("account abstraction", () => {
     expect(await zodiacMech.isModuleEnabled(anotherModule.address)).to.be.true
   })
 
-  it.skip("deploys the mech at the expected address if it does not exist yet", async () => {
-    const [signer, enabledModule, anotherModule] = await ethers.getSigners()
+  it("deploys the mech at the expected address if it does not exist yet", async () => {
+    // skip 2 signers, so this test
+    const [signer, , , enabledModule, anotherModule] = await ethers.getSigners()
     const deployer = ethers.provider.getSigner(signer.address)
 
     // deploy the ZodiacMech mastercopy
@@ -81,41 +86,47 @@ describe.only("account abstraction", () => {
     const entryPoint = IEntryPoint__factory.connect(entryPointAddress, deployer)
 
     // calculate the ZodiacMech init code
-    const { data: initCode } = await makeZodiacMechDeployTransaction(
+    const deployTx = await makeZodiacMechDeployTransaction(
       [enabledModule.address],
       ethers.provider
     )
+    const initCode = hexConcat([deployTx.to, deployTx.data])
 
     const zodiacMech = ZodiacMech__factory.connect(mechAddress, deployer)
 
     // enable another module on the Mech via the entry point
-    await expect(
-      entryPoint.handleOps(
-        [
-          await signUserOp(
-            await fillUserOp(
-              {
-                callData: zodiacMech.interface.encodeFunctionData(
-                  "enableModule",
-                  [anotherModule.address]
-                ),
-                initCode,
-                nonce: 0,
-              },
-              zodiacMech
-            ),
-            anotherModule
-          ),
-        ],
-        signer.address
+    const userOp = await signUserOp(
+      await fillUserOp(
+        {
+          // sender: mechAddress, // optional
+          callData: zodiacMech.interface.encodeFunctionData("enableModule", [
+            anotherModule.address,
+          ]),
+          initCode,
+          nonce: 0,
+        },
+        zodiacMech
+      ),
+      enabledModule
+    )
+
+    await expect(entryPoint.handleOps([userOp], signer.address))
+      .to.emit(entryPoint, "UserOperationEvent")
+      .withArgs(
+        getUserOpHash(userOp),
+        userOp.sender,
+        "0x0000000000000000000000000000000000000000", // paymaster
+        userOp.nonce,
+        true, // success
+        anyValue,
+        anyValue
       )
-    ).to.not.be.reverted
 
     // mech has been deployed
     expect(await ethers.provider.getCode(mechAddress)).to.not.equal("0x")
 
     // make sure the module is enabled
-    expect(zodiacMech.isModuleEnabled(anotherModule.address)).to.be.true
+    expect(await zodiacMech.isModuleEnabled(anotherModule.address)).to.be.true
   })
 })
 
@@ -130,11 +141,11 @@ export const fillUserOp = async (
   callGasLimit: 100000,
   maxFeePerGas: 0,
   maxPriorityFeePerGas: 1e9,
-  preVerificationGas: 21000,
-  verificationGasLimit: 100000,
+  preVerificationGas: 900000,
+  verificationGasLimit: 200000,
   paymasterAndData: "0x",
   ...op,
-  nonce: op.nonce || (await account.nonce()),
+  nonce: op.nonce === undefined ? await account.nonce() : op.nonce,
 })
 
 export const signUserOp = async (
