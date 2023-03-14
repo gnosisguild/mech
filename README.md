@@ -102,10 +102,10 @@ The deterministic deployment is implemented via Zodiac's [ModuleProxyFactory](ht
 ### Immutable storage
 
 The holder of the token gains full control over the mech account and can write to its storage without any restrictions via delegate calls.
-Since tokens are transferrable this is problematic, as a past owner could mess with storage to change the mech's behavior in ways that future owners don't expect.
-That's why the ERC721 and ERC1155 versions of the mech don't use storage whatsoever but exclusively rely on values hard-coded in bytecode.
-For this purpose Mech sub contracts can extend [ImmutableStorage](contracts/base/ImmutableStorage.sol) which allows writing data to a deterministic contract address once.
+Since tokens are transferrable this is problematic, as a past owner could mess with storage to change the mech's behavior in ways that future owners wouldn't expect.
+That's why the ERC721 and ERC1155 versions of the mech avoid using storage but hard-code their configuration in bytecode.
 
+To achieve this, Mech sub contracts can extend [ImmutableStorage](contracts/base/ImmutableStorage.sol) which allows writing data to the bytecode at a deterministic address once.
 Note that using Solidity's `immutable` keyword is not an option for proxy contracts, since immutable fields can only be written to from the constructor which won't be invoked for proxy instances.
 
 ### Migrate a Safe to a ZodiacMech
