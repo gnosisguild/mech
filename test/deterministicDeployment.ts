@@ -219,7 +219,7 @@ describe("deterministic deployment", () => {
       const mech = ZodiacMech__factory.connect(mechAddress, alice)
 
       expect(await mech.getModulesPaginated(SENTINEL_MODULES, 2)).to.deep.equal(
-        [[alice.address], "0x0000000000000000000000000000000000000001"]
+        [[alice.address], SENTINEL_MODULES]
       )
     })
   })
@@ -272,7 +272,7 @@ describe("deterministic deployment", () => {
       )
 
       expect(await mech.getModulesPaginated(SENTINEL_MODULES, 2)).to.deep.equal(
-        [[], "0x0000000000000000000000000000000000000001"]
+        [[], SENTINEL_MODULES]
       )
     })
 
