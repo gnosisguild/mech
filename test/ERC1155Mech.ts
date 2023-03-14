@@ -1,3 +1,4 @@
+import { defaultAbiCoder } from "@ethersproject/abi"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
 import { ethers } from "hardhat"
@@ -30,50 +31,36 @@ describe("ERC1155Mech contract", () => {
 
   describe("deployment", () => {
     it("sets token address, ids, and min balances", async () => {
-      const { testToken } = await loadFixture(deployMech1)
+      const { testToken, mech1 } = await loadFixture(deployMech1)
 
-      const ERC1155Mech = await ethers.getContractFactory("ERC1155Mech")
-      const mechWithAllThresholds = await ERC1155Mech.deploy(
-        testToken.address,
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-        [11, 22, 33, 44, 55, 66, 77, 88, 99, 100, 111, 122, 133, 144, 155, 166]
-      )
+      expect(await mech1.token()).to.equal(testToken.address)
 
-      expect(await mechWithAllThresholds.token()).to.equal(testToken.address)
+      expect(await mech1.tokenIds(0)).to.equal(1)
+      expect(await mech1.tokenIds(1)).to.equal(2)
+      expect(await mech1.tokenIds(2)).to.equal(3)
 
-      expect(await mechWithAllThresholds.tokenIds(0)).to.equal(1)
-      expect(await mechWithAllThresholds.tokenIds(1)).to.equal(2)
-      expect(await mechWithAllThresholds.tokenIds(2)).to.equal(3)
-      expect(await mechWithAllThresholds.tokenIds(3)).to.equal(4)
-      expect(await mechWithAllThresholds.tokenIds(4)).to.equal(5)
-      expect(await mechWithAllThresholds.tokenIds(5)).to.equal(6)
-      expect(await mechWithAllThresholds.tokenIds(6)).to.equal(7)
-      expect(await mechWithAllThresholds.tokenIds(7)).to.equal(8)
-      expect(await mechWithAllThresholds.tokenIds(8)).to.equal(9)
-      expect(await mechWithAllThresholds.tokenIds(9)).to.equal(10)
-      expect(await mechWithAllThresholds.tokenIds(10)).to.equal(11)
-      expect(await mechWithAllThresholds.tokenIds(11)).to.equal(12)
-      expect(await mechWithAllThresholds.tokenIds(12)).to.equal(13)
-      expect(await mechWithAllThresholds.tokenIds(13)).to.equal(14)
-      expect(await mechWithAllThresholds.tokenIds(14)).to.equal(15)
-      expect(await mechWithAllThresholds.tokenIds(15)).to.equal(16)
+      expect(await mech1.minBalances(0)).to.equal(1)
+      expect(await mech1.minBalances(1)).to.equal(2)
+      expect(await mech1.minBalances(2)).to.equal(3)
+    })
 
-      expect(await mechWithAllThresholds.minBalances(0)).to.equal(11)
-      expect(await mechWithAllThresholds.minBalances(1)).to.equal(22)
-      expect(await mechWithAllThresholds.minBalances(2)).to.equal(33)
-      expect(await mechWithAllThresholds.minBalances(3)).to.equal(44)
-      expect(await mechWithAllThresholds.minBalances(4)).to.equal(55)
-      expect(await mechWithAllThresholds.minBalances(5)).to.equal(66)
-      expect(await mechWithAllThresholds.minBalances(6)).to.equal(77)
-      expect(await mechWithAllThresholds.minBalances(7)).to.equal(88)
-      expect(await mechWithAllThresholds.minBalances(8)).to.equal(99)
-      expect(await mechWithAllThresholds.minBalances(9)).to.equal(100)
-      expect(await mechWithAllThresholds.minBalances(10)).to.equal(111)
-      expect(await mechWithAllThresholds.minBalances(11)).to.equal(122)
-      expect(await mechWithAllThresholds.minBalances(12)).to.equal(133)
-      expect(await mechWithAllThresholds.minBalances(13)).to.equal(144)
-      expect(await mechWithAllThresholds.minBalances(14)).to.equal(155)
-      expect(await mechWithAllThresholds.minBalances(15)).to.equal(166)
+    it("reverts if tokenIds and minBalances are not of same length", async () => {
+      const { testToken, ERC1155Mech } = await loadFixture(deployMech1)
+      await expect(
+        ERC1155Mech.deploy(testToken.address, [1, 2, 3], [1, 2])
+      ).to.be.revertedWith("Length mismatch")
+    })
+
+    it("should not allow any calls to setUp() afterwards", async () => {
+      const { mech1, testToken } = await loadFixture(deployMech1)
+      expect(
+        mech1.setUp(
+          defaultAbiCoder.encode(
+            ["address", "uint256[]", "uint256[]"],
+            [testToken.address, [4], [4]]
+          )
+        )
+      ).to.be.revertedWith("Already initialized")
     })
   })
 
@@ -104,22 +91,6 @@ describe("ERC1155Mech contract", () => {
     it("returns false if some of linked token IDs do not exist", async () => {
       const { mech1, alice } = await loadFixture(deployMech1)
       expect(await mech1.isOperator(alice.address)).to.equal(false)
-    })
-  })
-
-  describe("tokenIds()", () => {
-    it("reverts if index is out of bounds", async () => {
-      const { mech1 } = await loadFixture(deployMech1)
-      await expect(mech1.tokenIds(3)).to.be.revertedWith("Index out of bounds")
-    })
-  })
-
-  describe("minBalances()", () => {
-    it("reverts if index is out of bounds", async () => {
-      const { mech1 } = await loadFixture(deployMech1)
-      await expect(mech1.minBalances(3)).to.be.revertedWith(
-        "Index out of bounds"
-      )
     })
   })
 })

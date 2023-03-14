@@ -93,15 +93,20 @@ An EIP-1271 signature will be considered valid if it meets the following conditi
 - the signing contract is either the operator of the mech or the mech itself, and
 - the signing contract's `isValidSignature()` function returns `0x1626ba7e` (EIP-1271 magic value) for the given `<bytes of signature data>`.
 
-### Deterministic deployment & immutability
+### Deterministic deployment
 
 The idea for the ERC721 and ERC1155 mechs is that the mech instance for the designated tokens is deployed to a deterministic address.
 This enables counterfactually funding the mech account (own token to unlock treasure) or granting access for it (use token as key card).
-The deterministic deployment is implemented via the ERC-2470 singleton factory, through which each mech instance is deployed as an ERC-1167 minimal proxy.
+The deterministic deployment is implemented via Zodiac's [ModuleProxyFactory](https://github.com/gnosis/zodiac/blob/master/contracts/factory/ModuleProxyFactory.sol), through which each mech instance is deployed as an ERC-1167 minimal proxy.
+
+### Immutable storage
 
 The holder of the token gains full control over the mech account and can write to its storage without any restrictions via delegate calls.
-Since tokens are transferrable this is problematic, as a past owner could mess with storage to change the mech's behavior in ways that future owners don't expect.
-That's why the ERC721 and ERC1155 versions of the mech don't use storage whatsoever but exclusively rely on hard-coded values.
+Since tokens are transferrable this is problematic, as a past owner could mess with storage to change the mech's behavior in ways that future owners wouldn't expect.
+That's why the ERC721 and ERC1155 versions of the mech avoid using storage but hard-code their configuration in bytecode.
+
+To achieve this, Mech sub contracts can extend [ImmutableStorage](contracts/base/ImmutableStorage.sol) which allows writing data to the bytecode at a deterministic address once.
+Note that using Solidity's `immutable` keyword is not an option for proxy contracts, since immutable fields can only be written to from the constructor which won't be invoked for proxy instances.
 
 ### Migrate a Safe to a ZodiacMech
 

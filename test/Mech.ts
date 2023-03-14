@@ -16,7 +16,7 @@ describe("Mech base contract", () => {
   async function deployMech1() {
     const TestToken = await ethers.getContractFactory("ERC721Token")
     const ERC721Mech = await ethers.getContractFactory("ERC721Mech")
-    const [deployer, alice, bob] = await ethers.getSigners()
+    const [, alice, bob] = await ethers.getSigners()
 
     const testToken = await TestToken.deploy()
     const mech1 = await ERC721Mech.deploy(testToken.address, 1)
