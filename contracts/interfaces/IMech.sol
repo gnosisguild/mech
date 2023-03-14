@@ -5,7 +5,9 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@account-abstraction/contracts/interfaces/IAccount.sol";
 
-interface IMech is IAccount, IERC1271 {
+import "./IFactoryFriendly.sol";
+
+interface IMech is IAccount, IERC1271, IFactoryFriendly {
     /// @dev Executes either a delegatecall or a call with provided parameters
     /// @param to Destination address.
     /// @param value Ether value.

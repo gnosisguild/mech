@@ -1,3 +1,5 @@
+import { defaultAbiCoder } from "@ethersproject/abi"
+import { deployModuleFactory } from "@gnosis.pm/zodiac"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
 import hre, { ethers } from "hardhat"
@@ -28,9 +30,13 @@ import {
 } from "../typechain-types"
 
 describe("deterministic deployment", () => {
-  async function deploySingletonFactoryAndMastercopies() {
-    const [signer] = await hre.ethers.getSigners()
+  async function deployModuleFactoryAndMastercopy() {
+    const [signer, alice] = await hre.ethers.getSigners()
     const deployer = hre.ethers.provider.getSigner(signer.address)
+    const moduleProxyFactoryAddress = await deployModuleFactory(deployer)
+    if (moduleProxyFactoryAddress === ZERO_ADDRESS) {
+      throw new Error("Module proxy factory address is already deployed")
+    }
 
     const mastercopyAddresses = {
       erc721: await deployERC721MechMastercopy(deployer),
@@ -39,15 +45,35 @@ describe("deterministic deployment", () => {
     }
 
     return {
+      moduleProxyFactoryAddress,
       mastercopyAddresses,
       deployer,
+      alice,
     }
   }
+
+  describe("deployERC721Mech()", () => {
+    it("correctly initializes the mech proxy instance", async () => {
+      const { alice, deployer } = await loadFixture(
+        deployModuleFactoryAndMastercopy
+      )
+
+      const TestToken = await ethers.getContractFactory("ERC721Token")
+      const testToken = await TestToken.deploy()
+
+      await deployERC721Mech(testToken.address, 1, deployer)
+      const mechAddress = calculateERC721MechAddress(testToken.address, 1)
+      const mech = ERC721Mech__factory.connect(mechAddress, alice)
+
+      expect(await mech.token()).to.equal(testToken.address)
+      expect(await mech.tokenId()).to.equal(1)
+    })
+  })
 
   describe("calculateERC721MechMastercopyAddress", () => {
     it("returns the address of the ERC721Mech mastercopy", async () => {
       const { mastercopyAddresses } = await loadFixture(
-        deploySingletonFactoryAndMastercopies
+        deployModuleFactoryAndMastercopy
       )
 
       expect(calculateERC721MechMastercopyAddress()).to.equal(
@@ -55,10 +81,9 @@ describe("deterministic deployment", () => {
       )
     })
   })
-
   describe("calculateERC721MechAddress()", () => {
     it("returns the address of the mech for a given NFT", async () => {
-      await loadFixture(deploySingletonFactoryAndMastercopies)
+      await loadFixture(deployModuleFactoryAndMastercopy)
 
       const TestToken = await ethers.getContractFactory("ERC721Token")
       const testToken = await TestToken.deploy()
@@ -80,26 +105,55 @@ describe("deterministic deployment", () => {
   })
 
   describe("deployERC721MechMastercopy()", () => {
-    it("initializes the mastercopy with zero address and token ID 0", async () => {
+    it("initializes the mastercopy", async () => {
       const { mastercopyAddresses, deployer } = await loadFixture(
-        deploySingletonFactoryAndMastercopies
+        deployModuleFactoryAndMastercopy
       )
 
       const mech = ERC721Mech__factory.connect(
         mastercopyAddresses.erc721,
         deployer
       )
-      expect(await mech.token()).to.equal(ZERO_ADDRESS)
-      expect(await mech.tokenId()).to.equal(0)
+      const SOME_ADDRESS = "0x1111111111111111111111111111111111111111"
+      expect(
+        mech.setUp(
+          defaultAbiCoder.encode(["address", "uint256"], [SOME_ADDRESS, 1])
+        )
+      ).to.be.revertedWith("Already initialized")
     })
   })
 
   ///// ERC1155Mech
 
+  describe("deployERC1155Mech()", () => {
+    it("correctly initializes the mech proxy instance", async () => {
+      const { alice, deployer } = await loadFixture(
+        deployModuleFactoryAndMastercopy
+      )
+
+      const TestToken = await ethers.getContractFactory("ERC1155Token")
+      const testToken = await TestToken.deploy()
+
+      await deployERC1155Mech(testToken.address, [1, 2], [10, 20], deployer)
+      const mechAddress = calculateERC1155MechAddress(
+        testToken.address,
+        [1, 2],
+        [10, 20]
+      )
+      const mech = ERC1155Mech__factory.connect(mechAddress, alice)
+
+      expect(await mech.token()).to.equal(testToken.address)
+      expect(await mech.tokenIds(0)).to.equal(1)
+      expect(await mech.tokenIds(1)).to.equal(2)
+      expect(await mech.minBalances(0)).to.equal(10)
+      expect(await mech.minBalances(1)).to.equal(20)
+    })
+  })
+
   describe("calculateERC1155MechMastercopyAddress", () => {
     it("returns the address of the ERC1155Mech mastercopy", async () => {
       const { mastercopyAddresses } = await loadFixture(
-        deploySingletonFactoryAndMastercopies
+        deployModuleFactoryAndMastercopy
       )
 
       expect(calculateERC1155MechMastercopyAddress()).to.equal(
@@ -110,7 +164,7 @@ describe("deterministic deployment", () => {
 
   describe("calculateERC1155MechAddress()", () => {
     it("returns the address of the mech for a given NFT", async () => {
-      await loadFixture(deploySingletonFactoryAndMastercopies)
+      await loadFixture(deployModuleFactoryAndMastercopy)
 
       const TestToken = await ethers.getContractFactory("ERC1155Token")
       const testToken = await TestToken.deploy()
@@ -139,7 +193,7 @@ describe("deterministic deployment", () => {
   describe("deployERC1155MechMastercopy()", () => {
     it("initializes the mastercopy with zero address and threshold [0, 0]", async () => {
       const { mastercopyAddresses, deployer } = await loadFixture(
-        deploySingletonFactoryAndMastercopies
+        deployModuleFactoryAndMastercopy
       )
 
       const mech = ERC1155Mech__factory.connect(
@@ -154,10 +208,26 @@ describe("deterministic deployment", () => {
 
   ///// ZodiacMech
 
+  describe("deployZodiacMech()", () => {
+    it("correctly initializes the mech proxy instance", async () => {
+      const { deployer, alice } = await loadFixture(
+        deployModuleFactoryAndMastercopy
+      )
+
+      await deployZodiacMech([alice.address], deployer)
+      const mechAddress = calculateZodiacMechAddress([alice.address])
+      const mech = ZodiacMech__factory.connect(mechAddress, alice)
+
+      expect(await mech.getModulesPaginated(SENTINEL_MODULES, 2)).to.deep.equal(
+        [[alice.address], "0x0000000000000000000000000000000000000001"]
+      )
+    })
+  })
+
   describe("calculateZodiacMechMastercopyAddress", () => {
     it("returns the address of the ZodiacMech mastercopy", async () => {
       const { mastercopyAddresses } = await loadFixture(
-        deploySingletonFactoryAndMastercopies
+        deployModuleFactoryAndMastercopy
       )
 
       expect(calculateZodiacMechMastercopyAddress()).to.equal(
@@ -168,7 +238,7 @@ describe("deterministic deployment", () => {
 
   describe("calculateZodiacMechAddress()", () => {
     it("returns the address of the mech for a given NFT", async () => {
-      await loadFixture(deploySingletonFactoryAndMastercopies)
+      await loadFixture(deployModuleFactoryAndMastercopy)
 
       const [, mod1, mod2] = await hre.ethers.getSigners()
 
@@ -193,7 +263,7 @@ describe("deterministic deployment", () => {
   describe("deployZodiacMechMastercopy()", () => {
     it("initializes the mastercopy with an empty modules array", async () => {
       const { mastercopyAddresses, deployer } = await loadFixture(
-        deploySingletonFactoryAndMastercopies
+        deployModuleFactoryAndMastercopy
       )
 
       const mech = ZodiacMech__factory.connect(
@@ -204,6 +274,21 @@ describe("deterministic deployment", () => {
       expect(await mech.getModulesPaginated(SENTINEL_MODULES, 2)).to.deep.equal(
         [[], "0x0000000000000000000000000000000000000001"]
       )
+    })
+
+    it("initializes the mastercopy", async () => {
+      const { mastercopyAddresses, deployer } = await loadFixture(
+        deployModuleFactoryAndMastercopy
+      )
+
+      const mech = ZodiacMech__factory.connect(
+        mastercopyAddresses.zodiac,
+        deployer
+      )
+      const SOME_ADDRESS = "0x1111111111111111111111111111111111111111"
+      expect(
+        mech.setUp(defaultAbiCoder.encode(["address[]"], [[SOME_ADDRESS]]))
+      ).to.be.revertedWith("Already initialized")
     })
   })
 })

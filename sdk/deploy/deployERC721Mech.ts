@@ -1,6 +1,10 @@
 import { defaultAbiCoder } from "@ethersproject/abi"
-import { JsonRpcSigner } from "@ethersproject/providers"
-import { SupportedNetworks } from "@gnosis.pm/zodiac"
+import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers"
+import {
+  deployAndSetUpCustomModule,
+  deployMastercopyWithInitData,
+  SupportedNetworks,
+} from "@gnosis.pm/zodiac"
 import { BigNumberish } from "ethers"
 import {
   getCreate2Address,
@@ -8,30 +12,42 @@ import {
   solidityKeccak256,
 } from "ethers/lib/utils"
 
-import { ERC721Mech__factory } from "../../typechain-types"
+import {
+  ERC721Mech__factory,
+  IFactoryFriendly__factory,
+} from "../../typechain-types"
 import {
   DEFAULT_SALT,
   ERC2470_SINGLETON_FACTORY_ADDRESS,
+  MODULE_PROXY_FACTORY_ADDRESS,
   ZERO_ADDRESS,
 } from "../constants"
-
-import {
-  deterministicDeploy,
-  makeDeterministicDeployTransaction,
-} from "./deterministicDeploy"
 
 export const calculateERC721MechAddress = (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
   tokenId: BigNumberish,
-  salt = DEFAULT_SALT
+  salt: string = DEFAULT_SALT
 ) => {
-  const initData = solidityKeccak256(["address", "uint256"], [token, tokenId])
+  const initData =
+    IFactoryFriendly__factory.createInterface().encodeFunctionData("setUp", [
+      defaultAbiCoder.encode(["address", "uint256"], [token, tokenId]),
+    ])
+
+  // ERC-1167 minimal proxy bytecode
+  const byteCode =
+    "0x602d8060093d393df3363d3d373d3d3d363d73" +
+    calculateERC721MechMastercopyAddress().toLowerCase().slice(2) +
+    "5af43d82803e903d91602b57fd5bf3"
+
   return getCreate2Address(
-    ERC2470_SINGLETON_FACTORY_ADDRESS,
-    salt,
-    keccak256(PROXY_BYTECODE + initData.slice(2))
+    MODULE_PROXY_FACTORY_ADDRESS,
+    solidityKeccak256(
+      ["bytes32", "uint256"],
+      [solidityKeccak256(["bytes"], [initData]), salt]
+    ),
+    keccak256(byteCode)
   )
 }
 
@@ -49,25 +65,27 @@ export const calculateERC721MechMastercopyAddress = () => {
   )
 }
 
-// ERC-1167 minimal proxy bytecode
-const PROXY_BYTECODE =
-  "0x602d8060093d393df3363d3d373d3d3d363d73" +
-  calculateERC721MechMastercopyAddress().toLowerCase().slice(2) +
-  "5af43d82803e903d91602b57fd5bf3"
-
 export const makeERC721MechDeployTransaction = (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
   tokenId: BigNumberish,
+  chainId: number,
   salt: string = DEFAULT_SALT
 ) => {
-  const initData = solidityKeccak256(["address", "uint256"], [token, tokenId])
-
-  return makeDeterministicDeployTransaction(
-    PROXY_BYTECODE + initData.slice(2),
+  const { transaction } = deployAndSetUpCustomModule(
+    calculateERC721MechMastercopyAddress(),
+    ERC721Mech__factory.abi,
+    {
+      types: ["address", "uint256"],
+      values: [token, tokenId],
+    },
+    new JsonRpcProvider(undefined, chainId), // this provider instance is never really be used in deployAndSetUpCustomModule()
+    chainId,
     salt
   )
+
+  return transaction
 }
 
 export const deployERC721Mech = async (
@@ -85,13 +103,11 @@ export const deployERC721Mech = async (
       `A mech with the same token and token ID already exists at ${deterministicAddress}`
     )
   }
-
   const { chainId } = signer.provider.network
   // make sure the network is supported
   if (!Object.values(SupportedNetworks).includes(chainId)) {
     throw new Error(`Network #${chainId} is not supported yet.`)
   }
-
   // make sure the mastercopy is deployed
   const mastercopyAddress = calculateERC721MechMastercopyAddress()
   if ((await signer.provider.getCode(mastercopyAddress)) === "0x") {
@@ -100,13 +116,14 @@ export const deployERC721Mech = async (
     )
   }
 
-  const initData = solidityKeccak256(["address", "uint256"], [token, tokenId])
-
-  return await deterministicDeploy(
-    signer,
-    PROXY_BYTECODE + initData.slice(2),
-    DEFAULT_SALT
+  const transaction = makeERC721MechDeployTransaction(
+    token,
+    tokenId,
+    signer.provider.network.chainId,
+    salt
   )
+
+  return signer.sendTransaction(transaction)
 }
 
 export const deployERC721MechMastercopy = async (signer: JsonRpcSigner) => {
@@ -114,7 +131,7 @@ export const deployERC721MechMastercopy = async (signer: JsonRpcSigner) => {
     ["address", "uint256"],
     ERC721_MASTERCOPY_INIT_DATA
   )
-  return await deterministicDeploy(
+  return await deployMastercopyWithInitData(
     signer,
     ERC721Mech__factory.bytecode + initData.slice(2),
     DEFAULT_SALT

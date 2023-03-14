@@ -28,6 +28,16 @@ describe("ZodiacMech contract", () => {
     return { ZodiacMech, mech1, alice, bob, eve }
   }
 
+  describe("setUp()", () => {
+    it("reverts if called when modules are enabled", async () => {
+      const { mech1, alice } = await loadFixture(deployMech1)
+
+      await expect(
+        mech1.setUp(defaultAbiCoder.encode(["address[]"], [[alice.address]]))
+      ).to.be.revertedWith("Already initialized")
+    })
+  })
+
   describe("deployment", () => {
     it("should enable the passed modules", async () => {
       const { mech1, alice, bob } = await loadFixture(deployMech1)
