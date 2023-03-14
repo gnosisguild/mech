@@ -9,7 +9,7 @@ contract ImmutableStorage {
      * @return The address the data is written to
      */
     function storageLocation() internal view returns (address) {
-        // calculates the address of the contract created through the first create() call made by the current contract
+        // calculates the address of the contract created through the first create() call made by this contract
         // see: https://ethereum.stackexchange.com/a/761
         return
             address(
@@ -33,19 +33,15 @@ contract ImmutableStorage {
      * @param data to be written
      */
     function writeImmutable(bytes memory data) internal {
-        // Append 00 to _data so contract can't be called
-        // Build init code
-        bytes memory code = Bytecode.creationCodeFor(
-            abi.encodePacked(hex"00", data)
-        );
+        bytes memory initCode = Bytecode.creationCodeForStoring(data);
+        address createdAt;
 
-        address pointer;
         // Deploy contract using create
         assembly {
-            pointer := create(0, add(code, 32), mload(code))
+            createdAt := create(0, add(initCode, 32), mload(initCode))
         }
 
-        require(pointer == storageLocation(), "Write failed");
+        require(createdAt == storageLocation(), "Write failed");
     }
 
     /**
@@ -53,7 +49,6 @@ contract ImmutableStorage {
      * @return data stored at the storage location
      */
     function readImmutable() internal view returns (bytes memory) {
-        // skip over first 00 byte
-        return Bytecode.codeAt(storageLocation(), 1, type(uint256).max);
+        return Bytecode.valueStoredAt(storageLocation());
     }
 }
