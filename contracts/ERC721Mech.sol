@@ -22,7 +22,7 @@ contract ERC721Mech is Mech, ImmutableStorage {
     }
 
     function token() public view returns (IERC721) {
-        (address _token, ) = abi.decode(readImmutable(), (address, uint256));
+        address _token = abi.decode(readImmutable(), (address));
         return IERC721(_token);
     }
 

@@ -38,17 +38,14 @@ contract ERC1155Mech is Mech, ImmutableStorage {
     }
 
     function token() public view returns (IERC1155) {
-        (address _token, , ) = abi.decode(
-            readImmutable(),
-            (address, uint256[], uint256[])
-        );
+        address _token = abi.decode(readImmutable(), (address));
         return IERC1155(_token);
     }
 
     function tokenIds(uint256 index) public view returns (uint256) {
-        (, uint256[] memory _tokenIds, ) = abi.decode(
+        (, uint256[] memory _tokenIds) = abi.decode(
             readImmutable(),
-            (address, uint256[], uint256[])
+            (address, uint256[])
         );
         return _tokenIds[index];
     }
