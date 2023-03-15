@@ -15,18 +15,25 @@ contract ERC1155Mech is Mech, ImmutableStorage {
     constructor(
         address _token,
         uint256[] memory _tokenIds,
-        uint256[] memory _minBalances
+        uint256[] memory _minBalances,
+        uint256 _minTotalBalance
     ) {
-        bytes memory initParams = abi.encode(_token, _tokenIds, _minBalances);
+        bytes memory initParams = abi.encode(
+            _token,
+            _tokenIds,
+            _minBalances,
+            _minTotalBalance
+        );
         setUp(initParams);
     }
 
     function setUp(bytes memory initParams) public override {
         require(readImmutable().length == 0, "Already initialized");
-        (, uint256[] memory _tokenIds, uint256[] memory _minBalances) = abi
-            .decode(initParams, (address, uint256[], uint256[]));
+        (, uint256[] memory _tokenIds, uint256[] memory _minBalances, ) = abi
+            .decode(initParams, (address, uint256[], uint256[], uint256));
         require(_tokenIds.length > 0, "No token IDs provided");
         require(_tokenIds.length == _minBalances.length, "Length mismatch");
+
         writeImmutable(initParams);
     }
 
@@ -54,20 +61,34 @@ contract ERC1155Mech is Mech, ImmutableStorage {
         return _minBalances[index];
     }
 
+    function minTotalBalance() public view returns (uint256) {
+        (, , , uint256 _minTotalBalance) = abi.decode(
+            readImmutable(),
+            (address, uint256[], uint256[], uint256)
+        );
+        return _minTotalBalance;
+    }
+
     function isOperator(address signer) public view override returns (bool) {
         (
             address _token,
             uint256[] memory _tokenIds,
-            uint256[] memory _minBalances
-        ) = abi.decode(readImmutable(), (address, uint256[], uint256[]));
+            uint256[] memory _minBalances,
+            uint256 _minTotalBalance
+        ) = abi.decode(
+                readImmutable(),
+                (address, uint256[], uint256[], uint256)
+            );
+
+        uint256 balanceSum = 0;
         for (uint256 i = 0; i < _tokenIds.length; i++) {
-            if (
-                IERC1155(_token).balanceOf(signer, _tokenIds[i]) <
-                _minBalances[i]
-            ) {
+            uint256 balance = IERC1155(_token).balanceOf(signer, _tokenIds[i]);
+            if (balance < _minBalances[i]) {
                 return false;
             }
+            balanceSum += balance;
         }
-        return true;
+
+        return balanceSum >= _minTotalBalance;
     }
 }
