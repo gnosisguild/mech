@@ -20,7 +20,8 @@ describe("ERC1155Mech contract", () => {
     const mech1 = await ERC1155Mech.deploy(
       testToken.address,
       [1, 2, 3],
-      [1, 2, 3]
+      [1, 2, 3],
+      0
     )
 
     await mech1.deployed()
@@ -42,12 +43,14 @@ describe("ERC1155Mech contract", () => {
       expect(await mech1.minBalances(0)).to.equal(1)
       expect(await mech1.minBalances(1)).to.equal(2)
       expect(await mech1.minBalances(2)).to.equal(3)
+
+      expect(await mech1.minTotalBalance()).to.equal(0)
     })
 
     it("reverts if tokenIds and minBalances are not of same length", async () => {
       const { testToken, ERC1155Mech } = await loadFixture(deployMech1)
       await expect(
-        ERC1155Mech.deploy(testToken.address, [1, 2, 3], [1, 2])
+        ERC1155Mech.deploy(testToken.address, [1, 2, 3], [1, 2], 0)
       ).to.be.revertedWith("Length mismatch")
     })
 
@@ -91,6 +94,27 @@ describe("ERC1155Mech contract", () => {
     it("returns false if some of linked token IDs do not exist", async () => {
       const { mech1, alice } = await loadFixture(deployMech1)
       expect(await mech1.isOperator(alice.address)).to.equal(false)
+    })
+
+    it("returns false if the minimum total balance threshold is not met", async () => {
+      const { testToken, ERC1155Mech, alice } = await loadFixture(deployMech1)
+      const mech = await ERC1155Mech.deploy(
+        testToken.address,
+        [1, 2],
+        [1, 1],
+        4
+      )
+
+      // mint a total token balance of 2 to alice
+      await testToken.mintToken(alice.address, 1, 1, "0x")
+      await testToken.mintToken(alice.address, 2, 1, "0x")
+
+      expect(await mech.isOperator(alice.address)).to.equal(false)
+
+      // mint an additional 2 tokens to alice, now total balance is 4
+      await testToken.mintToken(alice.address, 1, 2, "0x")
+
+      expect(await mech.isOperator(alice.address)).to.equal(true)
     })
   })
 })
