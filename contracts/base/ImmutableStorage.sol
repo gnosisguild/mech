@@ -2,7 +2,7 @@
 pragma solidity ^0.8.12;
 
 import "hardhat/console.sol";
-import "../libraries/Bytecode.sol";
+import "../libraries/WriteOnce.sol";
 
 contract ImmutableStorage {
     /**
@@ -33,7 +33,7 @@ contract ImmutableStorage {
      * @param data to be written
      */
     function writeImmutable(bytes memory data) internal {
-        bytes memory initCode = Bytecode.creationCodeForStoring(data);
+        bytes memory initCode = WriteOnce.creationCodeFor(data);
         address createdAt;
 
         // Deploy contract using create
@@ -49,6 +49,6 @@ contract ImmutableStorage {
      * @return data stored at the storage location
      */
     function readImmutable() internal view returns (bytes memory) {
-        return Bytecode.valueStoredAt(storageLocation());
+        return WriteOnce.valueStoredAt(storageLocation());
     }
 }
