@@ -9,16 +9,14 @@
 
 pragma solidity ^0.8.12;
 
-library Bytecode {
-    error InvalidCodeAtRange(uint256 _size, uint256 _start, uint256 _end);
-
+library WriteOnce {
     /**
      * @notice Generate a creation code that results on a contract with `00${_value}` as bytecode
-     * @param _value The value to store in the bytecode
+     * @param data The value to store in the bytecode
      * @return creationCode (constructor) for new contract
      */
-    function creationCodeForStoring(
-        bytes memory _value
+    function creationCodeFor(
+        bytes memory data
     ) internal pure returns (bytes memory) {
         /*
           0x00    0x63         0x63XXXXXX  PUSH4 _value.length  size
@@ -35,10 +33,10 @@ library Bytecode {
         return
             abi.encodePacked(
                 hex"63",
-                uint32(_value.length + 1),
+                uint32(data.length + 1),
                 hex"80_60_0E_60_00_39_60_00_F3",
                 hex"00",
-                _value
+                data
             );
     }
 
