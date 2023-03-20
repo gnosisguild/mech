@@ -30,13 +30,15 @@ export const calculateERC1155MechAddress = (
   tokenIds: BigNumberish[],
   /** minimum balances of the tokens */
   minBalances: BigNumberish[],
+  /** minimum total balance over all tokens */
+  minTotalBalance: BigNumberish,
   salt: string = DEFAULT_SALT
 ) => {
   const initData =
     IFactoryFriendly__factory.createInterface().encodeFunctionData("setUp", [
       defaultAbiCoder.encode(
-        ["address", "uint256[]", "uint256[]"],
-        [token, tokenIds, minBalances]
+        ["address", "uint256[]", "uint256[]", "uint256"],
+        [token, tokenIds, minBalances, minTotalBalance]
       ),
     ])
 
@@ -56,11 +58,11 @@ export const calculateERC1155MechAddress = (
   )
 }
 
-export const ERC1155_MASTERCOPY_INIT_DATA = [ZERO_ADDRESS, [0], [0]]
+export const ERC1155_MASTERCOPY_INIT_DATA = [ZERO_ADDRESS, [0], [0], 0]
 
 export const calculateERC1155MechMastercopyAddress = () => {
   const initData = defaultAbiCoder.encode(
-    ["address", "uint256[]", "uint256[]"],
+    ["address", "uint256[]", "uint256[]", "uint256"],
     ERC1155_MASTERCOPY_INIT_DATA
   )
   return getCreate2Address(
@@ -77,6 +79,8 @@ export const makeERC1155MechDeployTransaction = (
   tokenIds: BigNumberish[],
   /** minimum balances of the tokens */
   minBalances: BigNumberish[],
+  /** minimum total balance over all tokens */
+  minTotalBalance: BigNumberish,
   chainId: number,
   salt: string = DEFAULT_SALT
 ) => {
@@ -84,8 +88,8 @@ export const makeERC1155MechDeployTransaction = (
     calculateERC1155MechMastercopyAddress(),
     ERC1155Mech__factory.abi,
     {
-      types: ["address", "uint256[]", "uint256[]"],
-      values: [token, tokenIds, minBalances],
+      types: ["address", "uint256[]", "uint256[]", "uint256"],
+      values: [token, tokenIds, minBalances, minTotalBalance],
     },
     new JsonRpcProvider(undefined, chainId), // this provider instance is never really be used in deployAndSetUpCustomModule()
     chainId,
@@ -102,6 +106,8 @@ export const deployERC1155Mech = async (
   tokenIds: BigNumberish[],
   /** minimum balances of the tokens */
   minBalances: BigNumberish[],
+  /** minimum total balance over all tokens */
+  minTotalBalance: BigNumberish,
   signer: JsonRpcSigner,
   salt: string = DEFAULT_SALT
 ) => {
@@ -110,6 +116,7 @@ export const deployERC1155Mech = async (
     token,
     tokenIds,
     minBalances,
+    minTotalBalance,
     salt
   )
   if ((await signer.provider.getCode(deterministicAddress)) !== "0x") {
@@ -136,6 +143,7 @@ export const deployERC1155Mech = async (
     token,
     tokenIds,
     minBalances,
+    minTotalBalance,
     signer.provider.network.chainId,
     salt
   )
@@ -145,7 +153,7 @@ export const deployERC1155Mech = async (
 
 export const deployERC1155MechMastercopy = async (signer: JsonRpcSigner) => {
   const initData = defaultAbiCoder.encode(
-    ["address", "uint256[]", "uint256[]"],
+    ["address", "uint256[]", "uint256[]", "uint256"],
     ERC1155_MASTERCOPY_INIT_DATA
   )
   return await deployMastercopyWithInitData(

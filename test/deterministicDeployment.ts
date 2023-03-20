@@ -121,6 +121,17 @@ describe("deterministic deployment", () => {
         )
       ).to.be.revertedWith("Already initialized")
     })
+
+    it("makes sure no one can operate the mastercopy", async () => {
+      const { mastercopyAddresses, deployer } = await loadFixture(
+        deployModuleFactoryAndMastercopy
+      )
+      const mech = ERC721Mech__factory.connect(
+        mastercopyAddresses.erc721,
+        deployer
+      )
+      await expect(mech.isOperator(deployer._address)).to.be.reverted
+    })
   })
 
   ///// ERC1155Mech
@@ -134,11 +145,12 @@ describe("deterministic deployment", () => {
       const TestToken = await ethers.getContractFactory("ERC1155Token")
       const testToken = await TestToken.deploy()
 
-      await deployERC1155Mech(testToken.address, [1, 2], [10, 20], deployer)
+      await deployERC1155Mech(testToken.address, [1, 2], [10, 20], 0, deployer)
       const mechAddress = calculateERC1155MechAddress(
         testToken.address,
         [1, 2],
-        [10, 20]
+        [10, 20],
+        0
       )
       const mech = ERC1155Mech__factory.connect(mechAddress, alice)
 
@@ -172,7 +184,8 @@ describe("deterministic deployment", () => {
       const calculatedAddress = calculateERC1155MechAddress(
         testToken.address,
         [1],
-        [1]
+        [1],
+        0
       )
 
       expect(await ethers.provider.getCode(calculatedAddress)).to.equal("0x")
@@ -181,6 +194,7 @@ describe("deterministic deployment", () => {
         testToken.address,
         [1],
         [1],
+        0,
         hre.ethers.provider.getSigner()
       )
 
@@ -203,6 +217,18 @@ describe("deterministic deployment", () => {
       expect(await mech.token()).to.equal(ZERO_ADDRESS)
       expect(await mech.tokenIds(0)).to.equal(0)
       expect(await mech.minBalances(0)).to.equal(0)
+      expect(await mech.minTotalBalance()).to.equal(0)
+    })
+
+    it("makes sure no one can operate the mastercopy", async () => {
+      const { mastercopyAddresses, deployer } = await loadFixture(
+        deployModuleFactoryAndMastercopy
+      )
+      const mech = ERC1155Mech__factory.connect(
+        mastercopyAddresses.erc1155,
+        deployer
+      )
+      await expect(mech.isOperator(deployer._address)).to.be.reverted
     })
   })
 
@@ -289,6 +315,18 @@ describe("deterministic deployment", () => {
       expect(
         mech.setUp(defaultAbiCoder.encode(["address[]"], [[SOME_ADDRESS]]))
       ).to.be.revertedWith("Already initialized")
+    })
+
+    it("makes sure no one can operate the mastercopy", async () => {
+      const { mastercopyAddresses, deployer } = await loadFixture(
+        deployModuleFactoryAndMastercopy
+      )
+
+      const mech = ZodiacMech__factory.connect(
+        mastercopyAddresses.zodiac,
+        deployer
+      )
+      expect(await mech.isOperator(deployer._address)).to.be.false
     })
   })
 })
