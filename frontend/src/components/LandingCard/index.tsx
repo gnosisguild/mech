@@ -16,7 +16,7 @@ const LandingCard: React.FC = () => {
         operator of its Mech.
       </p>
       <div className={classes.demoCard}>
-        <img src="/dva_mech.png" alt="Mech" className={classes.mech} />
+        <img src="/mech_sprite.png" alt="Mech" className={classes.mech} />
         <ul className={classes.demoInfo}>
           <li>
             <label>Mech</label>
