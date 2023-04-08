@@ -24,7 +24,7 @@
   border: 2px solid var(--button-border);
   padding: 10px;
   width: 80%;
-  max-width: 300px;
+  max-width: 350px;
   border-radius: 20px;
   display: flex;
   justify-content: flex-end;
@@ -35,8 +35,8 @@
 
 .mech {
   position: absolute;
-  inset: 0;
-  left: -35%;
+  bottom: -13px;
+  left: -30%;
   height: 100%;
 }
 
