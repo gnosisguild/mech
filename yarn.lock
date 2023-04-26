@@ -5,10 +5,10 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@account-abstraction/contracts@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "@account-abstraction/contracts@npm:0.5.0"
-  checksum: 792a82e9ac3dac2d0c6b92133998b567acfc980aea6bb6d51377d95039a2a4c8cbd764c02ebe4d16ea7f7e18ff0724a0ae41970ba2b1bbcaf89e9bf875806ec5
+"@account-abstraction/contracts@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@account-abstraction/contracts@npm:0.6.0"
+  checksum: 745e838e2cb04c89a9c0df11d022c1d604b1e440c9cd65c2014edd9b1056809fec2e363b42ec09883d49dbe09f9597d8339c90d57763a1621fb515edf5fef35d
   languageName: node
   linkType: hard
 
@@ -14042,7 +14042,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mech-contracts@workspace:."
   dependencies:
-    "@account-abstraction/contracts": ^0.5.0
+    "@account-abstraction/contracts": ^0.6.0
     "@ambire/signature-validator": ^1.1.0
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
