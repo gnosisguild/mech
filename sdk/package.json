@@ -13,8 +13,8 @@
     "build/**/*"
   ],
   "main": "build/cjs/sdk/index.js",
-  "typings": "build/cjs/sdk/index.d.ts",
   "module": "build/esm/sdk/index.js",
+  "types": "build/cjs/sdk/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gnosis/mech.git"
