@@ -46,18 +46,6 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         }
     }
 
-    function nonce() public view override returns (uint256) {
-        // Here we use the nonce variable of the SafeStorage contract rather than that of the Mech contract.
-        // This is for keeping the nonce sequence of Safes that got upgraded to ZodiacMechs.
-        return safeNonce;
-    }
-
-    function _validateAndUpdateNonce(
-        UserOperation calldata userOp
-    ) internal override {
-        require(safeNonce++ == userOp.nonce, "Invalid nonce");
-    }
-
     function isOperator(address signer) public view override returns (bool) {
         return isModuleEnabled(signer);
     }

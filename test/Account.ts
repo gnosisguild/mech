@@ -98,30 +98,6 @@ describe("Account base contract", () => {
       ).to.equal(0)
     })
 
-    it("increments the nonce on successful validation", async () => {
-      const { mech1, alice, entryPointSigner } = await loadFixture(deployMech1)
-
-      expect(await mech1.nonce()).to.equal(0)
-
-      const userOp = await signUserOp(
-        await fillUserOp(
-          {
-            callData: BURN_1_ETH,
-          },
-          mech1
-        ),
-        alice
-      )
-
-      expect(
-        await mech1
-          .connect(entryPointSigner)
-          .validateUserOp(userOp, getUserOpHash(userOp), 0)
-      ).to.not.be.reverted
-
-      expect(await mech1.nonce()).to.equal(1)
-    })
-
     it("returns 1 for any other ECDSA signature", async () => {
       const { mech1, bob, entryPointSigner } = await loadFixture(deployMech1)
 
@@ -140,27 +116,6 @@ describe("Account base contract", () => {
           .connect(entryPointSigner)
           .callStatic.validateUserOp(userOp, getUserOpHash(userOp), 0)
       ).to.equal(1)
-    })
-
-    it("reverts if it has a valid signature but a wrong nonce", async () => {
-      const { mech1, alice, entryPointSigner } = await loadFixture(deployMech1)
-
-      const userOp = await signUserOp(
-        await fillUserOp(
-          {
-            callData: BURN_1_ETH,
-            nonce: 99,
-          },
-          mech1
-        ),
-        alice
-      )
-
-      await expect(
-        mech1
-          .connect(entryPointSigner)
-          .validateUserOp(userOp, getUserOpHash(userOp), 0)
-      ).to.be.revertedWith("Invalid nonce")
     })
 
     it("sends the pre-fund to sender if the user op has valid signature", async () => {
@@ -210,7 +165,7 @@ export const fillUserOp = async (
   verificationGasLimit: 100000,
   paymasterAndData: "0x",
   ...op,
-  nonce: op.nonce === undefined ? await account.nonce() : op.nonce,
+  nonce: op.nonce || 0,
 })
 
 export const signUserOp = async (

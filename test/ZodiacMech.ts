@@ -301,64 +301,64 @@ describe("ZodiacMech contract", () => {
     })
   })
 
-  describe("nonce storage", async () => {
-    it("reads the nonce from Safe's storage slot and increments it on successful validation", async () => {
-      const { mech1, alice } = await loadFixture(deployMech1)
+  // describe("nonce storage", async () => {
+  //   it("reads the nonce from Safe's storage slot and increments it on successful validation", async () => {
+  //     const { mech1, alice } = await loadFixture(deployMech1)
 
-      // set safeNonce storage slot to 99
-      const nonceEncoded = defaultAbiCoder.encode(["uint256"], [99])
-      const nonceSlot = "0x5" // see SafeStorage.sol
-      await network.provider.request({
-        method: "hardhat_setStorageAt",
-        params: [mech1.address, nonceSlot, nonceEncoded],
-      })
+  //     // set safeNonce storage slot to 99
+  //     const nonceEncoded = defaultAbiCoder.encode(["uint256"], [99])
+  //     const nonceSlot = "0x5" // see SafeStorage.sol
+  //     await network.provider.request({
+  //       method: "hardhat_setStorageAt",
+  //       params: [mech1.address, nonceSlot, nonceEncoded],
+  //     })
 
-      // validate that the nonce is read from that slot
-      expect(await mech1.nonce()).to.equal(99)
+  //     // validate that the nonce is read from that slot
+  //     expect(await mech1.nonce()).to.equal(99)
 
-      // prepare ERC4337 entry point
-      await network.provider.request({
-        method: "hardhat_impersonateAccount",
-        params: [entryPoint],
-      })
-      const entryPointSigner = await ethers.getSigner(entryPoint)
-      await alice.sendTransaction({
-        to: entryPoint,
-        value: parseEther("1.0"),
-      })
+  //     // prepare ERC4337 entry point
+  //     await network.provider.request({
+  //       method: "hardhat_impersonateAccount",
+  //       params: [entryPoint],
+  //     })
+  //     const entryPointSigner = await ethers.getSigner(entryPoint)
+  //     await alice.sendTransaction({
+  //       to: entryPoint,
+  //       value: parseEther("1.0"),
+  //     })
 
-      // fund mech1 with 1 ETH
-      await alice.sendTransaction({
-        to: mech1.address,
-        value: parseEther("1.0"),
-      })
+  //     // fund mech1 with 1 ETH
+  //     await alice.sendTransaction({
+  //       to: mech1.address,
+  //       value: parseEther("1.0"),
+  //     })
 
-      const BURN_1_ETH = mech1.interface.encodeFunctionData("exec", [
-        ZERO_ADDRESS,
-        parseEther("1.0"),
-        "0x",
-        0,
-        0,
-      ])
+  //     const BURN_1_ETH = mech1.interface.encodeFunctionData("exec", [
+  //       ZERO_ADDRESS,
+  //       parseEther("1.0"),
+  //       "0x",
+  //       0,
+  //       0,
+  //     ])
 
-      const userOp = await signUserOp(
-        await fillUserOp(
-          {
-            callData: BURN_1_ETH,
-          },
-          mech1
-        ),
-        alice
-      )
+  //     const userOp = await signUserOp(
+  //       await fillUserOp(
+  //         {
+  //           callData: BURN_1_ETH,
+  //         },
+  //         mech1
+  //       ),
+  //       alice
+  //     )
 
-      // call validateUserOp so that the nonce is incremented
-      expect(
-        await mech1
-          .connect(entryPointSigner)
-          .validateUserOp(userOp, getUserOpHash(userOp), 0)
-      ).to.not.be.reverted
+  //     // call validateUserOp so that the nonce is incremented
+  //     expect(
+  //       await mech1
+  //         .connect(entryPointSigner)
+  //         .validateUserOp(userOp, getUserOpHash(userOp), 0)
+  //     ).to.not.be.reverted
 
-      expect(await mech1.nonce()).to.equal(100)
-    })
-  })
+  //     expect(await mech1.nonce()).to.equal(100)
+  //   })
+  // })
 })
