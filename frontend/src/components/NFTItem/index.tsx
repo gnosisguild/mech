@@ -33,7 +33,7 @@ const NFTItem: React.FC<Props> = ({
     error: assetsError,
   } = useAccountBalance({ address: mechAddress })
 
-  const { deployed } = useDeployMech(token, tokenId)
+  const { deployed } = useDeployMech(token, tokenId, nftData.tokenStandard)
 
   return (
     <div className={classes.itemContainer}>
@@ -41,9 +41,10 @@ const NFTItem: React.FC<Props> = ({
         <p className={classes.tokenName}>
           {nftData.nft.title || nftData.nft.contractTitle || "..."}
         </p>
-        {nftData.nft.tokenID.length < 5 && (
-          <p className={classes.tokenId}>{nftData.nft.tokenID || "..."}</p>
-        )}
+
+        <p className={classes.tokenId} title={nftData.nft.tokenID}>
+          {nftData.nft.tokenID}
+        </p>
       </div>
       <div className={classes.main}>
         {(imageError || !nftData.nft.previews) && (

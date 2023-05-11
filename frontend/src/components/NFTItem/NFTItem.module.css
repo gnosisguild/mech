@@ -73,6 +73,9 @@
   align-items: center;
 }
 
+.name {
+}
+
 .info {
   width: 45%;
   display: flex;
