@@ -1,8 +1,8 @@
-import { calculateERC721MechAddress } from "mech-sdk"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 
 import { nxyzNFT, nxyzSupportedChains } from "../types/nxyzApiTypes"
+import { calculateMechAddress } from "../utils/calculateMechAddress"
 import { MechNFT } from "./useNFTsByOwner"
 
 interface NFTProps {
@@ -38,12 +38,7 @@ const useNFT: useNFTType = ({ contractAddress, blockchain, tokenId }) => {
           if (!mechData) throw new Error("No metadata")
 
           const hasMech =
-            (await provider.getCode(
-              calculateERC721MechAddress(
-                mechData.contractAddress,
-                mechData.nft.tokenID
-              )
-            )) !== "0x"
+            (await provider.getCode(calculateMechAddress(mechData))) !== "0x"
           mechData.hasMech = hasMech
         } catch (error) {
           console.log(error)
