@@ -6,7 +6,8 @@ import dotenv from "dotenv"
 import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types"
 
 dotenv.config()
-const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env
+const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, GNOSISSCAN_API_KEY } =
+  process.env
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat"
 
@@ -44,7 +45,7 @@ let config: HardhatUserConfig = {
       ...sharedNetworkConfig,
       url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
     },
-    xdai: {
+    gnosis: {
       ...sharedNetworkConfig,
       url: "https://rpc.gnosischain.com/",
     },
@@ -54,7 +55,20 @@ let config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    apiKey: ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: ETHERSCAN_API_KEY,
+      gnosis: GNOSISSCAN_API_KEY,
+    } as Record<string, string>,
+    customChains: [
+      {
+        network: "gnosis",
+        chainId: 100,
+        urls: {
+          apiURL: "https://api.gnosisscan.io/api",
+          browserURL: "https://www.gnosisscan.io",
+        },
+      },
+    ],
   },
   // verify: {
   //   etherscan: {
