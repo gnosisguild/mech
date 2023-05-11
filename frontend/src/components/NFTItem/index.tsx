@@ -17,11 +17,12 @@ interface Props {
 
 const NFTItem: React.FC<Props> = ({ nftData }) => {
   const mechAddress = calculateMechAddress(nftData)
-  console.log(nftData)
+
   const operatorAddress = nftData.nft.owner?.address as string | undefined
   const operatorLabel =
     operatorAddress &&
-    (nftData.nft.owner?.ens[0]?.name || shortenAddress(operatorAddress))
+    ((nftData.nft.owner?.ens && nftData.nft.owner?.ens[0]?.name) ||
+      shortenAddress(operatorAddress))
 
   const [imageError, setImageError] = useState(false)
 
