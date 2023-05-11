@@ -14,17 +14,17 @@ interface Props {
   address: string
 }
 
-const DEFAULT_CHAIN = CHAINS[0]
+const DEFAULT_CHAIN = CHAINS[5] // TODO switch to mainnet when ready
 
 const NFTGrid: React.FC<Props> = ({ address }) => {
   const [pageToken, setPageToken] = useState<string | undefined>(undefined)
 
   const chainId = useChainId()
-  const chain = CHAINS.find((c) => c.chainID === `${chainId}`) || DEFAULT_CHAIN
+  const chain = (CHAINS as any)[chainId] || DEFAULT_CHAIN
 
   const { data, isLoading } = useNFTsByOwner({
     walletAddress: address,
-    blockchain: chain.shortName,
+    chainId: chain.chainId,
     pageToken,
   })
 

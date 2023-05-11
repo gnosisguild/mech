@@ -1,79 +1,73 @@
-export const CHAINS = [
-  {
-    name: "Optimism",
-    shortName: "Oeth",
-    chainID: "eip155:10",
-    shortChainID: "10",
-    prefix: "oeth",
-  },
-  {
-    name: "Binance Smart Chain Mainnet",
-    shortName: "BNB",
-    chainID: "eip155:56",
-    shortChainID: "56",
-    prefix: "bnb",
-  },
-  {
-    name: "Celo Mainnet",
-    shortName: "CELO",
-    chainID: "eip155:42220",
-    shortChainID: "42220",
-    prefix: "celo",
-  },
-  {
-    name: "Gnosis",
-    shortName: "gno",
-    chainID: "eip155:100",
-    shortChainID: "100",
-    prefix: "gno",
-  },
-  {
+export const CHAINS = {
+  1: {
     name: "Ethereum Mainnet",
     shortName: "Ethereum",
-    chainID: "eip155:1",
-    shortChainID: "1",
+    chainId: 1,
     prefix: "eth",
   },
-  {
-    name: "Polygon Testnet Mumbai",
-    shortName: "maticmum",
-    chainID: "eip155:80001",
-    shortChainID: "80001",
-    prefix: "maticmum",
+  100: {
+    name: "Gnosis",
+    shortName: "gno",
+    chainId: 100,
+    prefix: "gno",
+    rpc: "https://rpc.gnosis.gateway.fm",
   },
-  {
-    name: "Arbitrum One",
-    shortName: "Arb1",
-    chainID: "eip155:42161",
-    shortChainID: "42161",
-    prefix: "arb1",
-  },
-  {
-    name: "Avalanche C-Chain",
-    shortName: "Avalanche",
-    chainID: "eip155:43114",
-    shortChainID: "43114",
-    prefix: "avax",
-  },
-  {
-    name: "Moonbeam",
-    shortName: "mbeam",
-    chainID: "eip155:1284",
-    shortChainID: "1284",
-    prefix: "mbeam",
-  },
-  {
+  5: {
     name: "Ethereum Testnet Görli",
     shortName: "Gor",
-    chainID: "eip155:5",
-    shortChainID: "5",
+    chainId: 5,
     prefix: "gor",
   },
-  {
-    name: "Polygon Mainnet",
-    shortName: "Polygon",
-    chainID: "eip155:137",
-    shortChainID: "137",
-    prefix: "matic",
+  56: {
+    name: "Binance Smart Chain Mainnet",
+    shortName: "BNB",
+    chainId: 56,
+    prefix: "bnb",
+    rpc: "https://bsc-dataseed.binance.org/",
   },
-]
+
+  /// other chains with support from n.xzy
+  // 10: {
+  //   name: "Optimism",
+  //   shortName: "Oeth",
+  //   chainId: 10,
+  //   prefix: "oeth",
+  // },
+
+  // 42220: {
+  //   name: "Celo Mainnet",
+  //   shortName: "CELO",
+  //   chainId: 42220,
+  //   prefix: "celo",
+  // },
+  // 80001: {
+  //   name: "Polygon Testnet Mumbai",
+  //   shortName: "maticmum",
+  //   chainId: 80001,
+  //   prefix: "maticmum",
+  // },
+  // 42161: {
+  //   name: "Arbitrum One",
+  //   shortName: "Arb1",
+  //   chainId: 42161,
+  //   prefix: "arb1",
+  // },
+  // 43114: {
+  //   name: "Avalanche C-Chain",
+  //   shortName: "Avalanche",
+  //   chainId: 43114,
+  //   prefix: "avax",
+  // },
+  // 1284: {
+  //   name: "Moonbeam",
+  //   shortName: "mbeam",
+  //   chainId: 1284,
+  //   prefix: "mbeam",
+  // },
+  // 137: {
+  //   name: "Polygon Mainnet",
+  //   shortName: "Polygon",
+  //   chainId: 137,
+  //   prefix: "matic",
+  // },
+}

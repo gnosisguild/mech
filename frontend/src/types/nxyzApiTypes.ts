@@ -83,4 +83,15 @@ export interface nxyzNFTDetail {
   tokenID: string
 }
 
-export type nxyzShortChainID = (typeof CHAINS)[0]["shortChainID"]
+export type nxyzShortChainID =
+  | "10"
+  | "56"
+  | "42220"
+  | "100"
+  | "1"
+  | "80001"
+  | "42161"
+  | "43114"
+  | "1284"
+  | "5"
+  | "137"

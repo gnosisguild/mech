@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
-import { nxyzNFT, nxyzShortChainID } from "../types/nxyzApiTypes"
+import { CHAINS } from "../chains"
+import { nxyzNFT } from "../types/nxyzApiTypes"
 import { calculateMechAddress } from "../utils/calculateMechAddress"
 
 interface NFTProps {
   walletAddress: string
-  blockchain?: nxyzShortChainID
+  chainId?: number
   pageToken?: string
 }
 
@@ -27,9 +28,11 @@ interface NFTResult {
 
 type useNFTsByOwnerType = (props: NFTProps) => NFTResult
 
+const DEFAULT_CHAIN = CHAINS[5]
+
 const useNFTsByOwner: useNFTsByOwnerType = ({
   walletAddress,
-  blockchain,
+  chainId,
   pageToken,
 }) => {
   const [data, setData] = useState<any>(null)
@@ -37,8 +40,11 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
   const [error, setError] = useState<any>(null)
   const provider = useProvider()
 
+  const chain = chainId ? (CHAINS as any)[chainId] : DEFAULT_CHAIN
+  const chainShortName = chain.shortName
+
   useEffect(() => {
-    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${walletAddress}/balances/nfts?chainID=gor&limit=20&filterSpam=false${
+    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${walletAddress}/balances/nfts?chainID=${chainShortName}&limit=20&filterSpam=false${
       pageToken ? `&cursor=${pageToken}` : ""
     }`
     const fetchData = async () => {
@@ -69,7 +75,7 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
     }
 
     fetchData()
-  }, [walletAddress, blockchain, pageToken, provider])
+  }, [walletAddress, chainShortName, pageToken, provider])
 
   return { data, isLoading, error }
 }

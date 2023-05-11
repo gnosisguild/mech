@@ -23,8 +23,8 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
   const [imageError, setImageError] = useState(false)
   const [deploying, setDeploying] = useState(false)
 
-  const chain = CHAINS.find((c) => c.chainID === nftData.blockchain.chainID)!
-  const chainId = parseInt(chain.shortChainID)
+  const chain = (CHAINS as any)[parseInt(nftData.blockchain.shortChainID)]
+
   const { data: signer } = useSigner()
   const mechAddress = calculateMechAddress(nftData)
 
@@ -77,7 +77,7 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
           </div>
           <div className={classes.infoItem}>
             <p>Chain:</p>
-            <ChainIcon chainId={chainId} className={classes.chainIcon} />
+            <ChainIcon chainId={chain.chainId} className={classes.chainIcon} />
           </div>
         </div>
       </div>

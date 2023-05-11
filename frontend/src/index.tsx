@@ -23,6 +23,7 @@ import {
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
 import { infuraProvider } from "@wagmi/core/providers/infura"
 import router from "./router"
+import { CHAINS } from "./chains"
 
 const { REACT_APP_WALLET_CONNECT_PROJECT_ID } = process.env
 if (!REACT_APP_WALLET_CONNECT_PROJECT_ID) {
@@ -37,16 +38,7 @@ const { chains, provider } = configureChains(
     }),
     jsonRpcProvider({
       rpc: (chain) => {
-        switch (chain.id) {
-          case 56:
-            return { http: "https://bsc-dataseed.binance.org/" }
-          case 100:
-            return { http: "https://rpc.gnosis.gateway.fm" }
-          case 43114:
-            return { http: "https://api.avax.network/ext/bc/C/rpc" }
-          default:
-            return null
-        }
+        return (CHAINS as any)[chain.id]?.rpc
       },
     }),
     infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY || "" }),

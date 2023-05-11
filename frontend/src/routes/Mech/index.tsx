@@ -25,7 +25,7 @@ const Mech: React.FC = () => {
   if (!chainPrefix || !contractAddress) {
     throw new Error("token must be in the format <chain>:<contractAddress>")
   }
-  const chain = CHAINS.find((c) => c.prefix === chainPrefix)
+  const chain = Object.values(CHAINS).find((c) => c.prefix === chainPrefix)
 
   if (!chain) {
     throw new Error(`chain ${chainPrefix} not support`)
@@ -38,7 +38,7 @@ const Mech: React.FC = () => {
   const { data, error, isLoading } = useNFT({
     contractAddress,
     tokenId: tokenId,
-    blockchain: chain.shortChainID,
+    chainId: chain.chainId,
   })
 
   const { deployed, deploy, deployPending } = useDeployMech(data)
@@ -56,7 +56,7 @@ const Mech: React.FC = () => {
             <NFTItem nftData={data} />
 
             <ProvideWalletConnect
-              chainId={parseInt(chain.chainID)}
+              chainId={chain.chainId}
               mechAddress={mechAddress}
               onRequest={handleRequest}
             >

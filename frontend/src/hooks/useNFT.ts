@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
+import { CHAINS } from "../chains"
 
-import { nxyzNFT, nxyzShortChainID } from "../types/nxyzApiTypes"
+import { nxyzNFT } from "../types/nxyzApiTypes"
 import { calculateMechAddress } from "../utils/calculateMechAddress"
 import { MechNFT } from "./useNFTsByOwner"
 
 interface NFTProps {
   contractAddress: string
-  blockchain: nxyzShortChainID
+  chainId: number
   tokenId: string
 }
 
@@ -19,15 +20,20 @@ interface NFTResult {
 
 type useNFTType = (props: NFTProps) => NFTResult
 
-const useNFT: useNFTType = ({ contractAddress, blockchain, tokenId }) => {
+const DEFAULT_CHAIN = CHAINS[5]
+
+const useNFT: useNFTType = ({ contractAddress, chainId, tokenId }) => {
   const [data, setData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<any>(null)
   const provider = useProvider()
 
+  const chain = (CHAINS as any)[chainId] || DEFAULT_CHAIN
+  const chainShortName = chain.shortName
+
   useEffect(() => {
     const fetchData = async () => {
-      const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/nfts/${contractAddress}/${tokenId}?chainID=gor&limit=20&filterSpam=false`
+      const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/nfts/${contractAddress}/${tokenId}?chainID=${chainShortName}&limit=20&filterSpam=false`
       try {
         setIsLoading(true)
         const res = await fetch(apiUrl)
@@ -53,7 +59,7 @@ const useNFT: useNFTType = ({ contractAddress, blockchain, tokenId }) => {
     }
 
     fetchData()
-  }, [contractAddress, blockchain, tokenId, provider])
+  }, [contractAddress, chainShortName, tokenId, provider])
 
   return { data, isLoading, error }
 }
