@@ -1,4 +1,3 @@
-import { calculateERC721MechAddress, deployERC721Mech } from "mech-sdk"
 import { useState } from "react"
 import { useSigner } from "wagmi"
 import copy from "copy-to-clipboard"
@@ -12,6 +11,8 @@ import { JsonRpcSigner } from "@ethersproject/providers"
 import Spinner from "../Spinner"
 import { MechNFT } from "../../hooks/useNFTsByOwner"
 import ChainIcon from "../ChainIcon"
+import { deployMech } from "../../utils/deployMech"
+import { calculateMechAddress } from "../../utils/calculateMechAddress"
 
 interface Props {
   nftData: MechNFT
@@ -22,19 +23,12 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
   const [deploying, setDeploying] = useState(false)
   const chainId = parseInt(nftData.blockchain.shortChainId)
   const { data: signer } = useSigner()
-  const mechAddress = calculateERC721MechAddress(
-    nftData.contractAddress,
-    nftData.nft.tokenID
-  )
+  const mechAddress = calculateMechAddress(nftData)
 
   const handleDeploy = async () => {
     setDeploying(true)
     try {
-      const deployTx = await deployERC721Mech(
-        nftData.contractAddress,
-        nftData.nft.tokenID,
-        signer as JsonRpcSigner
-      )
+      const deployTx = await deployMech(nftData, signer as JsonRpcSigner)
       console.log("deploy tx", deployTx)
       setDeploying(false)
     } catch (e) {

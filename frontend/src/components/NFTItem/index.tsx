@@ -7,23 +7,21 @@ import clsx from "clsx"
 import useAccountBalance from "../../hooks/useAccountBalance"
 import Spinner from "../Spinner"
 import { useDeployMech } from "../../hooks/useDeployMech"
-import { calculateERC721MechAddress } from "mech-sdk"
+
 import { MechNFT } from "../../hooks/useNFTsByOwner"
+import { calculateMechAddress } from "../../utils/calculateMechAddress"
 
 interface Props {
-  token: string
-  tokenId: string
   nftData: MechNFT
-  operatorAddress?: string
 }
 
-const NFTItem: React.FC<Props> = ({
-  token,
-  tokenId,
-  nftData,
-  operatorAddress,
-}) => {
-  const mechAddress = calculateERC721MechAddress(token, tokenId)
+const NFTItem: React.FC<Props> = ({ nftData }) => {
+  const mechAddress = calculateMechAddress(nftData)
+  console.log(nftData)
+  const operatorAddress = nftData.nft.owner?.address as string | undefined
+  const operatorLabel =
+    operatorAddress &&
+    (nftData.nft.owner?.ens[0]?.name || shortenAddress(operatorAddress))
 
   const [imageError, setImageError] = useState(false)
 
@@ -33,7 +31,7 @@ const NFTItem: React.FC<Props> = ({
     error: assetsError,
   } = useAccountBalance({ address: mechAddress })
 
-  const { deployed } = useDeployMech(token, tokenId, nftData.tokenStandard)
+  const { deployed } = useDeployMech(nftData)
 
   return (
     <div className={classes.itemContainer}>
@@ -79,6 +77,7 @@ const NFTItem: React.FC<Props> = ({
             <div
               className={clsx(classes.infoItem, classes.address)}
               onClick={() => copy(mechAddress)}
+              title={mechAddress}
             >
               {shortenAddress(mechAddress)}
             </div>
@@ -92,8 +91,11 @@ const NFTItem: React.FC<Props> = ({
               onClick={
                 operatorAddress ? () => copy(operatorAddress) : undefined
               }
+              title={operatorAddress}
             >
-              {operatorAddress ? shortenAddress(operatorAddress) : "\u2014"}
+              <div className={classes.ellipsis}>
+                {operatorAddress ? operatorLabel : "\u2014"}
+              </div>
             </div>
           </li>
           <li>

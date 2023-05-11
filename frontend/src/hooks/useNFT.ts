@@ -12,7 +12,7 @@ interface NFTProps {
 }
 
 interface NFTResult {
-  data: MechNFT
+  data: MechNFT | null
   isLoading: boolean
   error: any
 }

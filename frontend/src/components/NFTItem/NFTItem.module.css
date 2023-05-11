@@ -127,10 +127,17 @@
 .address {
   cursor: pointer;
   transition: filter 0.1s ease-in-out;
+  max-width: 139px;
 }
 
 .address:hover {
   filter: brightness(1.2);
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .spinner {
