@@ -13,6 +13,7 @@ import { useHandleRequest } from "../../hooks/useHandleRequest"
 import { useDeployMech } from "../../hooks/useDeployMech"
 import MechDeploy from "../../components/Deploy"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
+import { CHAINS } from "../../chains"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -20,17 +21,23 @@ const Mech: React.FC = () => {
   if (!token || !tokenId) {
     throw new Error("token and tokenId are required")
   }
+
+  const [chainPrefix, contractAddress] = token.split(":")
+  const chain = CHAINS.find((c) => c.prefix === chainPrefix)
+
+  if (!chain) {
+    throw new Error(`chain ${chainPrefix} not support`)
+  }
+
   if (!token.startsWith("0x")) {
     throw new Error("token must be a valid address")
   }
 
   const { data, error, isLoading } = useNFT({
-    contractAddress: token,
+    contractAddress,
     tokenId: tokenId,
-    blockchain: "gor",
+    blockchain: chain.shortChainID,
   })
-
-  const chainId = useChainId()
 
   const { deployed, deploy, deployPending } = useDeployMech(data)
 
@@ -47,7 +54,7 @@ const Mech: React.FC = () => {
             <NFTItem nftData={data} />
 
             <ProvideWalletConnect
-              chainId={chainId}
+              chainId={parseInt(chain.chainID)}
               mechAddress={mechAddress}
               onRequest={handleRequest}
             >

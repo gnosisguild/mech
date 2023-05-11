@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 
-import { nxyzNFT, nxyzSupportedChains } from "../types/nxyzApiTypes"
+import { nxyzNFT, nxyzShortChainID } from "../types/nxyzApiTypes"
 import { calculateMechAddress } from "../utils/calculateMechAddress"
 import { MechNFT } from "./useNFTsByOwner"
 
 interface NFTProps {
   contractAddress: string
-  blockchain: nxyzSupportedChains
+  blockchain: nxyzShortChainID
   tokenId: string
 }
 

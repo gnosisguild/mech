@@ -1,3 +1,5 @@
+import { CHAINS } from "../chains"
+
 export interface nxyzBlockchain {
   name: string
   shortName: string
@@ -81,12 +83,4 @@ export interface nxyzNFTDetail {
   tokenID: string
 }
 
-export type nxyzSupportedChains =
-  | "ethereum"
-  | "polygon"
-  | "bnb"
-  | "arbitrumone"
-  | "optimism"
-  | "avalanche"
-  | "gor"
-  | "mubai"
+export type nxyzShortChainID = (typeof CHAINS)[0]["shortChainID"]
