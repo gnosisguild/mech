@@ -1,6 +1,5 @@
 import React from "react"
 import { useParams } from "react-router-dom"
-import { useChainId } from "wagmi"
 import Layout from "../../components/Layout"
 import useNFT from "../../hooks/useNFT"
 import NFTItem from "../../components/NFTItem"
@@ -23,13 +22,16 @@ const Mech: React.FC = () => {
   }
 
   const [chainPrefix, contractAddress] = token.split(":")
+  if (!chainPrefix || !contractAddress) {
+    throw new Error("token must be in the format <chain>:<contractAddress>")
+  }
   const chain = CHAINS.find((c) => c.prefix === chainPrefix)
 
   if (!chain) {
     throw new Error(`chain ${chainPrefix} not support`)
   }
 
-  if (!token.startsWith("0x")) {
+  if (!contractAddress.startsWith("0x")) {
     throw new Error("token must be a valid address")
   }
 

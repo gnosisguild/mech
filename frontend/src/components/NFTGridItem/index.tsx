@@ -13,6 +13,7 @@ import { MechNFT } from "../../hooks/useNFTsByOwner"
 import ChainIcon from "../ChainIcon"
 import { deployMech } from "../../utils/deployMech"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
+import { CHAINS } from "../../chains"
 
 interface Props {
   nftData: MechNFT
@@ -21,7 +22,9 @@ interface Props {
 const NFTGridItem: React.FC<Props> = ({ nftData }) => {
   const [imageError, setImageError] = useState(false)
   const [deploying, setDeploying] = useState(false)
-  const chainId = parseInt(nftData.blockchain.shortChainID)
+
+  const chain = CHAINS.find((c) => c.chainID === nftData.blockchain.chainID)!
+  const chainId = parseInt(chain.shortChainID)
   const { data: signer } = useSigner()
   const mechAddress = calculateMechAddress(nftData)
 
@@ -36,16 +39,16 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
       setDeploying(false)
     }
   }
-  console.log(
-    nftData.nft.tokenID,
-    nftData.contractAddress,
-    nftData.nft.previews
-  )
+
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
         <p className={classes.tokenName}>
-          {nftData.nft.title || nftData.nft.contractTitle || "..."}
+          <Link
+            to={`mechs/${chain.prefix}:${nftData.contractAddress}/${nftData.nft.tokenID}`}
+          >
+            {nftData.nft.title || nftData.nft.contractTitle || "..."}
+          </Link>
         </p>
         {nftData.nft.tokenID.length < 5 && (
           <p className={classes.tokenId}>{nftData.nft.tokenID || "..."}</p>
@@ -79,7 +82,9 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
         </div>
       </div>
       {nftData.hasMech ? (
-        <Link to={`mechs/${nftData.contractAddress}/${nftData.nft.tokenID}`}>
+        <Link
+          to={`mechs/${chain.prefix}:${nftData.contractAddress}/${nftData.nft.tokenID}`}
+        >
           <Button className={classes.useButton} onClick={() => {}}>
             Use Mech
           </Button>
