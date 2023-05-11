@@ -1,8 +1,8 @@
 export interface nxyzBlockchain {
   name: string
   shortName: string
-  chainId: string
-  shortChainId: string
+  chainID: string
+  shortChainID: string
 }
 
 export interface nxyzTokenSymbol {

@@ -21,7 +21,7 @@ interface Props {
 const NFTGridItem: React.FC<Props> = ({ nftData }) => {
   const [imageError, setImageError] = useState(false)
   const [deploying, setDeploying] = useState(false)
-  const chainId = parseInt(nftData.blockchain.shortChainId)
+  const chainId = parseInt(nftData.blockchain.shortChainID)
   const { data: signer } = useSigner()
   const mechAddress = calculateMechAddress(nftData)
 

@@ -20,7 +20,7 @@ export const deployMech = (token: MechNFT, signer: JsonRpcSigner) => {
 }
 
 export const makeMechDeployTransaction = (token: MechNFT) => {
-  const chainId = parseInt(token.blockchain.shortChainId)
+  const chainId = parseInt(token.blockchain.shortChainID)
   return token.tokenStandard === "ERC-1155"
     ? makeERC1155MechDeployTransaction(
         token.contractAddress,
