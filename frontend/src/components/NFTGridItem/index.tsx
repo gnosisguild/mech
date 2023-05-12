@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useSigner } from "wagmi"
+import { useChainId, useSigner } from "wagmi"
 import copy from "copy-to-clipboard"
 import clsx from "clsx"
 import { Link } from "react-router-dom"
@@ -13,7 +13,7 @@ import { MechNFT } from "../../hooks/useNFTsByOwner"
 import ChainIcon from "../ChainIcon"
 import { deployMech } from "../../utils/deployMech"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
-import { CHAINS } from "../../chains"
+import { CHAINS, ChainId } from "../../chains"
 
 interface Props {
   nftData: MechNFT
@@ -22,8 +22,8 @@ interface Props {
 const NFTGridItem: React.FC<Props> = ({ nftData }) => {
   const [imageError, setImageError] = useState(false)
   const [deploying, setDeploying] = useState(false)
-
-  const chain = (CHAINS as any)[parseInt(nftData.blockchain.shortChainID)]
+  console.log(nftData.blockchain.shortChainID)
+  const chain = CHAINS[parseInt(nftData.blockchain.shortChainID) as ChainId]
 
   const { data: signer } = useSigner()
   const mechAddress = calculateMechAddress(nftData)
@@ -77,7 +77,7 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
           </div>
           <div className={classes.infoItem}>
             <p>Chain:</p>
-            <ChainIcon chainId={chain.chainId} className={classes.chainIcon} />
+            <ChainIcon chainId={chain.id} className={classes.chainIcon} />
           </div>
         </div>
       </div>

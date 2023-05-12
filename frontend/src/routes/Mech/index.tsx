@@ -38,7 +38,7 @@ const Mech: React.FC = () => {
   const { data, error, isLoading } = useNFT({
     contractAddress,
     tokenId: tokenId,
-    chainId: chain.chainId,
+    chainId: chain.id,
   })
 
   const { deployed, deploy, deployPending } = useDeployMech(data)
@@ -56,7 +56,7 @@ const Mech: React.FC = () => {
             <NFTItem nftData={data} />
 
             <ProvideWalletConnect
-              chainId={chain.chainId}
+              chainId={chain.id}
               mechAddress={mechAddress}
               onRequest={handleRequest}
             >

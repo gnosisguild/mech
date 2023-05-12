@@ -8,23 +8,19 @@ import Button from "../Button"
 import classes from "./NFTGrid.module.css"
 import clsx from "clsx"
 import { useChainId } from "wagmi"
-import { CHAINS } from "../../chains"
 
 interface Props {
   address: string
 }
 
-const DEFAULT_CHAIN = CHAINS[5] // TODO switch to mainnet when ready
-
 const NFTGrid: React.FC<Props> = ({ address }) => {
   const [pageToken, setPageToken] = useState<string | undefined>(undefined)
 
   const chainId = useChainId()
-  const chain = (CHAINS as any)[chainId] || DEFAULT_CHAIN
 
   const { data, isLoading } = useNFTsByOwner({
     walletAddress: address,
-    chainId: chain.chainId,
+    chainId,
     pageToken,
   })
 

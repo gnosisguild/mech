@@ -40,13 +40,10 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
   const [error, setError] = useState<any>(null)
   const provider = useProvider()
 
-  const chain = chainId ? (CHAINS as any)[chainId] : DEFAULT_CHAIN
-  const chainShortName = chain.shortName
-
   useEffect(() => {
-    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${walletAddress}/balances/nfts?chainID=${chainShortName}&limit=20&filterSpam=false${
-      pageToken ? `&cursor=${pageToken}` : ""
-    }`
+    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${walletAddress}/balances/nfts?chainID=eip155:${
+      chainId || DEFAULT_CHAIN.id
+    }&limit=20&filterSpam=false${pageToken ? `&cursor=${pageToken}` : ""}`
     const fetchData = async () => {
       try {
         setIsLoading(true)
@@ -75,7 +72,7 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
     }
 
     fetchData()
-  }, [walletAddress, chainShortName, pageToken, provider])
+  }, [walletAddress, chainId, pageToken, provider])
 
   return { data, isLoading, error }
 }

@@ -1,5 +1,3 @@
-import { CHAINS } from "../chains"
-
 export interface nxyzBlockchain {
   name: string
   shortName: string

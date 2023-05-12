@@ -20,20 +20,15 @@ interface NFTResult {
 
 type useNFTType = (props: NFTProps) => NFTResult
 
-const DEFAULT_CHAIN = CHAINS[5]
-
 const useNFT: useNFTType = ({ contractAddress, chainId, tokenId }) => {
   const [data, setData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<any>(null)
   const provider = useProvider()
 
-  const chain = (CHAINS as any)[chainId] || DEFAULT_CHAIN
-  const chainShortName = chain.shortName
-
   useEffect(() => {
     const fetchData = async () => {
-      const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/nfts/${contractAddress}/${tokenId}?chainID=${chainShortName}&limit=20&filterSpam=false`
+      const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/nfts/${contractAddress}/${tokenId}?chainID=eip155:${chainId}&limit=20&filterSpam=false`
       try {
         setIsLoading(true)
         const res = await fetch(apiUrl)
@@ -59,7 +54,7 @@ const useNFT: useNFTType = ({ contractAddress, chainId, tokenId }) => {
     }
 
     fetchData()
-  }, [contractAddress, chainShortName, tokenId, provider])
+  }, [contractAddress, chainId, tokenId, provider])
 
   return { data, isLoading, error }
 }

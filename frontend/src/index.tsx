@@ -11,16 +11,7 @@ import { RouterProvider } from "react-router-dom"
 import "./index.css"
 
 import { configureChains, createClient, WagmiConfig } from "wagmi"
-import {
-  mainnet,
-  goerli,
-  avalanche,
-  arbitrum,
-  bsc,
-  polygon,
-  gnosis,
-} from "wagmi/chains"
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
+
 import { infuraProvider } from "@wagmi/core/providers/infura"
 import router from "./router"
 import { CHAINS } from "./chains"
@@ -30,20 +21,12 @@ if (!REACT_APP_WALLET_CONNECT_PROJECT_ID) {
   throw new Error("REACT_APP_WALLET_CONNECT_PROJECT_ID is not set")
 }
 
-const { chains, provider } = configureChains(
-  [mainnet, goerli, avalanche, arbitrum, bsc, polygon, gnosis],
-  [
-    walletConnectProvider({
-      projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
-    }),
-    jsonRpcProvider({
-      rpc: (chain) => {
-        return (CHAINS as any)[chain.id]?.rpc
-      },
-    }),
-    infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY || "" }),
-  ]
-)
+const { chains, provider } = configureChains(Object.values(CHAINS), [
+  walletConnectProvider({
+    projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
+  }),
+  infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY || "" }),
+])
 
 export { chains }
 
