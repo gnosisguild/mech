@@ -5,7 +5,7 @@ import { arrayify, hexlify } from "ethers/lib/utils"
 export const signWithMech = (
   mechAddress: string,
   signatureData: string | Bytes
-) => {
+): `0x${string}` => {
   // Produce a signature as bytes of the form:
   // {bytes32 r = mech address}{bytes32 s = 65 (offset to signature data)}{unpadded uint8 v = 0}{bytes32 signature data length}{bytes signature data}
 

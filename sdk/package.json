@@ -4,8 +4,7 @@
   "description": "Smart account with programmable ownership",
   "scripts": {
     "prepare": "yarn build",
-    "prebuild": "rimraf build",
-    "build": "yarn build:cjs && yarn build:esm",
+    "build": "rimraf build && yarn build:cjs && yarn build:esm",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json"
   },

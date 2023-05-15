@@ -55,7 +55,7 @@ export const calculateERC1155MechAddress = (
       [solidityKeccak256(["bytes"], [initData]), salt]
     ),
     keccak256(byteCode)
-  )
+  ) as `0x${string}`
 }
 
 export const ERC1155_MASTERCOPY_INIT_DATA = [ZERO_ADDRESS, [0], [0], 0]
@@ -69,7 +69,7 @@ export const calculateERC1155MechMastercopyAddress = () => {
     ERC2470_SINGLETON_FACTORY_ADDRESS,
     DEFAULT_SALT,
     keccak256(ERC1155Mech__factory.bytecode + initData.slice(2))
-  )
+  ) as `0x${string}`
 }
 
 export const makeERC1155MechDeployTransaction = (
@@ -96,7 +96,11 @@ export const makeERC1155MechDeployTransaction = (
     salt
   )
 
-  return transaction
+  return {
+    to: transaction.to as `0x${string}`,
+    data: transaction.data as `0x${string}`,
+    value: transaction.value.toBigInt(),
+  }
 }
 
 export const deployERC1155Mech = async (
@@ -156,9 +160,9 @@ export const deployERC1155MechMastercopy = async (signer: JsonRpcSigner) => {
     ["address", "uint256[]", "uint256[]", "uint256"],
     ERC1155_MASTERCOPY_INIT_DATA
   )
-  return await deployMastercopyWithInitData(
+  return (await deployMastercopyWithInitData(
     signer,
     ERC1155Mech__factory.bytecode + initData.slice(2),
     DEFAULT_SALT
-  )
+  )) as `0x${string}`
 }

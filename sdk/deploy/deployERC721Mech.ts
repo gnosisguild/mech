@@ -5,7 +5,6 @@ import {
   deployMastercopyWithInitData,
   SupportedNetworks,
 } from "@gnosis.pm/zodiac"
-import { BigNumberish } from "ethers"
 import {
   getCreate2Address,
   keccak256,
@@ -27,7 +26,7 @@ export const calculateERC721MechAddress = (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
-  tokenId: BigNumberish,
+  tokenId: bigint,
   salt: string = DEFAULT_SALT
 ) => {
   const initData =
@@ -48,7 +47,7 @@ export const calculateERC721MechAddress = (
       [solidityKeccak256(["bytes"], [initData]), salt]
     ),
     keccak256(byteCode)
-  )
+  ) as `0x${string}`
 }
 
 export const ERC721_MASTERCOPY_INIT_DATA = [ZERO_ADDRESS, 0]
@@ -62,14 +61,14 @@ export const calculateERC721MechMastercopyAddress = () => {
     ERC2470_SINGLETON_FACTORY_ADDRESS,
     DEFAULT_SALT,
     keccak256(ERC721Mech__factory.bytecode + initData.slice(2))
-  )
+  ) as `0x${string}`
 }
 
 export const makeERC721MechDeployTransaction = (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
-  tokenId: BigNumberish,
+  tokenId: bigint,
   chainId: number,
   salt: string = DEFAULT_SALT
 ) => {
@@ -85,14 +84,18 @@ export const makeERC721MechDeployTransaction = (
     salt
   )
 
-  return transaction
+  return {
+    to: transaction.to as `0x${string}`,
+    data: transaction.data as `0x${string}`,
+    value: transaction.value.toBigInt(),
+  }
 }
 
 export const deployERC721Mech = async (
   /** Address of the ERC721 token contract */
   token: string,
   /** ID of the ERC721 token */
-  tokenId: BigNumberish,
+  tokenId: bigint,
   signer: JsonRpcSigner,
   salt: string = DEFAULT_SALT
 ) => {
@@ -131,9 +134,9 @@ export const deployERC721MechMastercopy = async (signer: JsonRpcSigner) => {
     ["address", "uint256"],
     ERC721_MASTERCOPY_INIT_DATA
   )
-  return await deployMastercopyWithInitData(
+  return (await deployMastercopyWithInitData(
     signer,
     ERC721Mech__factory.bytecode + initData.slice(2),
     DEFAULT_SALT
-  )
+  )) as `0x${string}`
 }
