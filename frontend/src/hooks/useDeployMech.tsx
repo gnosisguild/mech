@@ -1,28 +1,22 @@
-import { useEffect, useState } from "react"
-import { useProvider, useSigner } from "wagmi"
-import { calculateMechAddress } from "../utils/calculateMechAddress"
+import { useState } from "react"
+import { usePublicClient, useWalletClient } from "wagmi"
 import { makeMechDeployTransaction } from "../utils/deployMech"
 import { MechNFT } from "./useNFTsByOwner"
 
 export const useDeployMech = (token: MechNFT | null) => {
-  const mechAddress = token && calculateMechAddress(token)
-  const { data: signer } = useSigner()
+  const { data: walletClient } = useWalletClient()
 
-  const provider = useProvider()
-  const [deployed, setDeployed] = useState(false)
-  useEffect(() => {
-    if (!mechAddress) return
-    provider.getCode(mechAddress).then((code) => setDeployed(code !== "0x"))
-  }, [provider, mechAddress])
+  const publicClient = usePublicClient()
+  const [deployed, setDeployed] = useState(token?.hasMech || false)
 
   const [deployPending, setDeployPending] = useState(false)
   const deploy = async () => {
-    if (!signer || !token) return
+    if (!walletClient || !token) return
     const tx = makeMechDeployTransaction(token)
     setDeployPending(true)
     try {
-      const res = await signer.sendTransaction(tx)
-      const receipt = await res.wait()
+      const hash = await walletClient.sendTransaction(tx)
+      const receipt = await publicClient.waitForTransactionReceipt({ hash })
       setDeployed(true)
       return receipt
     } catch (e) {

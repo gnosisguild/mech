@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useProvider } from "wagmi"
+import { usePublicClient } from "wagmi"
 import { CHAINS } from "../chains"
 import { nxyzNFT } from "../types/nxyzApiTypes"
 import { calculateMechAddress } from "../utils/calculateMechAddress"
@@ -38,7 +38,7 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
   const [data, setData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<any>(null)
-  const provider = useProvider()
+  const client = usePublicClient()
 
   useEffect(() => {
     const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${walletAddress}/balances/nfts?chainID=eip155:${
@@ -55,7 +55,9 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
           const nft = nfts[index] as MechNFT
           try {
             const hasMech =
-              (await provider.getCode(calculateMechAddress(nft))) !== "0x"
+              (await client.getBytecode({
+                address: calculateMechAddress(nft),
+              })) !== "0x"
             nft.hasMech = hasMech
           } catch (error) {
             console.log(error)
@@ -72,7 +74,7 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
     }
 
     fetchData()
-  }, [walletAddress, chainId, pageToken, provider])
+  }, [walletAddress, chainId, pageToken, client])
 
   return { data, isLoading, error }
 }

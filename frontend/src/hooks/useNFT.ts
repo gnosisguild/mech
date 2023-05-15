@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
-import { useProvider } from "wagmi"
-import { CHAINS } from "../chains"
+import { usePublicClient } from "wagmi"
 
 import { nxyzNFT } from "../types/nxyzApiTypes"
 import { calculateMechAddress } from "../utils/calculateMechAddress"
@@ -24,7 +23,7 @@ const useNFT: useNFTType = ({ contractAddress, chainId, tokenId }) => {
   const [data, setData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<any>(null)
-  const provider = useProvider()
+  const client = usePublicClient()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +38,9 @@ const useNFT: useNFTType = ({ contractAddress, chainId, tokenId }) => {
           if (!mechData) throw new Error("No metadata")
 
           const hasMech =
-            (await provider.getCode(calculateMechAddress(mechData))) !== "0x"
+            (await client.getBytecode({
+              address: calculateMechAddress(mechData),
+            })) !== "0x"
           mechData.hasMech = hasMech
         } catch (error) {
           console.log(error)
@@ -54,7 +55,7 @@ const useNFT: useNFTType = ({ contractAddress, chainId, tokenId }) => {
     }
 
     fetchData()
-  }, [contractAddress, chainId, tokenId, provider])
+  }, [contractAddress, chainId, tokenId, client])
 
   return { data, isLoading, error }
 }

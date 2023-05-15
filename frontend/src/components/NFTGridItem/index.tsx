@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { useChainId, useSigner } from "wagmi"
 import copy from "copy-to-clipboard"
 import clsx from "clsx"
 import { Link } from "react-router-dom"
@@ -7,13 +6,12 @@ import { Link } from "react-router-dom"
 import classes from "./NFTItem.module.css"
 import Button from "../Button"
 import { shortenAddress } from "../../utils/shortenAddress"
-import { JsonRpcSigner } from "@ethersproject/providers"
 import Spinner from "../Spinner"
 import { MechNFT } from "../../hooks/useNFTsByOwner"
 import ChainIcon from "../ChainIcon"
-import { deployMech } from "../../utils/deployMech"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import { CHAINS, ChainId } from "../../chains"
+import { useDeployMech } from "../../hooks/useDeployMech"
 
 interface Props {
   nftData: MechNFT
@@ -21,24 +19,11 @@ interface Props {
 
 const NFTGridItem: React.FC<Props> = ({ nftData }) => {
   const [imageError, setImageError] = useState(false)
-  const [deploying, setDeploying] = useState(false)
-  console.log(nftData.blockchain.shortChainID)
+
   const chain = CHAINS[parseInt(nftData.blockchain.shortChainID) as ChainId]
 
-  const { data: signer } = useSigner()
   const mechAddress = calculateMechAddress(nftData)
-
-  const handleDeploy = async () => {
-    setDeploying(true)
-    try {
-      const deployTx = await deployMech(nftData, signer as JsonRpcSigner)
-      console.log("deploy tx", deployTx)
-      setDeploying(false)
-    } catch (e) {
-      console.error(e)
-      setDeploying(false)
-    }
-  }
+  const { deploy, deployPending, deployed } = useDeployMech(nftData)
 
   return (
     <div className={classes.itemContainer}>
@@ -81,7 +66,7 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
           </div>
         </div>
       </div>
-      {nftData.hasMech ? (
+      {deployed ? (
         <Link
           to={`mechs/${chain.prefix}:${nftData.contractAddress}/${nftData.nft.tokenID}`}
         >
@@ -91,12 +76,12 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
         </Link>
       ) : (
         <>
-          {deploying ? (
+          {deployPending ? (
             <div className={classes.spinner}>
               <Spinner />
             </div>
           ) : (
-            <Button onClick={handleDeploy} secondary>
+            <Button onClick={deploy} secondary>
               Deploy Mech
             </Button>
           )}

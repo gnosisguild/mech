@@ -84,5 +84,8 @@
     "@types/node": "^18.11.18",
     "ethers": "^5.7.2"
   },
+  "resolutions": {
+    "@walletconnect/ethereum-provider": "2.7.0"
+  },
   "packageManager": "yarn@3.4.1"
 }

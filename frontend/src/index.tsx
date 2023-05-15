@@ -1,18 +1,15 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import {
-  EthereumClient,
-  modalConnectors,
-  walletConnectProvider,
-} from "@web3modal/ethereum"
+import { EthereumClient, w3mConnectors, w3mProvider } from "@web3modal/ethereum"
 
 import { Web3Modal } from "@web3modal/react"
 import { RouterProvider } from "react-router-dom"
 import "./index.css"
 
-import { configureChains, createClient, WagmiConfig } from "wagmi"
+import { configureChains, createConfig, WagmiConfig } from "wagmi"
 
 import { infuraProvider } from "@wagmi/core/providers/infura"
+import { publicProvider } from "@wagmi/core/providers/public"
 import router from "./router"
 import { CHAINS } from "./chains"
 
@@ -21,28 +18,28 @@ if (!REACT_APP_WALLET_CONNECT_PROJECT_ID) {
   throw new Error("REACT_APP_WALLET_CONNECT_PROJECT_ID is not set")
 }
 
-const { chains, provider } = configureChains(Object.values(CHAINS), [
-  walletConnectProvider({
+const { chains, publicClient } = configureChains(Object.values(CHAINS), [
+  w3mProvider({
     projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
   }),
   infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY || "" }),
+  publicProvider(),
 ])
 
 export { chains }
 
-const wagmiClient = createClient({
+const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors: modalConnectors({
+  connectors: w3mConnectors({
     projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
-    version: "2",
-    appName: "Mech",
+    version: 2,
     chains,
   }),
-  provider,
+  publicClient,
 })
 
 // Web3Modal Ethereum Client
-const ethereumClient = new EthereumClient(wagmiClient, chains)
+const ethereumClient = new EthereumClient(wagmiConfig, chains)
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
@@ -51,7 +48,7 @@ const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
 root.render(
   <React.StrictMode>
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={wagmiConfig}>
       <RouterProvider router={router} />
     </WagmiConfig>
 
