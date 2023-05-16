@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { usePublicClient } from "wagmi"
 import { CHAINS } from "../chains"
 import { nxyzNFT } from "../types/nxyzApiTypes"
-import { calculateMechAddress } from "../utils/calculateMechAddress"
 
 interface NFTProps {
   walletAddress: string
@@ -11,7 +10,6 @@ interface NFTProps {
 }
 
 export interface MechNFT extends nxyzNFT {
-  hasMech?: boolean
   tokenStandard?: "ERC-721" | "ERC-1155"
 }
 
@@ -50,21 +48,6 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
         const res = await fetch(apiUrl)
         const cursor = res.headers.get("X-Doc-Next-Cursor")
         const nfts: nxyzNFT[] = await res.json()
-
-        for (let index = 0; index < nfts.length; index++) {
-          const nft = nfts[index] as MechNFT
-          try {
-            const hasMech =
-              (await client.getBytecode({
-                address: calculateMechAddress(nft),
-              })) !== "0x"
-            nft.hasMech = hasMech
-          } catch (error) {
-            console.log(error)
-            nft.hasMech = false
-          }
-        }
-
         setData({ assets: nfts, nextPageToken: cursor })
         setIsLoading(false)
       } catch (e) {

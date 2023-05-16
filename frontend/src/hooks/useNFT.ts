@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { usePublicClient } from "wagmi"
 
 import { nxyzNFT } from "../types/nxyzApiTypes"
-import { calculateMechAddress } from "../utils/calculateMechAddress"
 import { MechNFT } from "./useNFTsByOwner"
 
 interface NFTProps {
@@ -33,19 +32,6 @@ const useNFT: useNFTType = ({ contractAddress, chainId, tokenId }) => {
         const res = await fetch(apiUrl)
         const data: nxyzNFT[] = await res.json()
         const mechData = data[0] as MechNFT
-
-        try {
-          if (!mechData) throw new Error("No metadata")
-
-          const hasMech =
-            (await client.getBytecode({
-              address: calculateMechAddress(mechData),
-            })) !== "0x"
-          mechData.hasMech = hasMech
-        } catch (error) {
-          console.log(error)
-          mechData.hasMech = false
-        }
         setData(mechData)
         setIsLoading(false)
       } catch (e) {
