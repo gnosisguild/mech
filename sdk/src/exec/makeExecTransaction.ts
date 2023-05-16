@@ -1,8 +1,8 @@
 import { BigNumber, BigNumberish } from "ethers"
 
-import { IMech__factory } from "../../typechain-types"
+import { IMech__factory } from "../../../typechain-types"
 
-const BASE_TX_GAS = 21000n
+const BASE_TX_GAS = BigInt(21000)
 const IMech = IMech__factory.createInterface()
 
 interface TransactionRequest {
@@ -20,7 +20,7 @@ export const makeExecTransaction = (
   transaction: TransactionRequest
 ) => {
   const { nonce, to, from, gasPrice, gasLimit, data, value } = transaction
-  const txGas = gasLimit ? BigNumber.from(gasLimit).sub(BASE_TX_GAS) : 0n
+  const txGas = gasLimit ? BigNumber.from(gasLimit).sub(BASE_TX_GAS) : BigInt(0)
 
   if (from && from.toLowerCase() !== mechAddress.toLowerCase()) {
     throw new Error(
@@ -44,7 +44,7 @@ export const makeExecTransaction = (
       txGas,
     ]) as `0x${string}`,
 
-    value: 0n,
+    value: BigInt(0),
     nonce,
   }
 }

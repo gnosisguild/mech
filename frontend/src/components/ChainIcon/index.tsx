@@ -66,7 +66,7 @@ const ChainIcon: React.FC<ChainIconProps> = ({
         </clipPath>
       </defs>
       <image
-        clip-path="url(#mask)"
+        clipPath="url(#mask)"
         width="58"
         height="59"
         x="-2"

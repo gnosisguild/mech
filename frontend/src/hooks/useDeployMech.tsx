@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   PublicClient,
   useChainId,
@@ -17,11 +17,15 @@ interface QueryKeyArgs {
 }
 
 function queryFn(client: PublicClient) {
-  return async ({ queryKey: [{ address }] }: { queryKey: [QueryKeyArgs] }) => {
+  return async ({
+    queryKey: [, { address }],
+  }: {
+    queryKey: [string, QueryKeyArgs]
+  }) => {
     const bytecode = await client.getBytecode({
       address,
     })
-    return bytecode && bytecode.length > 2
+    return !!bytecode && bytecode.length > 2
   }
 }
 
@@ -62,13 +66,35 @@ export const useDeployMech = (token: MechNFT | null) => {
   return { deployed, deploy, deployPending }
 }
 
-export const useDeployedMechs = () => {
+export const useDeployedMechs = (nfts: MechNFT[]) => {
   const queryClient = useQueryClient()
 
-  const deployedMechs = queryClient.getQueriesData(["mechDeployed"])
-  console.log({ deployedMechs })
-  return deployedMechs as unknown as {
-    address: `0x${string}`
-    chainId: number
-  }[] // TODO
+  useEffect(() => {
+    nfts.forEach((nft) => {
+      queryClient.ensureQueryData([
+        "mechDeployed",
+        {
+          address: calculateMechAddress(nft),
+          chainId: parseInt(nft.blockchain.shortChainID),
+        },
+      ])
+    })
+  }, [queryClient, nfts])
+
+  const deployedMechs = queryClient.getQueriesData([
+    "mechDeployed",
+  ]) as unknown as [
+    [
+      string,
+      {
+        address: `0x${string}`
+        chainId: number
+      }
+    ],
+    boolean | undefined
+  ][]
+
+  return deployedMechs
+    .filter(([, deployed]) => deployed)
+    .map(([args]) => args[1])
 }

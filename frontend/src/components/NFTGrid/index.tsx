@@ -47,7 +47,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
     })
   }, [data])
 
-  const deployedMechs = useDeployedMechs()
+  const deployedMechs = useDeployedMechs(nftData)
 
   const isDeployed = (nft: MechNFT) =>
     deployedMechs.some(

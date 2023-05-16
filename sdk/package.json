@@ -11,9 +11,15 @@
   "files": [
     "build/**/*"
   ],
-  "main": "build/cjs/sdk/index.js",
-  "typings": "build/cjs/sdk/index.d.ts",
-  "module": "build/esm/sdk/index.js",
+  "main": "build/cjs/sdk/src/index.js",
+  "types": "build/cjs/sdk/src/index.d.ts",
+  "module": "build/esm/sdk/src/index.js",
+  "exports": {
+    ".": {
+      "require": "./build/cjs/sdk/src/index.js",
+      "import": "./build/esm/sdk/src/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gnosis/mech.git"
