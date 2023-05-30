@@ -1741,6 +1741,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@erc6551/reference@https://github.com/erc6551/reference":
+  version: 0.0.1
+  resolution: "@erc6551/reference@https://github.com/erc6551/reference.git#commit=d79a49e99fee1154a2023bd164850c5d0c34c208"
+  checksum: dadd486de350f02ecf68809cb6130fb29029c2230fa44aa212a1ae473e0a1155e24220b50467bb1274539bda16205b947eb2c7904cba5ded918a274ba2043123
+  languageName: node
+  linkType: hard
+
 "@esbuild/android-arm@npm:0.15.13":
   version: 0.15.13
   resolution: "@esbuild/android-arm@npm:0.15.13"
@@ -14044,6 +14051,7 @@ __metadata:
   dependencies:
     "@account-abstraction/contracts": ^0.6.0
     "@ambire/signature-validator": ^1.1.0
+    "@erc6551/reference": "https://github.com/erc6551/reference"
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/providers": ^5.7.2
