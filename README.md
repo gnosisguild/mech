@@ -8,11 +8,13 @@ Smart account with programmable ownership
 
 #### Transferrable ownership
 
-- [ERC721Mech.sol](contracts/ERC721Mech.sol): allow the holder of a designated ERC-721 NFT to sign transactions on behalf of the Mech
+- [ERC721TokenboundMech.sol](contracts/ERC721TokenboundMech.sol): allow the holder of a designated ERC-721 NFT to sign transactions on behalf of the Mech
+- [ERC1155TokenboundMech.sol](contracts/ERC721TokenboundMech.sol): allow the holder of a designated ERC-1155 NFT to sign transactions on behalf of the Mech
 
 #### Threshold ownership
 
-- [ERC1155Mech.sol](contracts/ERC1155Mech.sol): allow holders of a minimum balance of ERC-1155 tokens to sign transactions on behalf of the Mech
+- [ERC20ThresholdMech.sol](contracts/ERC20ThresholdMech.sol): allow holders of a minimum balance of an ERC-20 token to sign transactions on behalf of the Mech
+- [ERC1155ThresholdMech.sol](contracts/ERC1155ThresholdMech.sol): allow holders of a minimum balance of ERC-1155 tokens to sign transactions on behalf of the Mech
 
 #### Programmable ownership
 
@@ -69,7 +71,7 @@ Integration tests are run on a mainnet fork and cover the interaction of mech co
 
 ### EIP-4337 account
 
-Mechs implement the EIP-4337 [Account](contracts/base/Account.sol) interface meaning they allow bundlers to execute account-abstracted user operations from the Mech's address.
+Mech implements the EIP-4337 [Account](contracts/base/Account.sol) interface meaning they allow bundlers to execute account-abstracted user operations from the Mech's address.
 For this purpose the EIP-4337 entry point contract first calls the Mech's `validateUserOp()` function for checking if a user operation has a valid signature by the mech operator.
 The entry point then calls the `exec` function, or any other function using the `onlyOperator` modifier, to trigger execution.
 
@@ -95,18 +97,17 @@ An EIP-1271 signature will be considered valid if it meets the following conditi
 
 ### Deterministic deployment
 
-The idea for the ERC721 and ERC1155 mechs is that the mech instance for the designated tokens is deployed to a deterministic address.
+The idea for the ERC721 and ERC1155 versions of mech is that the mech instance for the designated tokens is deployed to a deterministic address.
 This enables counterfactually funding the mech account (own token to unlock treasure) or granting access for it (use token as key card).
 The deterministic deployment is implemented via Zodiac's [ModuleProxyFactory](https://github.com/gnosis/zodiac/blob/master/contracts/factory/ModuleProxyFactory.sol), through which each mech instance is deployed as an ERC-1167 minimal proxy.
 
-### Immutable storage
+### EIP-1167 minimal proxies with context
 
 The holder of the token gains full control over the mech account and can write to its storage without any restrictions via delegate calls.
 Since tokens are transferrable this is problematic, as a past owner could mess with storage to change the mech's behavior in ways that future owners wouldn't expect.
-That's why the ERC721 and ERC1155 versions of the mech avoid using storage but hard-code their configuration in bytecode.
+That's why the ERC721 and ERC1155 versions of mech avoid using storage but instead solely rely on the immutable data in their own bytecode.
 
-To achieve this, Mech sub contracts can extend [ImmutableStorage](contracts/base/ImmutableStorage.sol) which allows writing data to the bytecode at a deterministic address once.
-Note that using Solidity's `immutable` keyword is not an option for proxy contracts, since immutable fields can only be written to from the constructor which won't be invoked for proxy instances.
+To achieve this, mechs are deployed through a version of a EIP-1167 proxy factory that allows appending arbitrary bytes to the minimal proxy bytecode.
 
 ### Migrate a Safe to a ZodiacMech
 
