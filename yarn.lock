@@ -14082,6 +14082,7 @@ __metadata:
     hardhat: ^2.12.5
     hardhat-deploy: ^0.11.22
     hardhat-gas-reporter: ^1.0.9
+    openzeppelin-contracts: ^4.0.0
     prettier: ^2.8.3
     prettier-plugin-solidity: ^1.1.1
     rimraf: ^4.1.2
@@ -15114,6 +15115,13 @@ __metadata:
     is-docker: ^2.1.1
     is-wsl: ^2.2.0
   checksum: 6388bfff21b40cb9bd8f913f9130d107f2ed4724ea81a8fd29798ee322b361ca31fa2cdfb491a5c31e43a3996cfe9566741238c7a741ada8d7af1cb78d85cf26
+  languageName: node
+  linkType: hard
+
+"openzeppelin-contracts@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "openzeppelin-contracts@npm:4.0.0"
+  checksum: 977df75157505a9687700714b0c3741a5d57b535ecab141e07fe00adb70f8922ff5ca7cd221ada4c284506899f8ad3d2b8cd1321cfff8460a1e0121170c7a456
   languageName: node
   linkType: hard
 

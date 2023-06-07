@@ -7,22 +7,24 @@ import { ethers } from "hardhat"
 // Using this simplifies your tests and makes them run faster, by taking
 // advantage or Hardhat Network's snapshot functionality.
 
-describe("ERC721Mech contract", () => {
+describe("ERC721TokenboundMech contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
   async function deployMech1() {
     const TestToken = await ethers.getContractFactory("ERC721Token")
-    const ERC721Mech = await ethers.getContractFactory("ERC721Mech")
+    const ERC721TokenboundMech = await ethers.getContractFactory(
+      "ERC721TokenboundMech"
+    )
     const [, alice, bob] = await ethers.getSigners()
 
     const testToken = await TestToken.deploy()
-    const mech1 = await ERC721Mech.deploy(testToken.address, 1)
+    const mech1 = await ERC721TokenboundMech.deploy(testToken.address, 1)
 
     await mech1.deployed()
 
     // Fixtures can return anything you consider useful for your tests
-    return { ERC721Mech, testToken, mech1, alice, bob }
+    return { ERC721TokenboundMech, testToken, mech1, alice, bob }
   }
 
   describe("deployment", () => {

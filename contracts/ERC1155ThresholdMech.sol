@@ -2,13 +2,12 @@
 pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "./base/Mech.sol";
-import "./base/ImmutableStorage.sol";
+import "./base/ThresholdMech.sol";
 
 /**
  * @dev A Mech that is operated by the holder of a defined set of minimum ERC1155 token balances
  */
-contract ERC1155Mech is Mech, ImmutableStorage {
+contract ERC1155ThresholdMech is ThresholdMech {
     /// @param _token Address of the token contract
     /// @param _tokenIds The token IDs
     /// @param _minBalances The minimum balances required for each token ID
