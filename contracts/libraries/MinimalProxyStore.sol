@@ -10,8 +10,6 @@ import "@openzeppelin/contracts/utils/Create2.sol";
 library MinimalProxyStore {
     error CreateError();
 
-    // error ContextOverflow();
-
     /**
      * @dev Returns bytecode for a minmal proxy with additional context data appended to it
      *

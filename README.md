@@ -69,11 +69,13 @@ Integration tests are run on a mainnet fork and cover the interaction of mech co
 
 ## How it works
 
-### EIP-4337 account
+### EIP-4337 account abstraction
 
 Mech implements the EIP-4337 [Account](contracts/base/Account.sol) interface meaning they allow bundlers to execute account-abstracted user operations from the Mech's address.
 For this purpose the EIP-4337 entry point contract first calls the Mech's `validateUserOp()` function for checking if a user operation has a valid signature by the mech operator.
 The entry point then calls the `exec` function, or any other function using the `onlyOperator` modifier, to trigger execution.
+
+### EIP-6551 token-bound account
 
 ### EIP-1271 signatures
 
@@ -97,7 +99,7 @@ An EIP-1271 signature will be considered valid if it meets the following conditi
 
 ### Deterministic deployment
 
-The idea for the token-bound versions of mech is that the mech instance for a designated token is deployed to a deterministic address.
+The idea for the token-bound versions of mech is that the mech instance for a designated token is deployed to an address that can be deterministically derived from the token contract address and token ID.
 This enables counterfactually funding the mech account (own token to unlock treasure) or granting access for it (use token as key card).
 
 The deterministic deployment is implemented via Zodiac's [ModuleProxyFactory](https://github.com/gnosis/zodiac/blob/master/contracts/factory/ModuleProxyFactory.sol), through which each mech instance is deployed as an ERC-1167 minimal proxy.
