@@ -6,6 +6,12 @@ import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@account-abstraction/contracts/interfaces/IAccount.sol";
 
 interface IMech is IAccount, IERC1271 {
+    /**
+     * @dev Return if the passed address is authorized to sign on behalf of the mech, must be implemented by the child contract
+     * @param signer The address to check
+     */
+    function isOperator(address signer) external view returns (bool);
+
     /// @dev Executes either a delegatecall or a call with provided parameters
     /// @param to Destination address.
     /// @param value Ether value.

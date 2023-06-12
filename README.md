@@ -21,6 +21,22 @@ Smart account with programmable ownership
 - [ZodiacMech.sol](contracts/ZodiacMech.sol): allow enabled [zodiac](https://github.com/gnosis/zodiac) modules to sign transactions on behalf of the Mech
 - [Mech.sol](contracts/base/Mech.sol): implement custom ownership terms by extending this abstract contract
 
+## Mech interface
+
+Mech implements the [EIP-4337](https://eips.ethereum.org/EIPS/eip-4337) account interface, [EIP-1271](https://eips.ethereum.org/EIPS/eip-1271), and the following functions:
+
+### `isOperator(address signer)`
+
+Returns true if `signer` is allowed to operate the Mech.
+Sub classes implement this function for defining the specific operator criteria.
+
+### `exec(address to, uint256 value, bytes data, Enum.Operation operation, uint256 txGas)`
+
+Allows the operator to make the Mech execute a transaction.
+
+- `operation: 0` for a regular call
+- `operation: 1` for a delegate call
+
 ## Contribute
 
 The repo is structured as a monorepo with `mech-contracts` as the container package exporting the contract sources and artifacts.
@@ -75,8 +91,6 @@ Mech implements the EIP-4337 [Account](contracts/base/Account.sol) interface mea
 For this purpose the EIP-4337 entry point contract first calls the Mech's `validateUserOp()` function for checking if a user operation has a valid signature by the mech operator.
 The entry point then calls the `exec` function, or any other function using the `onlyOperator` modifier, to trigger execution.
 
-### EIP-6551 token-bound account
-
 ### EIP-1271 signatures
 
 [Mech](contracts/base/Mech.sol) implements the EIP-1271 interface.
@@ -104,6 +118,11 @@ This enables counterfactually funding the mech account (own token to unlock trea
 
 The deterministic deployment is implemented via Zodiac's [ModuleProxyFactory](https://github.com/gnosis/zodiac/blob/master/contracts/factory/ModuleProxyFactory.sol), through which each mech instance is deployed as an ERC-1167 minimal proxy.
 
+### EIP-6551 token-bound account
+
+The token-bound versions of Mech adopts the [EIP-6551](https://eips.ethereum.org/EIPS/eip-6551) standard.
+This means that these kinds of mechs are deployed through the official 6551 account registry, so they are deployed to the canonical address and detected by compatible tools.
+
 ### EIP-1167 minimal proxies with context
 
 The holder of the token gains full control over the mech account and can write to its storage without any restrictions via delegate calls.
@@ -111,6 +130,7 @@ Since tokens are transferrable this is problematic, as a past owner could mess w
 That's why the ERC721 and ERC1155 versions of mech avoid using storage but instead solely rely on the immutable data in their own bytecode.
 
 To achieve this, mechs are deployed through a version of a EIP-1167 proxy factory that allows appending arbitrary bytes to the minimal proxy bytecode.
+The same mechanism is implemented by the 6551 account registry.
 
 ### Migrate a Safe to a ZodiacMech
 
