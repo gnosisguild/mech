@@ -13,7 +13,7 @@ contract Receiver is
     ERC777TokensRecipient,
     ERC721TokenReceiver
 {
-    receive() external payable {}
+    receive() external payable virtual {}
 
     function onERC1155Received(
         address,

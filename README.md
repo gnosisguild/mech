@@ -6,15 +6,15 @@
 
 Smart account with programmable ownership
 
-#### Transferrable ownership
+#### Token-bound ownership
 
-- [ERC721TokenboundMech.sol](contracts/ERC721TokenboundMech.sol): allow the holder of a designated ERC-721 NFT to sign transactions on behalf of the Mech
-- [ERC1155TokenboundMech.sol](contracts/ERC721TokenboundMech.sol): allow the holder of a designated ERC-1155 NFT to sign transactions on behalf of the Mech
+- [ERC721TokenboundMech.sol](contracts/ERC721TokenboundMech.sol): allow the holder of a designated ERC-721 NFT to operate the Mech
+- [ERC1155TokenboundMech.sol](contracts/ERC721TokenboundMech.sol): allow the holder of a designated ERC-1155 NFT to operate the Mech
 
 #### Threshold ownership
 
-- [ERC20ThresholdMech.sol](contracts/ERC20ThresholdMech.sol): allow holders of a minimum balance of an ERC-20 token to sign transactions on behalf of the Mech
-- [ERC1155ThresholdMech.sol](contracts/ERC1155ThresholdMech.sol): allow holders of a minimum balance of ERC-1155 tokens to sign transactions on behalf of the Mech
+- [ERC20ThresholdMech.sol](contracts/ERC20ThresholdMech.sol): allow holders of a minimum balance of an ERC-20 token to operate the Mech
+- [ERC1155ThresholdMech.sol](contracts/ERC1155ThresholdMech.sol): allow holders of a minimum balances of designated ERC-1155 tokens to operate the Mech
 
 #### Programmable ownership
 
@@ -97,8 +97,9 @@ An EIP-1271 signature will be considered valid if it meets the following conditi
 
 ### Deterministic deployment
 
-The idea for the ERC721 and ERC1155 versions of mech is that the mech instance for the designated tokens is deployed to a deterministic address.
+The idea for the token-bound versions of mech is that the mech instance for a designated token is deployed to a deterministic address.
 This enables counterfactually funding the mech account (own token to unlock treasure) or granting access for it (use token as key card).
+
 The deterministic deployment is implemented via Zodiac's [ModuleProxyFactory](https://github.com/gnosis/zodiac/blob/master/contracts/factory/ModuleProxyFactory.sol), through which each mech instance is deployed as an ERC-1167 minimal proxy.
 
 ### EIP-1167 minimal proxies with context

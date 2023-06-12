@@ -31,7 +31,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
     }
 
     /// @dev This function can be called whenever no modules are enabled, meaning anyone could come and call setUp() then. We keep this behavior to not brick the mech in that case.
-    function setUp(bytes memory initParams) public override {
+    function setUp(bytes memory initParams) public {
         require(
             modules[address(SENTINEL_MODULES)] == address(0),
             "Already initialized"

@@ -15,8 +15,6 @@ abstract contract Mech is IMech, Account, Receiver {
     // bytes4(keccak256("isValidSignature(bytes32,bytes)")
     bytes4 internal constant EIP1271_MAGICVALUE = 0x1626ba7e;
 
-    receive() external payable override {}
-
     /**
      * @dev Modifier to make a function callable only by the mech operator or the ERC4337 entry point contract
      */

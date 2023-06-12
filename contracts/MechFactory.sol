@@ -33,6 +33,7 @@ contract MechFactory {
         bytes32 salt = keccak256(
             abi.encodePacked(keccak256(context), saltNonce)
         );
+
         address proxy = MinimalProxyStore.cloneDeterministic(
             target,
             context,
