@@ -30,7 +30,8 @@ import {
 } from "../typechain-types"
 
 describe("deterministic deployment", () => {
-  async function deployModuleFactoryAndMastercopy() {
+  /** deploy ERC2470 singleton factory, ZodiacFactory, and ERC6551 registry */
+  async function deployFactories() {
     const [signer, alice] = await hre.ethers.getSigners()
     const deployer = hre.ethers.provider.getSigner(signer.address)
     const moduleProxyFactoryAddress = await deployModuleFactory(deployer)

@@ -6,7 +6,7 @@ import "./libraries/MinimalProxyStore.sol";
 contract MechFactory {
     event MechCreated(
         address indexed proxy,
-        address indexed masterCopy,
+        address indexed mastercopy,
         bytes context
     );
 
@@ -25,14 +25,10 @@ contract MechFactory {
     function createProxy(
         address target,
         bytes memory context,
-        uint256 saltNonce
+        bytes32 salt
     ) internal returns (address result) {
         if (address(target) == address(0)) revert ZeroAddress(target);
         if (address(target).code.length == 0) revert TargetHasNoCode(target);
-
-        bytes32 salt = keccak256(
-            abi.encodePacked(keccak256(context), saltNonce)
-        );
 
         address proxy = MinimalProxyStore.cloneDeterministic(
             target,
@@ -46,12 +42,12 @@ contract MechFactory {
     }
 
     function deployMech(
-        address masterCopy,
+        address mastercopy,
         bytes memory context,
         bytes memory initialCall,
-        uint256 saltNonce
+        bytes32 salt
     ) public returns (address proxy) {
-        proxy = createProxy(masterCopy, context, saltNonce);
+        proxy = createProxy(mastercopy, context, salt);
 
         if (initialCall.length > 0) {
             (bool success, ) = proxy.call(initialCall);
