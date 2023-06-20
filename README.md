@@ -21,6 +21,8 @@ Smart account with programmable ownership
 - [ZodiacMech.sol](contracts/ZodiacMech.sol): allow enabled [zodiac](https://github.com/gnosis/zodiac) modules to sign transactions on behalf of the Mech
 - [Mech.sol](contracts/base/Mech.sol): implement custom ownership terms by extending this abstract contract
 
+![mech hierarchy](docs/mech-hierarchy.png)
+
 ## Mech interface
 
 Mech implements the [EIP-4337](https://eips.ethereum.org/EIPS/eip-4337) account interface, [EIP-1271](https://eips.ethereum.org/EIPS/eip-1271), and the following functions:
@@ -116,12 +118,10 @@ An EIP-1271 signature will be considered valid if it meets the following conditi
 The idea for the token-bound versions of mech is that the mech instance for a designated token is deployed to an address that can be deterministically derived from the token contract address and token ID.
 This enables counterfactually funding the mech account (own token to unlock treasure) or granting access for it (use token as key card).
 
-The deterministic deployment is implemented via Zodiac's [ModuleProxyFactory](https://github.com/gnosis/zodiac/blob/master/contracts/factory/ModuleProxyFactory.sol), through which each mech instance is deployed as an ERC-1167 minimal proxy.
-
 ### EIP-6551 token-bound account
 
 The token-bound versions of Mech adopts the [EIP-6551](https://eips.ethereum.org/EIPS/eip-6551) standard.
-This means that these kinds of mechs are deployed through the official 6551 account registry, so they are deployed to the canonical address and detected by compatible tools.
+This means that these kinds of mechs are deployed through the official 6551 account registry, so they are deployed to their canonical addresses and can be detected by compatible tools.
 
 ### EIP-1167 minimal proxies with context
 
