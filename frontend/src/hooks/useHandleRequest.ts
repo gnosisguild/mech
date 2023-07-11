@@ -3,11 +3,15 @@ import { useCallback } from "react"
 import { useJsonRpcSigner } from "./useJsonRpcSigner"
 import { ProvideWalletConnect } from "./useWalletConnect"
 
-export const useHandleRequest = (mechAddress: string) => {
+export const useHandleRequest = (mechAddress: string | null) => {
   const signer = useJsonRpcSigner()
 
   const handleRequest = useCallback<HandleRequest>(
     async ({ session, request }) => {
+      if (!mechAddress) {
+        throw new Error("mech address not available")
+      }
+
       console.debug("handle request", { session, request })
       if (!signer) {
         throw new Error("signer not available")

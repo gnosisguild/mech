@@ -1,7 +1,7 @@
-import { calculateERC721MechAddress } from "mech-sdk"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 import { nxyzNFT, nxyzSupportedChains } from "../types/nxyzApiTypes"
+import { calculateMechAddress } from "../utils/calculateMechAddress"
 
 interface NFTProps {
   walletAddress: string
@@ -11,6 +11,7 @@ interface NFTProps {
 
 export interface MechNFT extends nxyzNFT {
   hasMech?: boolean
+  tokenStandard?: "ERC-721" | "ERC-1155"
 }
 
 interface MechGetNFTsByOwnerReply {
@@ -51,9 +52,7 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
           const nft = nfts[index] as MechNFT
           try {
             const hasMech =
-              (await provider.getCode(
-                calculateERC721MechAddress(nft.contractAddress, nft.nft.tokenID)
-              )) !== "0x"
+              (await provider.getCode(calculateMechAddress(nft))) !== "0x"
             nft.hasMech = hasMech
           } catch (error) {
             console.log(error)

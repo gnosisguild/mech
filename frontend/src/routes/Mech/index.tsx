@@ -1,10 +1,7 @@
 import React from "react"
 import { useParams } from "react-router-dom"
-import { calculateERC721MechAddress } from "mech-sdk"
 import { useChainId } from "wagmi"
 import Layout from "../../components/Layout"
-import { useErc721OwnerOf } from "../../generated"
-import { BigNumber } from "ethers"
 import useNFT from "../../hooks/useNFT"
 import NFTItem from "../../components/NFTItem"
 
@@ -15,6 +12,7 @@ import { ProvideWalletConnect } from "../../hooks/useWalletConnect"
 import { useHandleRequest } from "../../hooks/useHandleRequest"
 import { useDeployMech } from "../../hooks/useDeployMech"
 import MechDeploy from "../../components/Deploy"
+import { calculateMechAddress } from "../../utils/calculateMechAddress"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -34,29 +32,19 @@ const Mech: React.FC = () => {
 
   const chainId = useChainId()
 
-  const { data: tokenOwner } = useErc721OwnerOf({
-    address: token as `0x${string}`,
-    args: [BigNumber.from(tokenId)],
-  })
+  const { deployed, deploy, deployPending } = useDeployMech(data)
 
-  const { deployed, deploy, deployPending } = useDeployMech(token, tokenId)
-
-  const mechAddress = calculateERC721MechAddress(token, tokenId)
+  const mechAddress = data && calculateMechAddress(data)
 
   const handleRequest = useHandleRequest(mechAddress)
 
   return (
-    <Layout mechAddress={mechAddress}>
+    <Layout mechAddress={mechAddress || undefined}>
       <div className={classes.container}>
         {isLoading && <Spinner />}
-        {!error && !isLoading && data && (
+        {!error && !isLoading && data && mechAddress && (
           <>
-            <NFTItem
-              token={token}
-              tokenId={tokenId}
-              nftData={data}
-              operatorAddress={tokenOwner}
-            />
+            <NFTItem nftData={data} />
 
             <ProvideWalletConnect
               chainId={chainId}

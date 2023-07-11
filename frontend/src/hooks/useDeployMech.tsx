@@ -1,25 +1,24 @@
 import { useEffect, useState } from "react"
-import { useChainId, useProvider, useSigner } from "wagmi"
-import {
-  calculateERC721MechAddress,
-  makeERC721MechDeployTransaction,
-} from "mech-sdk"
+import { useProvider, useSigner } from "wagmi"
+import { calculateMechAddress } from "../utils/calculateMechAddress"
+import { makeMechDeployTransaction } from "../utils/deployMech"
+import { MechNFT } from "./useNFTsByOwner"
 
-export const useDeployMech = (token: string, tokenId: string) => {
-  const mechAddress = calculateERC721MechAddress(token, tokenId)
+export const useDeployMech = (token: MechNFT | null) => {
+  const mechAddress = token && calculateMechAddress(token)
   const { data: signer } = useSigner()
-  const chainId = useChainId()
 
   const provider = useProvider()
   const [deployed, setDeployed] = useState(false)
   useEffect(() => {
+    if (!mechAddress) return
     provider.getCode(mechAddress).then((code) => setDeployed(code !== "0x"))
   }, [provider, mechAddress])
 
   const [deployPending, setDeployPending] = useState(false)
   const deploy = async () => {
-    if (!signer) return
-    const tx = makeERC721MechDeployTransaction(token, tokenId, chainId)
+    if (!signer || !token) return
+    const tx = makeMechDeployTransaction(token)
     setDeployPending(true)
     try {
       const res = await signer.sendTransaction(tx)
