@@ -1,6 +1,5 @@
 import React from "react"
 import { useParams } from "react-router-dom"
-import { useChainId } from "wagmi"
 import Layout from "../../components/Layout"
 import useNFT from "../../hooks/useNFT"
 import NFTItem from "../../components/NFTItem"
@@ -13,6 +12,7 @@ import { useHandleRequest } from "../../hooks/useHandleRequest"
 import { useDeployMech } from "../../hooks/useDeployMech"
 import MechDeploy from "../../components/Deploy"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
+import { CHAINS } from "../../chains"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -20,17 +20,26 @@ const Mech: React.FC = () => {
   if (!token || !tokenId) {
     throw new Error("token and tokenId are required")
   }
-  if (!token.startsWith("0x")) {
+
+  const [chainPrefix, contractAddress] = token.split(":")
+  if (!chainPrefix || !contractAddress) {
+    throw new Error("token must be in the format <chain>:<contractAddress>")
+  }
+  const chain = Object.values(CHAINS).find((c) => c.prefix === chainPrefix)
+
+  if (!chain) {
+    throw new Error(`chain ${chainPrefix} not support`)
+  }
+
+  if (!contractAddress.startsWith("0x")) {
     throw new Error("token must be a valid address")
   }
 
   const { data, error, isLoading } = useNFT({
-    contractAddress: token,
+    contractAddress,
     tokenId: tokenId,
-    blockchain: "gor",
+    chainId: chain.id,
   })
-
-  const chainId = useChainId()
 
   const { deployed, deploy, deployPending } = useDeployMech(data)
 
@@ -47,7 +56,7 @@ const Mech: React.FC = () => {
             <NFTItem nftData={data} />
 
             <ProvideWalletConnect
-              chainId={chainId}
+              chainId={chain.id}
               mechAddress={mechAddress}
               onRequest={handleRequest}
             >

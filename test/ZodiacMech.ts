@@ -4,7 +4,7 @@ import { expect } from "chai"
 import { parseEther } from "ethers/lib/utils"
 import { ethers, network } from "hardhat"
 
-import { SENTINEL_MODULES, ZERO_ADDRESS } from "../sdk/constants"
+import { SENTINEL_MODULES, ZERO_ADDRESS } from "../sdk/src/constants"
 
 import { entryPoint, fillUserOp, getUserOpHash, signUserOp } from "./Account"
 

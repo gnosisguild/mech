@@ -9,7 +9,7 @@ import {
 } from "ethers/lib/utils"
 import { ethers, network } from "hardhat"
 
-import { ZERO_ADDRESS } from "../sdk/constants"
+import { ZERO_ADDRESS } from "../sdk/src/constants"
 import { Account__factory, Mech__factory } from "../typechain-types"
 import {
   Account,

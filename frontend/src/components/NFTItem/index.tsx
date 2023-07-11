@@ -30,7 +30,10 @@ const NFTItem: React.FC<Props> = ({ nftData }) => {
     isLoading: assetsLoading,
     data: assetsData,
     error: assetsError,
-  } = useAccountBalance({ address: mechAddress })
+  } = useAccountBalance({
+    address: mechAddress,
+    chainId: parseInt(nftData.blockchain.shortChainID),
+  })
 
   const { deployed } = useDeployMech(nftData)
 

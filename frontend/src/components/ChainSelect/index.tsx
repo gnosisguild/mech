@@ -2,16 +2,15 @@ import { useWeb3Modal } from "@web3modal/react"
 import Button from "../Button"
 
 import classes from "./ChainSelect.module.css"
-import { Chain, goerli, useNetwork } from "wagmi"
+import { Chain, useNetwork } from "wagmi"
 import { Suspense, lazy, useEffect, useState } from "react"
+import { DEFAULT_CHAIN } from "../../chains"
 const ChainIcon = lazy(() => import("../ChainIcon"))
 
 const ChainSelect = () => {
-  const [selectedChain, setSelectedChain] = useState<Chain>(goerli)
-  const { open, setDefaultChain } = useWeb3Modal()
+  const [selectedChain, setSelectedChain] = useState<Chain>(DEFAULT_CHAIN)
+  const { open } = useWeb3Modal()
   const { chain } = useNetwork()
-
-  setDefaultChain(goerli)
 
   useEffect(() => {
     if (chain) {

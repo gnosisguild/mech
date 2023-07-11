@@ -12,5 +12,8 @@ export const calculateMechAddress = (token: MechNFT) => {
         [1],
         1
       )
-    : calculateERC721MechAddress(token.contractAddress, token.nft.tokenID)
+    : calculateERC721MechAddress(
+        token.contractAddress,
+        BigInt(token.nft.tokenID)
+      )
 }

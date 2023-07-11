@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react"
-import { useProvider } from "wagmi"
-import { nxyzNFT, nxyzSupportedChains } from "../types/nxyzApiTypes"
-import { calculateMechAddress } from "../utils/calculateMechAddress"
+import { usePublicClient } from "wagmi"
+import { CHAINS } from "../chains"
+import { nxyzNFT } from "../types/nxyzApiTypes"
 
 interface NFTProps {
   walletAddress: string
-  blockchain?: nxyzSupportedChains
+  chainId?: number
   pageToken?: string
 }
 
 export interface MechNFT extends nxyzNFT {
-  hasMech?: boolean
   tokenStandard?: "ERC-721" | "ERC-1155"
 }
 
@@ -27,39 +26,28 @@ interface NFTResult {
 
 type useNFTsByOwnerType = (props: NFTProps) => NFTResult
 
+const DEFAULT_CHAIN = CHAINS[5]
+
 const useNFTsByOwner: useNFTsByOwnerType = ({
   walletAddress,
-  blockchain,
+  chainId,
   pageToken,
 }) => {
   const [data, setData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<any>(null)
-  const provider = useProvider()
+  const client = usePublicClient()
 
   useEffect(() => {
-    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${walletAddress}/balances/nfts?chainID=gor&limit=20&filterSpam=false${
-      pageToken ? `&cursor=${pageToken}` : ""
-    }`
+    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${walletAddress}/balances/nfts?chainID=eip155:${
+      chainId || DEFAULT_CHAIN.id
+    }&limit=20&filterSpam=false${pageToken ? `&cursor=${pageToken}` : ""}`
     const fetchData = async () => {
       try {
         setIsLoading(true)
         const res = await fetch(apiUrl)
         const cursor = res.headers.get("X-Doc-Next-Cursor")
         const nfts: nxyzNFT[] = await res.json()
-
-        for (let index = 0; index < nfts.length; index++) {
-          const nft = nfts[index] as MechNFT
-          try {
-            const hasMech =
-              (await provider.getCode(calculateMechAddress(nft))) !== "0x"
-            nft.hasMech = hasMech
-          } catch (error) {
-            console.log(error)
-            nft.hasMech = false
-          }
-        }
-
         setData({ assets: nfts, nextPageToken: cursor })
         setIsLoading(false)
       } catch (e) {
@@ -69,7 +57,7 @@ const useNFTsByOwner: useNFTsByOwnerType = ({
     }
 
     fetchData()
-  }, [walletAddress, blockchain, pageToken, provider])
+  }, [walletAddress, chainId, pageToken, client])
 
   return { data, isLoading, error }
 }

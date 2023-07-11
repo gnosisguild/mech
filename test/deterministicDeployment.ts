@@ -22,7 +22,7 @@ import {
   deployZodiacMech,
   deployZodiacMechMastercopy,
 } from "../sdk"
-import { SENTINEL_MODULES, ZERO_ADDRESS } from "../sdk/constants"
+import { SENTINEL_MODULES, ZERO_ADDRESS } from "../sdk/src/constants"
 import {
   ERC1155Mech__factory,
   ERC721Mech__factory,

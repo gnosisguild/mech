@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noEmit": false,
     "outDir": "build/esm",
+    "target": "es2016",
     "module": "esnext"
   }
 }

@@ -14,7 +14,7 @@ import {
 import {
   IFactoryFriendly__factory,
   ZodiacMech__factory,
-} from "../../typechain-types"
+} from "../../../typechain-types"
 import {
   DEFAULT_SALT,
   ERC2470_SINGLETON_FACTORY_ADDRESS,
@@ -44,7 +44,7 @@ export const calculateZodiacMechAddress = (
       [solidityKeccak256(["bytes"], [initData]), salt]
     ),
     keccak256(byteCode)
-  )
+  ) as `0x${string}`
 }
 
 export const ZODIAC_MASTERCOPY_INIT_DATA = [[]]
@@ -58,17 +58,15 @@ export const calculateZodiacMechMastercopyAddress = () => {
     ERC2470_SINGLETON_FACTORY_ADDRESS,
     DEFAULT_SALT,
     keccak256(ZodiacMech__factory.bytecode + initData.slice(2))
-  )
+  ) as `0x${string}`
 }
 
 export const makeZodiacMechDeployTransaction = (
   /** Addresses of the Zodiac modules */
   modules: string[],
-  provider: JsonRpcProvider,
+  chainId: number,
   salt: string = DEFAULT_SALT
 ) => {
-  const { chainId } = provider.network
-
   const { transaction } = deployAndSetUpCustomModule(
     calculateZodiacMechMastercopyAddress(),
     ZodiacMech__factory.abi,
@@ -76,12 +74,16 @@ export const makeZodiacMechDeployTransaction = (
       types: ["address[]"],
       values: [modules],
     },
-    provider,
+    new JsonRpcProvider(undefined, chainId), // this provider instance is never really be used in deployAndSetUpCustomModule(),
     chainId,
     salt
   )
 
-  return transaction
+  return {
+    to: transaction.to as `0x${string}`,
+    data: transaction.data as `0x${string}`,
+    value: transaction.value.toBigInt(),
+  }
 }
 
 export const deployZodiacMech = async (
@@ -111,11 +113,7 @@ export const deployZodiacMech = async (
     )
   }
 
-  const transaction = makeZodiacMechDeployTransaction(
-    modules,
-    signer.provider,
-    salt
-  )
+  const transaction = makeZodiacMechDeployTransaction(modules, chainId, salt)
 
   return signer.sendTransaction(transaction)
 }
@@ -125,9 +123,9 @@ export const deployZodiacMechMastercopy = async (signer: JsonRpcSigner) => {
     ["address[]"],
     ZODIAC_MASTERCOPY_INIT_DATA
   )
-  return await deployMastercopyWithInitData(
+  return (await deployMastercopyWithInitData(
     signer,
     ZodiacMech__factory.bytecode + initData.slice(2),
     DEFAULT_SALT
-  )
+  )) as `0x${string}`
 }
