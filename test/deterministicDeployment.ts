@@ -1,59 +1,62 @@
 import { defaultAbiCoder } from "@ethersproject/abi"
-import { deployModuleFactory } from "@gnosis.pm/zodiac"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
 import hre, { ethers } from "hardhat"
+import { createWalletClient, http } from "viem"
+import { hardhat } from "viem/chains"
 
 // We use `loadFixture` to share common setups (or fixtures) between tests.
 // Using this simplifies your tests and makes them run faster, by taking
 // advantage or Hardhat Network's snapshot functionality.
 
 import {
-  calculateERC1155MechAddress,
-  calculateERC1155MechMastercopyAddress,
-  calculateERC721MechAddress,
-  calculateERC721MechMastercopyAddress,
+  calculateERC1155ThresholdMechAddress,
+  calculateERC1155ThresholdMechMastercopyAddress,
+  calculateERC721TokenboundMechAddress,
+  calculateERC721TokenboundMechMastercopyAddress,
   calculateZodiacMechAddress,
   calculateZodiacMechMastercopyAddress,
-  deployERC1155Mech,
-  deployERC1155MechMastercopy,
-  deployERC721Mech,
-  deployERC721MechMastercopy,
+  deployERC1155ThresholdMech,
+  deployERC1155ThresholdMechMastercopy,
+  deployERC721TokenboundMech,
+  deployERC721TokenboundMechMastercopy,
+  deployMechFactory,
   deployZodiacMech,
   deployZodiacMechMastercopy,
 } from "../sdk"
 import { SENTINEL_MODULES, ZERO_ADDRESS } from "../sdk/constants"
-import {
-  ERC1155Mech__factory,
-  ERC721Mech__factory,
-  ZodiacMech__factory,
-} from "../typechain-types"
+import { deployERC2470SingletonFactory } from "../sdk/deploy/factory"
+import { ZodiacMech__factory } from "../typechain-types"
 
 describe("deterministic deployment", () => {
-  /** deploy ERC2470 singleton factory, ZodiacFactory, and ERC6551 registry */
+  /** deploy ERC2470 singleton factory, MechFactory, and ERC6551 registry */
   async function deployFactories() {
     const [signer, alice] = await hre.ethers.getSigners()
     const deployer = hre.ethers.provider.getSigner(signer.address)
-    const moduleProxyFactoryAddress = await deployModuleFactory(deployer)
-    if (moduleProxyFactoryAddress === ZERO_ADDRESS) {
-      throw new Error("Module proxy factory address is already deployed")
-    }
+
+    const walletClient = createWalletClient({
+      chain: hardhat,
+      account: signer.address as `0x${string}`,
+      transport: http(),
+    })
+
+    await deployERC2470SingletonFactory(walletClient)
+    await deployMechFactory(walletClient)
 
     const mastercopyAddresses = {
-      erc721: await deployERC721MechMastercopy(deployer),
-      erc1155: await deployERC1155MechMastercopy(deployer),
+      erc721: await deployERC721TokenboundMechMastercopy(deployer),
+      erc1155: await deployERC1155ThresholdMechMastercopy(deployer),
       zodiac: await deployZodiacMechMastercopy(deployer),
     }
 
     return {
-      moduleProxyFactoryAddress,
       mastercopyAddresses,
       deployer,
       alice,
     }
   }
 
-  describe("deployERC721Mech()", () => {
+  describe.only("deployERC721TokenboundMech()", () => {
     it("correctly initializes the mech proxy instance", async () => {
       const { alice, deployer } = await loadFixture(
         deployModuleFactoryAndMastercopy
@@ -62,38 +65,44 @@ describe("deterministic deployment", () => {
       const TestToken = await ethers.getContractFactory("ERC721Token")
       const testToken = await TestToken.deploy()
 
-      await deployERC721Mech(testToken.address, 1, deployer)
-      const mechAddress = calculateERC721MechAddress(testToken.address, 1)
-      const mech = ERC721Mech__factory.connect(mechAddress, alice)
+      await deployERC721TokenboundMech(testToken.address, 1, deployer)
+      const mechAddress = calculateERC721TokenboundMechAddress(
+        testToken.address,
+        1
+      )
+      const mech = ERC721TokenboundMech__factory.connect(mechAddress, alice)
 
       expect(await mech.token()).to.equal(testToken.address)
       expect(await mech.tokenId()).to.equal(1)
     })
   })
 
-  describe("calculateERC721MechMastercopyAddress", () => {
-    it("returns the address of the ERC721Mech mastercopy", async () => {
+  describe("calculateERC721TokenboundMechMastercopyAddress", () => {
+    it("returns the address of the ERC721TokenboundMech mastercopy", async () => {
       const { mastercopyAddresses } = await loadFixture(
         deployModuleFactoryAndMastercopy
       )
 
-      expect(calculateERC721MechMastercopyAddress()).to.equal(
+      expect(calculateERC721TokenboundMechMastercopyAddress()).to.equal(
         mastercopyAddresses.erc721
       )
     })
   })
-  describe("calculateERC721MechAddress()", () => {
+  describe("calculateERC721TokenboundMechAddress()", () => {
     it("returns the address of the mech for a given NFT", async () => {
       await loadFixture(deployModuleFactoryAndMastercopy)
 
       const TestToken = await ethers.getContractFactory("ERC721Token")
       const testToken = await TestToken.deploy()
 
-      const calculatedAddress = calculateERC721MechAddress(testToken.address, 1)
+      const calculatedAddress = calculateERC721TokenboundMechAddress(
+        testToken.address,
+        1
+      )
 
       expect(await ethers.provider.getCode(calculatedAddress)).to.equal("0x")
 
-      await deployERC721Mech(
+      await deployERC721TokenboundMech(
         testToken.address,
         1,
         hre.ethers.provider.getSigner()
@@ -105,13 +114,13 @@ describe("deterministic deployment", () => {
     })
   })
 
-  describe("deployERC721MechMastercopy()", () => {
+  describe("deployERC721TokenboundMechMastercopy()", () => {
     it("initializes the mastercopy", async () => {
       const { mastercopyAddresses, deployer } = await loadFixture(
         deployModuleFactoryAndMastercopy
       )
 
-      const mech = ERC721Mech__factory.connect(
+      const mech = ERC721TokenboundMech__factory.connect(
         mastercopyAddresses.erc721,
         deployer
       )
@@ -127,7 +136,7 @@ describe("deterministic deployment", () => {
       const { mastercopyAddresses, deployer } = await loadFixture(
         deployModuleFactoryAndMastercopy
       )
-      const mech = ERC721Mech__factory.connect(
+      const mech = ERC721TokenboundMech__factory.connect(
         mastercopyAddresses.erc721,
         deployer
       )
@@ -135,9 +144,9 @@ describe("deterministic deployment", () => {
     })
   })
 
-  ///// ERC1155Mech
+  ///// ERC1155ThresholdMech
 
-  describe("deployERC1155Mech()", () => {
+  describe("deployERC1155ThresholdMech()", () => {
     it("correctly initializes the mech proxy instance", async () => {
       const { alice, deployer } = await loadFixture(
         deployModuleFactoryAndMastercopy
@@ -146,14 +155,20 @@ describe("deterministic deployment", () => {
       const TestToken = await ethers.getContractFactory("ERC1155Token")
       const testToken = await TestToken.deploy()
 
-      await deployERC1155Mech(testToken.address, [1, 2], [10, 20], 0, deployer)
-      const mechAddress = calculateERC1155MechAddress(
+      await deployERC1155ThresholdMech(
+        testToken.address,
+        [1, 2],
+        [10, 20],
+        0,
+        deployer
+      )
+      const mechAddress = calculateERC1155ThresholdMechAddress(
         testToken.address,
         [1, 2],
         [10, 20],
         0
       )
-      const mech = ERC1155Mech__factory.connect(mechAddress, alice)
+      const mech = ERC1155ThresholdMech__factory.connect(mechAddress, alice)
 
       expect(await mech.token()).to.equal(testToken.address)
       expect(await mech.tokenIds(0)).to.equal(1)
@@ -163,26 +178,26 @@ describe("deterministic deployment", () => {
     })
   })
 
-  describe("calculateERC1155MechMastercopyAddress", () => {
-    it("returns the address of the ERC1155Mech mastercopy", async () => {
+  describe("calculateERC1155ThresholdMechMastercopyAddress", () => {
+    it("returns the address of the ERC1155ThresholdMech mastercopy", async () => {
       const { mastercopyAddresses } = await loadFixture(
         deployModuleFactoryAndMastercopy
       )
 
-      expect(calculateERC1155MechMastercopyAddress()).to.equal(
+      expect(calculateERC1155ThresholdMechMastercopyAddress()).to.equal(
         mastercopyAddresses.erc1155
       )
     })
   })
 
-  describe("calculateERC1155MechAddress()", () => {
+  describe("calculateERC1155ThresholdMechAddress()", () => {
     it("returns the address of the mech for a given NFT", async () => {
       await loadFixture(deployModuleFactoryAndMastercopy)
 
       const TestToken = await ethers.getContractFactory("ERC1155Token")
       const testToken = await TestToken.deploy()
 
-      const calculatedAddress = calculateERC1155MechAddress(
+      const calculatedAddress = calculateERC1155ThresholdMechAddress(
         testToken.address,
         [1],
         [1],
@@ -191,7 +206,7 @@ describe("deterministic deployment", () => {
 
       expect(await ethers.provider.getCode(calculatedAddress)).to.equal("0x")
 
-      await deployERC1155Mech(
+      await deployERC1155ThresholdMech(
         testToken.address,
         [1],
         [1],
@@ -205,13 +220,13 @@ describe("deterministic deployment", () => {
     })
   })
 
-  describe("deployERC1155MechMastercopy()", () => {
+  describe("deployERC1155ThresholdMechMastercopy()", () => {
     it("initializes the mastercopy with zero address and threshold [0, 0]", async () => {
       const { mastercopyAddresses, deployer } = await loadFixture(
         deployModuleFactoryAndMastercopy
       )
 
-      const mech = ERC1155Mech__factory.connect(
+      const mech = ERC1155ThresholdMech__factory.connect(
         mastercopyAddresses.erc1155,
         deployer
       )
@@ -225,7 +240,7 @@ describe("deterministic deployment", () => {
       const { mastercopyAddresses, deployer } = await loadFixture(
         deployModuleFactoryAndMastercopy
       )
-      const mech = ERC1155Mech__factory.connect(
+      const mech = ERC1155ThresholdMech__factory.connect(
         mastercopyAddresses.erc1155,
         deployer
       )
