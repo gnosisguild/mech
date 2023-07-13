@@ -13,6 +13,8 @@ import { publicProvider } from "@wagmi/core/providers/public"
 import router from "./router"
 import { CHAINS } from "./chains"
 
+window.Buffer = window.Buffer || require("buffer").Buffer
+
 const { REACT_APP_WALLET_CONNECT_PROJECT_ID } = process.env
 if (!REACT_APP_WALLET_CONNECT_PROJECT_ID) {
   throw new Error("REACT_APP_WALLET_CONNECT_PROJECT_ID is not set")

@@ -43,5 +43,5 @@
     "@types/node": "^18.11.18",
     "ethers": "^5.7.2"
   },
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "yarn@3.6.1"
 }
