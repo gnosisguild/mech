@@ -16,7 +16,7 @@ export const CHAINS = {
   // [arbitrum.id]: { ...arbitrum, prefix: "arb1" },
   // [bsc.id]: { ...bsc, prefix: "bnb" },
   [polygon.id]: { ...polygon, prefix: "matic" },
-  [polygonMumbai.id]: { ...polygon, prefix: "maticmum" },
+  [polygonMumbai.id]: { ...polygonMumbai, prefix: "maticmum" },
   [gnosis.id]: { ...gnosis, prefix: "gno" },
 }
 

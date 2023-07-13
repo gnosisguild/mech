@@ -32,7 +32,6 @@ const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: w3mConnectors({
     projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
-    version: 2,
     chains,
   }),
   publicClient,
