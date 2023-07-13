@@ -6,8 +6,13 @@ import dotenv from "dotenv"
 import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types"
 
 dotenv.config()
-const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, GNOSISSCAN_API_KEY } =
-  process.env
+const {
+  INFURA_KEY,
+  MNEMONIC,
+  ETHERSCAN_API_KEY,
+  GNOSISSCAN_API_KEY,
+  POLYGONSCAN_API_KEY,
+} = process.env
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat"
 
@@ -58,6 +63,7 @@ let config: HardhatUserConfig = {
     apiKey: {
       mainnet: ETHERSCAN_API_KEY,
       gnosis: GNOSISSCAN_API_KEY,
+      matic: POLYGONSCAN_API_KEY,
     } as Record<string, string>,
     customChains: [
       {
@@ -66,6 +72,14 @@ let config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api.gnosisscan.io/api",
           browserURL: "https://www.gnosisscan.io",
+        },
+      },
+      {
+        network: "matic",
+        chainId: 137,
+        urls: {
+          apiURL: "https://api.polygonscan.com/api",
+          browserURL: "https://www.polygonscan.com",
         },
       },
     ],
