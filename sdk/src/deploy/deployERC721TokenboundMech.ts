@@ -5,7 +5,7 @@ import {
   WalletClient,
 } from "viem"
 
-import { ERC721TokenboundMech__factory } from "../../typechain-types"
+import { ERC721TokenboundMech__factory } from "../../../typechain-types"
 import {
   DEFAULT_SALT,
   ERC2470_SINGLETON_FACTORY_ADDRESS,

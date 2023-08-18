@@ -7,7 +7,7 @@ import {
   WalletClient,
 } from "viem"
 
-import { MechFactory__factory } from "../../typechain-types"
+import { MechFactory__factory } from "../../../typechain-types"
 import { ERC2470_SINGLETON_FACTORY_ADDRESS } from "../constants"
 
 export const mechProxyBytecode = (
