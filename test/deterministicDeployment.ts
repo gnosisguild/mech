@@ -24,9 +24,12 @@ import {
   deployZodiacMech,
   deployZodiacMechMastercopy,
 } from "../sdk"
-import { SENTINEL_MODULES, ZERO_ADDRESS } from "../sdk/constants"
-import { deployERC2470SingletonFactory } from "../sdk/deploy/factory"
-import { ZodiacMech__factory } from "../typechain-types"
+import { SENTINEL_MODULES, ZERO_ADDRESS } from "../sdk/src/constants"
+import {
+  ERC1155Mech__factory,
+  ERC721Mech__factory,
+  ZodiacMech__factory,
+} from "../typechain-types"
 
 describe("deterministic deployment", () => {
   /** deploy ERC2470 singleton factory, MechFactory, and ERC6551 registry */

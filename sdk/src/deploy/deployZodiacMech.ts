@@ -10,7 +10,7 @@ import {
 import {
   MechFactory__factory,
   ZodiacMech__factory,
-} from "../../typechain-types"
+} from "../../../typechain-types"
 import {
   DEFAULT_SALT,
   ERC2470_SINGLETON_FACTORY_ADDRESS,

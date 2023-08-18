@@ -1,8 +1,8 @@
 export interface nxyzBlockchain {
   name: string
   shortName: string
-  chainId: string
-  shortChainId: string
+  chainID: string
+  shortChainID: string
 }
 
 export interface nxyzTokenSymbol {
@@ -81,12 +81,15 @@ export interface nxyzNFTDetail {
   tokenID: string
 }
 
-export type nxyzSupportedChains =
-  | "ethereum"
-  | "polygon"
-  | "bnb"
-  | "arbitrumone"
-  | "optimism"
-  | "avalanche"
-  | "gor"
-  | "mubai"
+export type nxyzShortChainID =
+  | "10"
+  | "56"
+  | "42220"
+  | "100"
+  | "1"
+  | "80001"
+  | "42161"
+  | "43114"
+  | "1284"
+  | "5"
+  | "137"

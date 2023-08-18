@@ -4,17 +4,22 @@
   "description": "Smart account with programmable ownership",
   "scripts": {
     "prepare": "yarn build",
-    "prebuild": "rimraf build",
-    "build": "yarn build:cjs && yarn build:esm",
+    "build": "rimraf build && yarn build:cjs && yarn build:esm",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json"
   },
   "files": [
     "build/**/*"
   ],
-  "main": "build/cjs/sdk/index.js",
-  "module": "build/esm/sdk/index.js",
-  "types": "build/cjs/sdk/index.d.ts",
+  "main": "build/cjs/sdk/src/index.js",
+  "types": "build/cjs/sdk/src/index.d.ts",
+  "module": "build/esm/sdk/src/index.js",
+  "exports": {
+    ".": {
+      "require": "./build/cjs/sdk/src/index.js",
+      "import": "./build/esm/sdk/src/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gnosis/mech.git"
@@ -39,5 +44,5 @@
     "ethers": "^5.7.2",
     "viem": "^1.0.5"
   },
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "yarn@3.6.1"
 }

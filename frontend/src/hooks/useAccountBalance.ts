@@ -3,6 +3,7 @@ import { nxyzFungibleBalance } from "../types/nxyzApiTypes"
 
 interface Props {
   address: string
+  chainId: number
 }
 
 interface AccountResult {
@@ -26,13 +27,13 @@ const sumNxyzFiatBalances = (balances: nxyzFungibleBalance[]) => {
   }, 0)
 }
 
-const useAccountBalance: useAccountBalanceType = ({ address }) => {
+const useAccountBalance: useAccountBalanceType = ({ address, chainId }) => {
   const [data, setData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<any>(null)
 
   useEffect(() => {
-    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${address}/balances/fungibles?chainID=gor&filterDust=true&filterSpam=true`
+    const apiUrl = `https://nxyz-api-wrapper.vercel.app/api/v1/address/${address}/balances/fungibles?chainID=eip155:${chainId}&filterDust=true&filterSpam=true`
     const fetchData = async () => {
       try {
         setIsLoading(true)
@@ -51,7 +52,7 @@ const useAccountBalance: useAccountBalanceType = ({ address }) => {
     }
 
     fetchData()
-  }, [address])
+  }, [address, chainId])
 
   return { data, isLoading, error }
 }

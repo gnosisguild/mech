@@ -6,7 +6,7 @@ import {
   calculateZodiacMechMastercopyAddress,
   deployZodiacMechMastercopy,
 } from "../sdk"
-import { ZERO_ADDRESS } from "../sdk/constants"
+import { ZERO_ADDRESS } from "../sdk/src/constants"
 import { ZodiacMech__factory } from "../typechain-types"
 import { IAvatar__factory } from "../typechain-types/factories/@gnosis.pm/zodiac/contracts/interfaces/IAvatar__factory"
 

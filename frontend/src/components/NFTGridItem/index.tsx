@@ -1,6 +1,4 @@
-import { calculateERC721MechAddress, deployERC721Mech } from "mech-sdk"
 import { useState } from "react"
-import { useSigner } from "wagmi"
 import copy from "copy-to-clipboard"
 import clsx from "clsx"
 import { Link } from "react-router-dom"
@@ -8,10 +6,12 @@ import { Link } from "react-router-dom"
 import classes from "./NFTItem.module.css"
 import Button from "../Button"
 import { shortenAddress } from "../../utils/shortenAddress"
-import { JsonRpcSigner } from "@ethersproject/providers"
 import Spinner from "../Spinner"
 import { MechNFT } from "../../hooks/useNFTsByOwner"
 import ChainIcon from "../ChainIcon"
+import { calculateMechAddress } from "../../utils/calculateMechAddress"
+import { CHAINS, ChainId } from "../../chains"
+import { useDeployMech } from "../../hooks/useDeployMech"
 
 interface Props {
   nftData: MechNFT
@@ -19,39 +19,21 @@ interface Props {
 
 const NFTGridItem: React.FC<Props> = ({ nftData }) => {
   const [imageError, setImageError] = useState(false)
-  const [deploying, setDeploying] = useState(false)
-  const chainId = parseInt(nftData.blockchain.shortChainId)
-  const { data: signer } = useSigner()
-  const mechAddress = calculateERC721MechAddress(
-    nftData.contractAddress,
-    nftData.nft.tokenID
-  )
 
-  const handleDeploy = async () => {
-    setDeploying(true)
-    try {
-      const deployTx = await deployERC721Mech(
-        nftData.contractAddress,
-        nftData.nft.tokenID,
-        signer as JsonRpcSigner
-      )
-      console.log("deploy tx", deployTx)
-      setDeploying(false)
-    } catch (e) {
-      console.error(e)
-      setDeploying(false)
-    }
-  }
-  console.log(
-    nftData.nft.tokenID,
-    nftData.contractAddress,
-    nftData.nft.previews
-  )
+  const chain = CHAINS[parseInt(nftData.blockchain.shortChainID) as ChainId]
+
+  const mechAddress = calculateMechAddress(nftData)
+  const { deploy, deployPending, deployed } = useDeployMech(nftData)
+
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
         <p className={classes.tokenName}>
-          {nftData.nft.title || nftData.nft.contractTitle || "..."}
+          <Link
+            to={`mechs/${chain.prefix}:${nftData.contractAddress}/${nftData.nft.tokenID}`}
+          >
+            {nftData.nft.title || nftData.nft.contractTitle || "..."}
+          </Link>
         </p>
         {nftData.nft.tokenID.length < 5 && (
           <p className={classes.tokenId}>{nftData.nft.tokenID || "..."}</p>
@@ -80,24 +62,26 @@ const NFTGridItem: React.FC<Props> = ({ nftData }) => {
           </div>
           <div className={classes.infoItem}>
             <p>Chain:</p>
-            <ChainIcon chainId={chainId} className={classes.chainIcon} />
+            <ChainIcon chainId={chain.id} className={classes.chainIcon} />
           </div>
         </div>
       </div>
-      {nftData.hasMech ? (
-        <Link to={`mechs/${nftData.contractAddress}/${nftData.nft.tokenID}`}>
+      {deployed ? (
+        <Link
+          to={`mechs/${chain.prefix}:${nftData.contractAddress}/${nftData.nft.tokenID}`}
+        >
           <Button className={classes.useButton} onClick={() => {}}>
             Use Mech
           </Button>
         </Link>
       ) : (
         <>
-          {deploying ? (
+          {deployPending ? (
             <div className={classes.spinner}>
               <Spinner />
             </div>
           ) : (
-            <Button onClick={handleDeploy} secondary>
+            <Button onClick={deploy} secondary>
               Deploy Mech
             </Button>
           )}

@@ -7,6 +7,9 @@ import {
 } from "../sdk"
 
 const deployMastercopyZodiac: DeployFunction = async (hre) => {
+  // TODO disabled for now
+  return
+
   const [signer] = await hre.ethers.getSigners()
   const deployer = hre.ethers.provider.getSigner(signer.address)
 

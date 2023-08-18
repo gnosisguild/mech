@@ -7,6 +7,9 @@ import Button from "../Button"
 
 import classes from "./NFTGrid.module.css"
 import clsx from "clsx"
+import { useChainId } from "wagmi"
+import { useDeployedMechs } from "../../hooks/useDeployMech"
+import { calculateMechAddress } from "../../utils/calculateMechAddress"
 
 interface Props {
   address: string
@@ -15,9 +18,11 @@ interface Props {
 const NFTGrid: React.FC<Props> = ({ address }) => {
   const [pageToken, setPageToken] = useState<string | undefined>(undefined)
 
+  const chainId = useChainId()
+
   const { data, isLoading } = useNFTsByOwner({
     walletAddress: address,
-    blockchain: "gor",
+    chainId,
     pageToken,
   })
 
@@ -42,9 +47,17 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
     })
   }, [data])
 
-  const deployed = nftData.filter((nft) => nft.hasMech)
+  const deployedMechs = useDeployedMechs(nftData)
 
-  const undeployed = nftData.filter((nft) => !nft.hasMech)
+  const isDeployed = (nft: MechNFT) =>
+    deployedMechs.some(
+      (mech) =>
+        mech.chainId === chainId &&
+        mech.address.toLowerCase() === calculateMechAddress(nft).toLowerCase()
+    )
+
+  const deployed = nftData.filter(isDeployed)
+  const undeployed = nftData.filter((nft) => !isDeployed(nft))
 
   return (
     <div className={classes.container}>
