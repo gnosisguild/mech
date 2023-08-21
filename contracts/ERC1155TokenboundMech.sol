@@ -16,10 +16,10 @@ contract ERC1155TokenboundMech is TokenboundMech {
     }
 
     function onERC1155Received(
-        address operator,
+        address,
         address from,
         uint256 receivedTokenId,
-        uint256 value,
+        uint256,
         bytes calldata
     ) external view override returns (bytes4) {
         (
@@ -46,10 +46,10 @@ contract ERC1155TokenboundMech is TokenboundMech {
     }
 
     function onERC1155BatchReceived(
-        address operator,
+        address,
         address from,
         uint256[] calldata ids,
-        uint256[] calldata values,
+        uint256[] calldata,
         bytes calldata
     ) external view override returns (bytes4) {
         (

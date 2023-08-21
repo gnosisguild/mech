@@ -55,8 +55,8 @@ describe("Account base contract", () => {
   }
 
   const BURN_1_ETH = Mech__factory.createInterface().encodeFunctionData(
-    "exec",
-    [ZERO_ADDRESS, parseEther("1.0"), "0x", 0, 0]
+    "execute",
+    [ZERO_ADDRESS, parseEther("1.0"), "0x", 0]
   )
 
   describe("validateUserOp()", () => {

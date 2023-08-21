@@ -19,8 +19,8 @@ contract ERC721TokenboundMech is TokenboundMech {
     }
 
     function onERC721Received(
-        address operator,
-        address from,
+        address,
+        address,
         uint256 receivedTokenId,
         bytes calldata
     ) external view override returns (bytes4) {

@@ -8,7 +8,7 @@ contract ERC1155Token is ERC1155("ERC1155Token") {
         address recipient,
         uint256 id,
         uint256 amount,
-        bytes memory data
+        bytes calldata data
     ) public {
         _mint(recipient, id, amount, data);
     }

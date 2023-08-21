@@ -93,7 +93,7 @@ abstract contract Mech is IMech, Account, Receiver {
     function _exec(
         address to,
         uint256 value,
-        bytes memory data,
+        bytes calldata data,
         Enum.Operation operation,
         uint256 txGas
     ) internal returns (bool success, bytes memory returnData) {
@@ -111,13 +111,13 @@ abstract contract Mech is IMech, Account, Receiver {
     /// @param operation Operation type of transaction.
     /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
     /// @return returnData Return data of the call
-    function exec(
+    function execute(
         address to,
         uint256 value,
-        bytes memory data,
+        bytes calldata data,
         Enum.Operation operation,
         uint256 txGas
-    ) public onlyOperator returns (bytes memory returnData) {
+    ) public payable onlyOperator returns (bytes memory returnData) {
         bool success;
         (success, returnData) = _exec(
             to,
@@ -126,6 +126,29 @@ abstract contract Mech is IMech, Account, Receiver {
             operation,
             txGas == 0 ? gasleft() : txGas
         );
+
+        if (!success) {
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                revert(add(returnData, 0x20), mload(returnData))
+            }
+        }
+    }
+
+    /// @dev Allows the mech operator to execute arbitrary transactions
+    /// @param to Destination address of transaction.
+    /// @param value Ether value of transaction.
+    /// @param data Data payload of transaction.
+    /// @param operation Operation type of transaction.
+    /// @return returnData Return data of the call
+    function execute(
+        address to,
+        uint256 value,
+        bytes calldata data,
+        Enum.Operation operation
+    ) external payable returns (bytes memory returnData) {
+        bool success;
+        (success, returnData) = _exec(to, value, data, operation, gasleft());
 
         if (!success) {
             // solhint-disable-next-line no-inline-assembly

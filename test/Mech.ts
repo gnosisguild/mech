@@ -158,7 +158,7 @@ describe("Mech base contract", () => {
     })
   })
 
-  describe("exec()", () => {
+  describe("execute()", () => {
     it("reverts if called when the connected token ID is not valid", async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
@@ -173,7 +173,7 @@ describe("Mech base contract", () => {
       )
 
       await expect(
-        mech1.exec(testToken.address, 0, testTx.data as string, 0, 0)
+        mech1.execute(testToken.address, 0, testTx.data as string, 0)
       ).to.be.revertedWith("ERC721: invalid token ID")
     })
 
@@ -193,7 +193,7 @@ describe("Mech base contract", () => {
 
       // call exec() from deployer who is not an operator
       await expect(
-        mech1.exec(testToken.address, 0, testTx.data as string, 0, 0)
+        mech1.execute(testToken.address, 0, testTx.data as string, 0)
       ).to.be.revertedWith(
         "Only callable by the mech operator or the entry point contract"
       )
@@ -212,7 +212,9 @@ describe("Mech base contract", () => {
       )
 
       await expect(
-        mech1.connect(alice).exec(testToken.address, 0, revertingTxData, 0, 0)
+        mech1
+          .connect(alice)
+          .execute(testToken.address, 0, revertingTxData, 0, 0)
       ).to.be.revertedWith("ERC721: caller is not token owner or approved")
     })
 
@@ -227,7 +229,7 @@ describe("Mech base contract", () => {
 
       const result = await mech1
         .connect(alice)
-        .callStatic.exec(testToken.address, 0, callData, 0, 0)
+        .callStatic.execute(testToken.address, 0, callData, 0)
       const decoded = testToken.interface.decodeFunctionResult(
         "ownerOf",
         result
@@ -249,12 +251,12 @@ describe("Mech base contract", () => {
 
       // this should revert because the call is not a delegate call
       await expect(
-        mech1.connect(alice).exec(delegateCall.address, 0, callData, 0, 0)
+        mech1.connect(alice).execute(delegateCall.address, 0, callData, 0)
       ).to.be.revertedWith("Can only be called via delegatecall")
 
       // this should succeed because the call is a delegate call
       await expect(
-        mech1.connect(alice).exec(delegateCall.address, 0, callData, 1, 0)
+        mech1.connect(alice).execute(delegateCall.address, 0, callData, 1)
       ).to.not.be.reverted
     })
 
@@ -284,7 +286,7 @@ describe("Mech base contract", () => {
       // send just enough gas to meta tx -> gas estimation succeed
       const mechTxGas = await mech1
         .connect(alice)
-        .estimateGas.exec(
+        .estimateGas.execute(
           testToken.address,
           0,
           testToken.interface.encodeFunctionData("transferFrom", [
@@ -298,7 +300,7 @@ describe("Mech base contract", () => {
 
       // send too little gas to the meta tx -> tx fails
       await expect(
-        mech1.connect(alice).exec(
+        mech1.connect(alice).execute(
           testToken.address,
           0,
           testToken.interface.encodeFunctionData("transferFrom", [

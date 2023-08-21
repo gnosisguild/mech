@@ -1,3 +1,3 @@
 export * from "./deploy"
-export * from "./exec"
+export * from "./execute"
 export * from "./sign"

@@ -40,7 +40,7 @@ describe("Safe migration", () => {
 
     // sanity check making sure the Gnosis DAO Safe is configured as expected
     expect(await safe.isModuleEnabled(enabledModule)).to.be.true
-    await expect(zodiacMech.exec(ZERO_ADDRESS, parseEther("1.0"), "0x", 0, 0))
+    await expect(zodiacMech.execute(ZERO_ADDRESS, parseEther("1.0"), "0x", 0))
       .to.be.reverted
 
     // deploy ZodiacMech mastercopy
@@ -76,7 +76,7 @@ describe("Safe migration", () => {
 
     // make sure the Safe is now a ZodiacMech
     await expect(
-      zodiacMech.exec(ZERO_ADDRESS, parseEther("1.0"), "0x", 0, 0)
+      zodiacMech.execute(ZERO_ADDRESS, parseEther("1.0"), "0x", 0)
     ).to.changeEtherBalance(safeAddress, parseEther("-1.0"))
 
     // the enabled modules did not change

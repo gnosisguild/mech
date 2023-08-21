@@ -32,7 +32,7 @@ abstract contract TokenboundMech is Mech, IERC6551Account {
     receive() external payable override(Receiver, IERC6551Account) {}
 
     /**
-     * @dev EIP-6551 compatibility: Returns a magic value indicating whether a given signer is authorized to act on behalf
+     * @dev Returns a magic value indicating whether a given signer is authorized to act on behalf
      * of the account
      * @param  signer     The address to check signing authorization for
      * @return magicValue Magic value indicating whether the signer is valid

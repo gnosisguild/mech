@@ -15,7 +15,7 @@ interface TransactionRequest {
   nonce?: number
 }
 
-export const makeExecTransaction = (
+export const makeExecuteTransaction = (
   mechAddress: `0x${string}`,
   transaction: TransactionRequest
 ) => {
@@ -36,7 +36,7 @@ export const makeExecTransaction = (
     // gas for mech's onlyOperator modifier still needs to be calculated (can't be fixed, since it depends on external ERC721 ownerOf() function)
     gasLimit: undefined,
 
-    data: IMech.encodeFunctionData("exec", [
+    data: IMech.encodeFunctionData("execute()", [
       to || "",
       value || 0,
       data || "0x",

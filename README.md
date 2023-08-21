@@ -32,12 +32,17 @@ Mech implements the [EIP-4337](https://eips.ethereum.org/EIPS/eip-4337) account 
 Returns true if `signer` is allowed to operate the Mech.
 Sub classes implement this function for defining the specific operator criteria.
 
-### `exec(address to, uint256 value, bytes data, Enum.Operation operation, uint256 txGas)`
+### `execute(address to, uint256 value, bytes data, Enum.Operation operation)`
 
 Allows the operator to make the Mech execute a transaction.
 
 - `operation: 0` for a regular call
 - `operation: 1` for a delegate call
+
+### `execute(address to, uint256 value, bytes data, Enum.Operation operation, uint256 txGas)`
+
+Allows the operator to make the Mech execute a transaction restricting the gas amount made available to the direct execution of the internal meta transaction.
+Any remaining transaction gas must only be spent for surrounding checks of the operator criteria.
 
 ## Contribute
 
@@ -91,7 +96,7 @@ Integration tests are run on a mainnet fork and cover the interaction of mech co
 
 Mech implements the EIP-4337 [Account](contracts/base/Account.sol) interface meaning they allow bundlers to execute account-abstracted user operations from the Mech's address.
 For this purpose the EIP-4337 entry point contract first calls the Mech's `validateUserOp()` function for checking if a user operation has a valid signature by the mech operator.
-The entry point then calls the `exec` function, or any other function using the `onlyOperator` modifier, to trigger execution.
+The entry point then calls the `execute` function, or any other function using the `onlyOperator` modifier, to trigger execution.
 
 ### EIP-1271 signatures
 

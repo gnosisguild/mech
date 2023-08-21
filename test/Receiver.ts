@@ -57,14 +57,13 @@ describe("Receiver base contract", () => {
 
       await mech1
         .connect(alice)
-        .exec(
+        .execute(
           test20Token.address,
           0,
           test20Token.interface.encodeFunctionData("transfer", [
             alice.address,
             500,
           ]),
-          0,
           0
         )
 

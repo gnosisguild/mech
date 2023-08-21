@@ -333,7 +333,7 @@ describe("ZodiacMech contract", () => {
   //       value: parseEther("1.0"),
   //     })
 
-  //     const BURN_1_ETH = mech1.interface.encodeFunctionData("exec", [
+  //     const BURN_1_ETH = mech1.interface.encodeFunctionData("execute", [
   //       ZERO_ADDRESS,
   //       parseEther("1.0"),
   //       "0x",

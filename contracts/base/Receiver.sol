@@ -21,7 +21,7 @@ contract Receiver is
         uint256,
         uint256,
         bytes calldata
-    ) external view override returns (bytes4) {
+    ) external view virtual override returns (bytes4) {
         return 0xf23a6e61;
     }
 
@@ -31,7 +31,7 @@ contract Receiver is
         uint256[] calldata,
         uint256[] calldata,
         bytes calldata
-    ) external view override returns (bytes4) {
+    ) external view virtual override returns (bytes4) {
         return 0xbc197c81;
     }
 
@@ -40,7 +40,7 @@ contract Receiver is
         address,
         uint256,
         bytes calldata
-    ) external view override returns (bytes4) {
+    ) external view virtual override returns (bytes4) {
         return 0x150b7a02;
     }
 
