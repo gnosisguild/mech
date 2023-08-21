@@ -10,18 +10,11 @@ import "../libraries/MinimalProxyStore.sol";
  * @dev A Mech that is operated by the holder of a designated token, implements the ERC6551 standard and is deployed through the ERC6551 registry
  */
 abstract contract TokenboundMech is Mech, IERC6551Account {
-    function isOperator(
-        address signer
-    ) public view virtual override returns (bool) {
-        return owner() == signer && signer != address(0);
-    }
+    error OwnershipCycle();
 
-    function executeCall(
-        address to,
-        uint256 value,
-        bytes calldata data
-    ) external payable returns (bytes memory) {
-        return exec(to, value, data, Enum.Operation.Call, 0);
+    /// @dev Returns the current account nonce
+    function state() external view returns (uint256) {
+        return entryPoint().getNonce(address(this), 0);
     }
 
     function token()
@@ -36,13 +29,21 @@ abstract contract TokenboundMech is Mech, IERC6551Account {
             );
     }
 
-    function owner() public view virtual returns (address);
-
-    // required by ERC-6551, even though their account (https://github.com/tokenbound/contracts/blob/main/src/Account.sol) does not use it but a time-locking mechanism
-    // TODO adopt whatever ERC-6551 will settle on
-    function nonce() external pure returns (uint256) {
-        return 0;
-    }
-
     receive() external payable override(Receiver, IERC6551Account) {}
+
+    /**
+     * @dev EIP-6551 compatibility: Returns a magic value indicating whether a given signer is authorized to act on behalf
+     * of the account
+     * @param  signer     The address to check signing authorization for
+     * @return magicValue Magic value indicating whether the signer is valid
+     */
+    function isValidSigner(
+        address signer,
+        bytes calldata
+    ) external view returns (bytes4 magicValue) {
+        return
+            isOperator(signer)
+                ? IERC6551Account.isValidSigner.selector
+                : bytes4(0);
+    }
 }

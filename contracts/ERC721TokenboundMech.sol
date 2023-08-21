@@ -9,11 +9,35 @@ import "./base/TokenboundMech.sol";
  * @dev A Mech that is operated by the holder of an ERC721 non-fungible token
  */
 contract ERC721TokenboundMech is TokenboundMech {
-    function owner() public view override returns (address) {
+    function isOperator(address signer) public view override returns (bool) {
         (uint256 chainId, address tokenContract, uint256 tokenId) = this
             .token();
-        if (chainId != block.chainid) return address(0);
+        if (chainId != block.chainid) return false;
+        return
+            IERC721(tokenContract).ownerOf(tokenId) == signer &&
+            signer != address(0);
+    }
 
-        return IERC721(tokenContract).ownerOf(tokenId);
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 receivedTokenId,
+        bytes calldata
+    ) external view override returns (bytes4) {
+        (
+            uint256 chainId,
+            address boundTokenContract,
+            uint256 boundTokenId
+        ) = this.token();
+
+        if (
+            chainId == block.chainid &&
+            msg.sender == boundTokenContract &&
+            receivedTokenId == boundTokenId
+        ) {
+            revert OwnershipCycle();
+        }
+
+        return 0x150b7a02;
     }
 }
