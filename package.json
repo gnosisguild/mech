@@ -7,7 +7,7 @@
     "frontend"
   ],
   "scripts": {
-    "clean": "yarn rimraf artifacts cache typechain-types",
+    "clean": "yarn hardhat clean",
     "build:contracts": "yarn hardhat compile",
     "build:sdk": "yarn workspace mech-sdk build",
     "build:frontend": "yarn workspace frontend build",

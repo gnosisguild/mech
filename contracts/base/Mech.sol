@@ -3,6 +3,12 @@ pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import "@account-abstraction/contracts/interfaces/IAccount.sol";
 
 import "./Receiver.sol";
 import "./Account.sol";
@@ -174,5 +180,18 @@ abstract contract Mech is IMech, Account, Receiver {
             s := mload(add(signature, 0x40))
             v := byte(0, mload(add(signature, 0x60)))
         }
+    }
+
+    /// @dev Returns true if a given interfaceId is supported by this account. This method can be
+    /// extended by an override
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public pure virtual returns (bool) {
+        return
+            interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IAccount).interfaceId ||
+            interfaceId == type(IERC1271).interfaceId ||
+            interfaceId == type(IERC1155Receiver).interfaceId ||
+            interfaceId == type(IERC6551Executable).interfaceId;
     }
 }

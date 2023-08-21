@@ -46,4 +46,12 @@ abstract contract TokenboundMech is Mech, IERC6551Account {
                 ? IERC6551Account.isValidSigner.selector
                 : bytes4(0);
     }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public pure override returns (bool) {
+        return
+            super.supportsInterface(interfaceId) ||
+            interfaceId == type(IERC6551Account).interfaceId;
+    }
 }
