@@ -41,7 +41,7 @@
     "@safe-global/safe-core-sdk": "^3.3.5",
     "@types/chai": "^4.3.5",
     "@types/node": "^18.17.5",
-    "ethers": "^5.7.2",
+    "ethers": "^6.7.1",
     "viem": "^1.6.4"
   },
   "packageManager": "yarn@3.6.1"

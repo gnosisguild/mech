@@ -36,12 +36,11 @@ export const makeExecuteTransaction = (
     // gas for mech's onlyOperator modifier still needs to be calculated (can't be fixed, since it depends on external ERC721 ownerOf() function)
     gasLimit: undefined,
 
-    data: IMech.encodeFunctionData("execute()", [
+    data: IMech.encodeFunctionData("execute(address,uint256,bytes,uint8)", [
       to || "",
       value || 0,
       data || "0x",
       0,
-      txGas,
     ]) as `0x${string}`,
 
     value: BigInt(0),

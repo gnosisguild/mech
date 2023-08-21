@@ -17,7 +17,7 @@
     "copy-to-clipboard": "^3.3.3",
     "cryptocurrency-icons": "^0.18.1",
     "ethereum-blockies-base64": "^1.0.2",
-    "ethers": "^5.7.2",
+    "ethers": "^6.7.1",
     "mech-sdk": "workspace:^",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
