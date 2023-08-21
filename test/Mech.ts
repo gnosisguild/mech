@@ -1,5 +1,6 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
+import { hashMessage } from "ethers"
 import { ethers } from "hardhat"
 
 // We use `loadFixture` to share common setups (or fixtures) between tests.
@@ -15,16 +16,18 @@ describe("Mech base contract", () => {
   // Network to that snapshot in every test.
   async function deployMech1() {
     const TestToken = await ethers.getContractFactory("ERC721Token")
-    const ERC721Mech = await ethers.getContractFactory("ERC721Mech")
+    const ERC721TokenboundMech = await ethers.getContractFactory(
+      "ERC721TokenboundMech"
+    )
     const [, alice, bob] = await ethers.getSigners()
 
     const testToken = await TestToken.deploy()
-    const mech1 = await ERC721Mech.deploy(testToken.address, 1)
+    const mech1 = await ERC721TokenboundMech.deploy(testToken.getAddress(), 1)
 
-    await mech1.deployed()
+    await mech1.waitForDeployment()
 
     // Fixtures can return anything you consider useful for your tests
-    return { ERC721Mech, testToken, mech1, alice, bob }
+    return { ERC721TokenboundMech, testToken, mech1, alice, bob }
   }
 
   describe("isValidSignature()", () => {
@@ -33,11 +36,11 @@ describe("Mech base contract", () => {
       // mech1 is linked to testToken#1
 
       // mint testToken#1 to alice
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       const message = "Test message"
       const signature = await alice.signMessage(message)
-      const messageHash = ethers.utils.hashMessage(message)
+      const messageHash = hashMessage(message)
 
       expect(await mech1.isValidSignature(messageHash, signature)).to.equal(
         EIP1271_MAGIC_VALUE
@@ -49,12 +52,12 @@ describe("Mech base contract", () => {
       // mech1 is linked to testToken#1
 
       // mint testToken#1 to alice
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // let bob sign message
       const message = "Test message"
       const signature = await bob.signMessage(message)
-      const messageHash = ethers.utils.hashMessage(message)
+      const messageHash = hashMessage(message)
 
       expect(await mech1.isValidSignature(messageHash, signature)).to.equal(
         "0xffffffff"
@@ -62,25 +65,27 @@ describe("Mech base contract", () => {
     })
 
     it("returns magic value for a valid EIP-1271 signature of the mech operator contract", async () => {
-      const { ERC721Mech, mech1, testToken, alice } = await loadFixture(
-        deployMech1
-      )
+      const { ERC721TokenboundMech, mech1, testToken, alice } =
+        await loadFixture(deployMech1)
       // mech1 is linked to testToken#1
 
-      const mech2 = await ERC721Mech.deploy(testToken.address, 2)
-      await mech2.deployed()
+      const mech2 = await ERC721TokenboundMech.deploy(testToken.getAddress(), 2)
+      await mech2.waitForDeployment()
 
       // mint testToken#1 to alice
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // mint testToken#2 to mech1, making mech1 the operator of mech2
-      await testToken.mintToken(mech1.address, 2)
+      await testToken.mintToken(mech1.getAddress(), 2)
 
       const message = "Test message"
       const ecdsaSignature = await alice.signMessage(message)
-      const messageHash = ethers.utils.hashMessage(message)
+      const messageHash = hashMessage(message)
 
-      const contractSignature = signWithMech(mech1.address, ecdsaSignature)
+      const contractSignature = signWithMech(
+        await mech1.getAddress(),
+        ecdsaSignature
+      )
 
       expect(
         await mech2.isValidSignature(messageHash, contractSignature)
@@ -92,13 +97,16 @@ describe("Mech base contract", () => {
       // mech1 is linked to testToken#1
 
       // mint testToken#1 to alice
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       const message = "Test message"
       const ecdsaSignature = await alice.signMessage(message)
-      const messageHash = ethers.utils.hashMessage(message)
+      const messageHash = hashMessage(message)
 
-      const ownContractSignature = signWithMech(mech1.address, ecdsaSignature)
+      const ownContractSignature = signWithMech(
+        await mech1.getAddress(),
+        ecdsaSignature
+      )
 
       expect(
         await mech1.isValidSignature(messageHash, ownContractSignature)
@@ -106,25 +114,27 @@ describe("Mech base contract", () => {
     })
 
     it("returns zero for an invalid EIP-1271 signature of the mech operator contract", async () => {
-      const { ERC721Mech, mech1, testToken, alice, bob } = await loadFixture(
-        deployMech1
-      )
+      const { ERC721TokenboundMech, mech1, testToken, alice, bob } =
+        await loadFixture(deployMech1)
       // mech1 is linked to testToken#1
 
-      const mech2 = await ERC721Mech.deploy(testToken.address, 2)
-      await mech2.deployed()
+      const mech2 = await ERC721TokenboundMech.deploy(testToken.getAddress(), 2)
+      await mech2.waitForDeployment()
 
       // mint testToken#1 to alice
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // mint testToken#2 to mech1
-      await testToken.mintToken(mech1.address, 2)
+      await testToken.mintToken(mech1.getAddress(), 2)
 
       const message = "Test message"
       const wrongEcdsaSignature = await bob.signMessage(message)
-      const messageHash = ethers.utils.hashMessage(message)
+      const messageHash = hashMessage(message)
 
-      const contractSignature = signWithMech(mech1.address, wrongEcdsaSignature)
+      const contractSignature = signWithMech(
+        await mech1.getAddress(),
+        wrongEcdsaSignature
+      )
 
       expect(
         await mech2.isValidSignature(messageHash, contractSignature)
@@ -132,25 +142,27 @@ describe("Mech base contract", () => {
     })
 
     it("returns zero for an EIP-1271 signature from a contract that is not the mech operator", async () => {
-      const { ERC721Mech, mech1, testToken, alice } = await loadFixture(
-        deployMech1
-      )
+      const { ERC721TokenboundMech, mech1, testToken, alice } =
+        await loadFixture(deployMech1)
       // mech1 is linked to testToken#1
 
-      const mech2 = await ERC721Mech.deploy(testToken.address, 2)
-      await mech2.deployed()
+      const mech2 = await ERC721TokenboundMech.deploy(testToken.getAddress(), 2)
+      await mech2.waitForDeployment()
 
       // mint testToken#1 to alice
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // mint testToken#2 to mech1
-      await testToken.mintToken(mech1.address, 2)
+      await testToken.mintToken(mech1.getAddress(), 2)
 
       const message = "Test message"
       const ecdsaSignature = await alice.signMessage(message)
-      const messageHash = ethers.utils.hashMessage(message)
+      const messageHash = hashMessage(message)
 
-      const contractSignature = signWithMech(mech2.address, ecdsaSignature)
+      const contractSignature = signWithMech(
+        await mech2.getAddress(),
+        ecdsaSignature
+      )
 
       expect(
         await mech1.isValidSignature(messageHash, contractSignature)
@@ -165,15 +177,20 @@ describe("Mech base contract", () => {
       // don't mint testToken#1
 
       // make testTx (token#2 transfer from mech1 to alice)
-      await testToken.mintToken(mech1.address, 2)
-      const testTx = await testToken.populateTransaction.transferFrom(
-        mech1.address,
-        alice.address,
+      await testToken.mintToken(mech1.getAddress(), 2)
+      const testTx = await testToken.transferFrom.populateTransaction(
+        mech1.getAddress(),
+        alice.getAddress(),
         2
       )
 
       await expect(
-        mech1.execute(testToken.address, 0, testTx.data as string, 0)
+        mech1["execute(address,uint256,bytes,uint8)"](
+          testToken.getAddress(),
+          0,
+          testTx.data as string,
+          0
+        )
       ).to.be.revertedWith("ERC721: invalid token ID")
     })
 
@@ -181,19 +198,24 @@ describe("Mech base contract", () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // make testTx (token#2 transfer from mech1 to alice)
-      await testToken.mintToken(mech1.address, 2)
-      const testTx = await testToken.populateTransaction.transferFrom(
-        mech1.address,
-        alice.address,
+      await testToken.mintToken(mech1.getAddress(), 2)
+      const testTx = await testToken.transferFrom.populateTransaction(
+        mech1.getAddress(),
+        alice.getAddress(),
         2
       )
 
       // call exec() from deployer who is not an operator
       await expect(
-        mech1.execute(testToken.address, 0, testTx.data as string, 0)
+        mech1["execute(address,uint256,bytes,uint8)"](
+          testToken.getAddress(),
+          0,
+          testTx.data as string,
+          0
+        )
       ).to.be.revertedWith(
         "Only callable by the mech operator or the entry point contract"
       )
@@ -203,18 +225,23 @@ describe("Mech base contract", () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // this tx will revert because mech1 does not own token#1
       const revertingTxData = testToken.interface.encodeFunctionData(
         "transferFrom",
-        [mech1.address, alice.address, 1]
+        [mech1.getAddress(), alice.getAddress(), 1]
       )
 
       await expect(
         mech1
           .connect(alice)
-          .execute(testToken.address, 0, revertingTxData, 0, 0)
+          ["execute(address,uint256,bytes,uint8)"](
+            testToken.getAddress(),
+            0,
+            revertingTxData,
+            0
+          )
       ).to.be.revertedWith("ERC721: caller is not token owner or approved")
     })
 
@@ -222,26 +249,32 @@ describe("Mech base contract", () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // this tx will revert because mech1 does not own token#1
       const callData = testToken.interface.encodeFunctionData("ownerOf", [1])
 
-      const result = await mech1
+      const [result] = await mech1
         .connect(alice)
-        .callStatic.execute(testToken.address, 0, callData, 0)
+        ["execute(address,uint256,bytes,uint8)"].staticCallResult(
+          testToken.getAddress(),
+          0,
+          callData,
+          0
+        )
+
       const decoded = testToken.interface.decodeFunctionResult(
         "ownerOf",
         result
       )
-      expect(decoded[0]).to.equal(alice.address)
+      expect(decoded[0]).to.equal(alice.getAddress())
     })
 
     it("allows to execute delegate calls", async () => {
       const { mech1, testToken, alice } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // deploy a contract with a test() function that reverts if not called via delegatecall
       const DelegateCall = await ethers.getContractFactory("DelegateCall")
@@ -251,12 +284,26 @@ describe("Mech base contract", () => {
 
       // this should revert because the call is not a delegate call
       await expect(
-        mech1.connect(alice).execute(delegateCall.address, 0, callData, 0)
+        mech1
+          .connect(alice)
+          ["execute(address,uint256,bytes,uint8)"](
+            delegateCall.getAddress(),
+            0,
+            callData,
+            0
+          )
       ).to.be.revertedWith("Can only be called via delegatecall")
 
       // this should succeed because the call is a delegate call
       await expect(
-        mech1.connect(alice).execute(delegateCall.address, 0, callData, 1)
+        mech1
+          .connect(alice)
+          ["execute(address,uint256,bytes,uint8)"](
+            delegateCall.getAddress(),
+            0,
+            callData,
+            1
+          )
       ).to.not.be.reverted
     })
 
@@ -264,34 +311,34 @@ describe("Mech base contract", () => {
       const { mech1, testToken, alice, bob } = await loadFixture(deployMech1)
 
       // mint testToken#1 to alice to make her the operator of mech1
-      await testToken.mintToken(alice.address, 1)
+      await testToken.mintToken(alice.getAddress(), 1)
 
       // mint testToken#2 to alice
-      await testToken.mintToken(alice.address, 2)
+      await testToken.mintToken(alice.getAddress(), 2)
 
       // mint testToken#3 to mech1
-      await testToken.mintToken(mech1.address, 3)
+      await testToken.mintToken(mech1.getAddress(), 3)
 
       // mint a token to bob, since receiving the first token will cost more gas
-      await testToken.mintToken(bob.address, 4)
+      await testToken.mintToken(bob.getAddress(), 4)
 
       // measure actual gas of a transfer and subtract the base tx gas to get a good estimate of the required gas for the meta tx
       const aliceTransferTx = await testToken
         .connect(alice)
-        .transferFrom(alice.address, bob.address, 2)
-      const aliceGasUsed = (await aliceTransferTx.wait()).gasUsed
-      const BASE_TX_GAS = 21000
-      const metaTxGasCost = aliceGasUsed.sub(BASE_TX_GAS) // the actual transfer gas
+        .transferFrom(alice.getAddress(), bob.getAddress(), 2)
+      const aliceGasUsed = (await aliceTransferTx.wait())?.gasUsed || 0n
+      const BASE_TX_GAS = 21000n
+      const metaTxGasCost = aliceGasUsed - BASE_TX_GAS // the actual transfer gas
 
       // send just enough gas to meta tx -> gas estimation succeed
       const mechTxGas = await mech1
         .connect(alice)
-        .estimateGas.execute(
-          testToken.address,
+        ["execute(address,uint256,bytes,uint8,uint256)"].estimateGas(
+          testToken.getAddress(),
           0,
           testToken.interface.encodeFunctionData("transferFrom", [
-            mech1.address,
-            bob.address,
+            mech1.getAddress(),
+            bob.getAddress(),
             3,
           ]),
           0,
@@ -300,16 +347,16 @@ describe("Mech base contract", () => {
 
       // send too little gas to the meta tx -> tx fails
       await expect(
-        mech1.connect(alice).execute(
-          testToken.address,
+        mech1.connect(alice)["execute(address,uint256,bytes,uint8,uint256)"](
+          testToken.getAddress(),
           0,
           testToken.interface.encodeFunctionData("transferFrom", [
-            mech1.address,
-            bob.address,
+            mech1.getAddress(),
+            bob.getAddress(),
             3,
           ]),
           0,
-          metaTxGasCost.sub(1000), // send too little gas
+          metaTxGasCost - 1000n, // send too little gas
           { gasLimit: mechTxGas } // send enough
         )
       ).to.be.revertedWithoutReason

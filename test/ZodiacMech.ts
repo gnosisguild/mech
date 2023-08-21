@@ -1,7 +1,7 @@
 import { defaultAbiCoder } from "@ethersproject/abi"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
-import { parseEther } from "ethers/lib/utils"
+import { parseEther } from "ethers"
 import { ethers, network } from "hardhat"
 
 import { SENTINEL_MODULES, ZERO_ADDRESS } from "../sdk/src/constants"
@@ -20,9 +20,12 @@ describe("ZodiacMech contract", () => {
     const ZodiacMech = await ethers.getContractFactory("ZodiacMech")
     const [, alice, bob, eve] = await ethers.getSigners()
 
-    const mech1 = await ZodiacMech.deploy([alice.address, bob.address])
+    const mech1 = await ZodiacMech.deploy([
+      alice.getAddress(),
+      bob.getAddress(),
+    ])
 
-    await mech1.deployed()
+    await mech1.waitForDeployment()
 
     // Fixtures can return anything you consider useful for your tests
     return { ZodiacMech, mech1, alice, bob, eve }
@@ -33,7 +36,9 @@ describe("ZodiacMech contract", () => {
       const { mech1, alice } = await loadFixture(deployMech1)
 
       await expect(
-        mech1.setUp(defaultAbiCoder.encode(["address[]"], [[alice.address]]))
+        mech1.setUp(
+          defaultAbiCoder.encode(["address[]"], [[alice.getAddress()]])
+        )
       ).to.be.revertedWith("Already initialized")
     })
   })
@@ -47,7 +52,7 @@ describe("ZodiacMech contract", () => {
         2
       )
       expect(enabledModules.toString()).to.equal(
-        [bob.address, alice.address, SENTINEL_MODULES].toString()
+        [bob.getAddress(), alice.getAddress(), SENTINEL_MODULES].toString()
       )
     })
   })
@@ -55,14 +60,14 @@ describe("ZodiacMech contract", () => {
   describe("isOperator() / isModuleEnabled()", () => {
     it("returns true for enabled modules", async () => {
       const { mech1, alice } = await loadFixture(deployMech1)
-      expect(await mech1.isModuleEnabled(alice.address)).to.equal(true)
-      expect(await mech1.isOperator(alice.address)).to.equal(true)
+      expect(await mech1.isModuleEnabled(alice.getAddress())).to.equal(true)
+      expect(await mech1.isOperator(alice.getAddress())).to.equal(true)
     })
 
     it("returns false for any other address", async () => {
       const { mech1, eve } = await loadFixture(deployMech1)
-      expect(await mech1.isModuleEnabled(eve.address)).to.equal(false)
-      expect(await mech1.isOperator(eve.address)).to.equal(false)
+      expect(await mech1.isModuleEnabled(eve.getAddress())).to.equal(false)
+      expect(await mech1.isOperator(eve.getAddress())).to.equal(false)
     })
 
     it("returns false if SENTINEL_MODULES is provided", async () => {
@@ -84,7 +89,7 @@ describe("ZodiacMech contract", () => {
     it("reverts if caller is not an enabled module", async () => {
       const { mech1, eve } = await loadFixture(deployMech1)
       await expect(
-        mech1.connect(eve).enableModule(eve.address)
+        mech1.connect(eve).enableModule(eve.getAddress())
       ).to.be.revertedWith(
         "Only callable by the mech operator or the entry point contract"
       )
@@ -106,16 +111,16 @@ describe("ZodiacMech contract", () => {
 
     it('emits "EnabledModule" event and enables the module', async () => {
       const { mech1, alice, eve } = await loadFixture(deployMech1)
-      await expect(mech1.connect(alice).enableModule(eve.address))
+      await expect(mech1.connect(alice).enableModule(eve.getAddress()))
         .to.emit(mech1, "EnabledModule")
-        .withArgs(eve.address)
-      expect(await mech1.isModuleEnabled(eve.address)).to.equal(true)
+        .withArgs(eve.getAddress())
+      expect(await mech1.isModuleEnabled(eve.getAddress())).to.equal(true)
     })
 
     it("reverts if module is already enabled", async () => {
       const { mech1, alice } = await loadFixture(deployMech1)
       await expect(
-        mech1.connect(alice).enableModule(alice.address)
+        mech1.connect(alice).enableModule(alice.getAddress())
       ).to.be.revertedWithCustomError(mech1, "AlreadyEnabledModule")
     })
   })
@@ -124,7 +129,7 @@ describe("ZodiacMech contract", () => {
     it("reverts if caller is not the owner", async () => {
       const { mech1, alice, eve } = await loadFixture(deployMech1)
       await expect(
-        mech1.connect(eve).disableModule(SENTINEL_MODULES, alice.address)
+        mech1.connect(eve).disableModule(SENTINEL_MODULES, alice.getAddress())
       ).to.be.revertedWith(
         "Only callable by the mech operator or the entry point contract"
       )
@@ -147,7 +152,7 @@ describe("ZodiacMech contract", () => {
     it("reverts if module is already disabled", async () => {
       const { mech1, alice, eve } = await loadFixture(deployMech1)
       await expect(
-        mech1.connect(alice).disableModule(SENTINEL_MODULES, eve.address)
+        mech1.connect(alice).disableModule(SENTINEL_MODULES, eve.getAddress())
       ).to.be.revertedWithCustomError(mech1, "AlreadyDisabledModule")
     })
 
@@ -155,12 +160,12 @@ describe("ZodiacMech contract", () => {
       const { mech1, alice, bob } = await loadFixture(deployMech1)
 
       await expect(
-        mech1.connect(alice).disableModule(SENTINEL_MODULES, bob.address)
+        mech1.connect(alice).disableModule(SENTINEL_MODULES, bob.getAddress())
       )
         .to.emit(mech1, "DisabledModule")
-        .withArgs(bob.address)
+        .withArgs(bob.getAddress())
 
-      expect(await mech1.isModuleEnabled(bob.address)).to.equal(false)
+      expect(await mech1.isModuleEnabled(bob.getAddress())).to.equal(false)
     })
   })
 
@@ -172,7 +177,7 @@ describe("ZodiacMech contract", () => {
         SENTINEL_MODULES,
         3
       )
-      await expect(array).to.deep.equal([bob.address, alice.address])
+      await expect(array).to.deep.equal([bob.getAddress(), alice.getAddress()])
       expect(next).to.equal(SENTINEL_MODULES)
     })
 
@@ -191,12 +196,11 @@ describe("ZodiacMech contract", () => {
         mech1.getModulesPaginated(ZERO_ADDRESS, 1)
       ).to.be.revertedWith("Invalid start address")
 
-      expect(await mech1.getModulesPaginated(bob.address, 1)).to.be.deep.equal([
-        [alice.address],
-        SENTINEL_MODULES,
-      ])
+      expect(
+        await mech1.getModulesPaginated(bob.getAddress(), 1)
+      ).to.be.deep.equal([[alice.getAddress()], SENTINEL_MODULES])
       await expect(
-        mech1.getModulesPaginated(eve.address, 1)
+        mech1.getModulesPaginated(eve.getAddress(), 1)
       ).to.be.revertedWith("Invalid start address")
     })
 
@@ -205,17 +209,21 @@ describe("ZodiacMech contract", () => {
 
       await expect(
         await mech1.getModulesPaginated(SENTINEL_MODULES, 1)
-      ).to.be.deep.equal([[bob.address], bob.address])
+      ).to.be.deep.equal([[bob.getAddress()], bob.getAddress()])
       await expect(
-        await mech1.getModulesPaginated(bob.address, 1)
-      ).to.be.deep.equal([[alice.address], SENTINEL_MODULES])
+        await mech1.getModulesPaginated(bob.getAddress(), 1)
+      ).to.be.deep.equal([[alice.getAddress()], SENTINEL_MODULES])
     })
 
     it("returns an empty array for a bricked mech", async () => {
       const { mech1, alice, bob } = await loadFixture(deployMech1)
 
-      await mech1.connect(alice).disableModule(SENTINEL_MODULES, bob.address)
-      await mech1.connect(alice).disableModule(SENTINEL_MODULES, alice.address)
+      await mech1
+        .connect(alice)
+        .disableModule(SENTINEL_MODULES, bob.getAddress())
+      await mech1
+        .connect(alice)
+        .disableModule(SENTINEL_MODULES, alice.getAddress())
 
       expect(
         await mech1.getModulesPaginated(SENTINEL_MODULES, 10)
@@ -240,7 +248,7 @@ describe("ZodiacMech contract", () => {
 
       // fund mech1 with 1 ETH
       await alice.sendTransaction({
-        to: mech1.address,
+        to: mech1.getAddress(),
         value: parseEther("1.0"),
       })
 
@@ -260,7 +268,7 @@ describe("ZodiacMech contract", () => {
         mech1
           .connect(eve)
           .execTransactionFromModuleReturnData(
-            mech1.address,
+            mech1.getAddress(),
             0,
             mech1.interface.encodeFunctionData("getModulesPaginated", [
               SENTINEL_MODULES,
@@ -278,14 +286,14 @@ describe("ZodiacMech contract", () => {
 
       // fund mech1 with 1 ETH
       await alice.sendTransaction({
-        to: mech1.address,
+        to: mech1.getAddress(),
         value: parseEther("1.0"),
       })
 
-      const { success, returnData } = await mech1
+      const [{ success, returnData }] = await mech1
         .connect(alice)
-        .callStatic.execTransactionFromModuleReturnData(
-          mech1.address,
+        .execTransactionFromModuleReturnData.staticCallResult(
+          mech1.getAddress(),
           0,
           mech1.interface.encodeFunctionData("getModulesPaginated", [
             SENTINEL_MODULES,
@@ -310,7 +318,7 @@ describe("ZodiacMech contract", () => {
   //     const nonceSlot = "0x5" // see SafeStorage.sol
   //     await network.provider.request({
   //       method: "hardhat_setStorageAt",
-  //       params: [mech1.address, nonceSlot, nonceEncoded],
+  //       params: [mech1.getAddress(), nonceSlot, nonceEncoded],
   //     })
 
   //     // validate that the nonce is read from that slot
@@ -329,7 +337,7 @@ describe("ZodiacMech contract", () => {
 
   //     // fund mech1 with 1 ETH
   //     await alice.sendTransaction({
-  //       to: mech1.address,
+  //       to: mech1.getAddress(),
   //       value: parseEther("1.0"),
   //     })
 

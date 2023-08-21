@@ -1,12 +1,7 @@
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs"
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers"
 import { expect } from "chai"
-import {
-  arrayify,
-  defaultAbiCoder,
-  hexConcat,
-  keccak256,
-} from "ethers/lib/utils"
+import { AbiCoder, concat, getBytes, keccak256 } from "ethers"
 import { ethers, network } from "hardhat"
 
 import {
@@ -27,13 +22,17 @@ const entryPointAddress = "0x0576a174D229E3cFA37253523E645A78A0C91B57"
 describe("account abstraction", () => {
   it("implements ERC-4337 account abstraction", async () => {
     const [signer, enabledModule, anotherModule] = await ethers.getSigners()
-    const deployer = ethers.provider.getSigner(signer.address)
+    const deployer = await ethers.provider.getSigner(await signer.getAddress())
 
     // deploy a ZodiacMech
     await deployZodiacMechMastercopy(deployer)
-    await deployZodiacMech([enabledModule.address], deployer)
+    await deployZodiacMech(deployer, {
+      modules: [(await enabledModule.getAddress()) as `0x${string}`],
+    })
     const zodiacMech = ZodiacMech__factory.connect(
-      calculateZodiacMechAddress([enabledModule.address]),
+      calculateZodiacMechAddress([
+        (await enabledModule.getAddress()) as `0x${string}`,
+      ]),
       deployer
     )
 
@@ -46,14 +45,14 @@ describe("account abstraction", () => {
       await fillUserOp(
         {
           callData: zodiacMech.interface.encodeFunctionData("enableModule", [
-            anotherModule.address,
+            anotherModule.getAddress(),
           ]),
         },
         zodiacMech
       ),
       enabledModule
     )
-    await expect(entryPoint.handleOps([userOp], signer.address))
+    await expect(entryPoint.handleOps([userOp], signer.getAddress()))
       .to.emit(entryPoint, "UserOperationEvent")
       .withArgs(
         getUserOpHash(userOp),
@@ -66,19 +65,20 @@ describe("account abstraction", () => {
       )
 
     // make sure the module is enabled
-    expect(await zodiacMech.isModuleEnabled(anotherModule.address)).to.be.true
+    expect(await zodiacMech.isModuleEnabled(anotherModule.getAddress())).to.be
+      .true
   })
 
   it("deploys the mech at the expected address if it does not exist yet", async () => {
     // skip 2 signers, so this test
     const [signer, , , enabledModule, anotherModule] = await ethers.getSigners()
-    const deployer = ethers.provider.getSigner(signer.address)
+    const deployer = ethers.provider.getSigner(signer.getAddress())
 
     // deploy the ZodiacMech mastercopy
     await deployZodiacMechMastercopy(deployer)
 
     // make sure the mech does not exist yet
-    const mechAddress = calculateZodiacMechAddress([enabledModule.address])
+    const mechAddress = calculateZodiacMechAddress([enabledModule.getAddress()])
     expect(await ethers.provider.getCode(mechAddress)).to.equal("0x")
 
     // make sure the entry point contract is there
@@ -87,10 +87,10 @@ describe("account abstraction", () => {
 
     // calculate the ZodiacMech init code
     const deployTx = await makeZodiacMechDeployTransaction(
-      [enabledModule.address],
+      [enabledModule.getAddress()],
       ethers.provider
     )
-    const initCode = hexConcat([deployTx.to, deployTx.data])
+    const initCode = concat([deployTx.to, deployTx.data])
 
     const zodiacMech = ZodiacMech__factory.connect(mechAddress, deployer)
 
@@ -100,7 +100,7 @@ describe("account abstraction", () => {
         {
           // sender: mechAddress, // optional
           callData: zodiacMech.interface.encodeFunctionData("enableModule", [
-            anotherModule.address,
+            anotherModule.getAddress(),
           ]),
           initCode,
           nonce: 0,
@@ -110,7 +110,7 @@ describe("account abstraction", () => {
       enabledModule
     )
 
-    await expect(entryPoint.handleOps([userOp], signer.address))
+    await expect(entryPoint.handleOps([userOp], signer.getAddress()))
       .to.emit(entryPoint, "UserOperationEvent")
       .withArgs(
         getUserOpHash(userOp),
@@ -126,7 +126,8 @@ describe("account abstraction", () => {
     expect(await ethers.provider.getCode(mechAddress)).to.not.equal("0x")
 
     // make sure the module is enabled
-    expect(await zodiacMech.isModuleEnabled(anotherModule.address)).to.be.true
+    expect(await zodiacMech.isModuleEnabled(anotherModule.getAddress())).to.be
+      .true
   })
 })
 
@@ -135,7 +136,7 @@ export const fillUserOp = async (
   op: Partial<UserOperation>,
   account: ZodiacMech
 ): Promise<UserOperation> => ({
-  sender: account.address,
+  sender: account.getAddress(),
   callData: "0x",
   initCode: "0x",
   callGasLimit: 100000,
@@ -150,9 +151,9 @@ export const fillUserOp = async (
 
 export const signUserOp = async (
   op: UserOperation,
-  signer: SignerWithAddress
+  signer: HardhatEthersSigner
 ): Promise<UserOperationStruct> => {
-  const message = arrayify(getUserOpHash(op))
+  const message = getBytes(getUserOpHash(op))
 
   return {
     ...op,
@@ -164,7 +165,7 @@ export function getUserOpHash(op: UserOperation): string {
   const { chainId } = network.config
 
   const userOpHash = keccak256(packUserOp(op))
-  const enc = defaultAbiCoder.encode(
+  const enc = AbiCoder.defaultAbiCoder().encode(
     ["bytes32", "address", "uint256"],
     [userOpHash, entryPointAddress, chainId]
   )
@@ -173,10 +174,9 @@ export function getUserOpHash(op: UserOperation): string {
 
 function packUserOp(op: UserOperation): string {
   const userOpAbiType =
-    ZodiacMech__factory.createInterface().functions[
-      "validateUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes),bytes32,uint256)"
-    ].inputs[0]
-  const encoded = defaultAbiCoder.encode(
+    ZodiacMech__factory.createInterface().getFunction("validateUserOp")
+      .inputs[0]
+  const encoded = AbiCoder.defaultAbiCoder().encode(
     [userOpAbiType],
     [{ ...op, signature: "0x" }]
   )

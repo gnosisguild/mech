@@ -13,7 +13,6 @@ import {
   DEFAULT_SALT,
   ERC2470_SINGLETON_FACTORY_ADDRESS,
   MECH_FACTORY_ADDRESS,
-  ZERO_ADDRESS,
 } from "../constants"
 
 import { deployMastercopy, mechProxyBytecode } from "./factory"
@@ -54,8 +53,6 @@ export const calculateERC1155ThresholdMechAddress = ({
     salt,
   })
 }
-
-export const ERC1155_MASTERCOPY_INIT_DATA = [ZERO_ADDRESS, [0], [0], 0]
 
 export const calculateERC1155ThresholdMechMastercopyAddress = () => {
   return getCreate2Address({

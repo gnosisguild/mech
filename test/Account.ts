@@ -1,12 +1,7 @@
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { expect } from "chai"
-import {
-  arrayify,
-  defaultAbiCoder,
-  keccak256,
-  parseEther,
-} from "ethers/lib/utils"
+import { AbiCoder, getBytes, keccak256, parseEther } from "ethers"
 import { ethers, network } from "hardhat"
 
 import { ZERO_ADDRESS } from "../sdk/src/constants"
@@ -24,16 +19,18 @@ describe("Account base contract", () => {
   // Network to that snapshot in every test.
   async function deployMech1() {
     const TestToken = await ethers.getContractFactory("ERC721Token")
-    const ERC721Mech = await ethers.getContractFactory("ERC721Mech")
+    const ERC721TokenboundMech = await ethers.getContractFactory(
+      "ERC721TokenboundMech"
+    )
     const [deployer, alice, bob] = await ethers.getSigners()
 
     const testToken = await TestToken.deploy()
-    const mech1 = await ERC721Mech.deploy(testToken.address, 1)
+    const mech1 = await ERC721TokenboundMech.deploy(testToken.getAddress(), 1)
 
     // make alice the operator of mech1
     await testToken.mintToken(alice.address, 1)
 
-    await mech1.deployed()
+    await mech1.waitForDeployment()
 
     await network.provider.request({
       method: "hardhat_impersonateAccount",
@@ -45,7 +42,7 @@ describe("Account base contract", () => {
 
     // Fixtures can return anything you consider useful for your tests
     return {
-      ERC721Mech,
+      ERC721TokenboundMech,
       testToken,
       mech1,
       alice,
@@ -55,7 +52,7 @@ describe("Account base contract", () => {
   }
 
   const BURN_1_ETH = Mech__factory.createInterface().encodeFunctionData(
-    "execute",
+    "execute(address,uint256,bytes,uint8)",
     [ZERO_ADDRESS, parseEther("1.0"), "0x", 0]
   )
 
@@ -94,7 +91,7 @@ describe("Account base contract", () => {
       expect(
         await mech1
           .connect(entryPointSigner)
-          .callStatic.validateUserOp(userOp, getUserOpHash(userOp), 0)
+          .validateUserOp.staticCallResult(userOp, getUserOpHash(userOp), 0)
       ).to.equal(0)
     })
 
@@ -114,7 +111,7 @@ describe("Account base contract", () => {
       expect(
         await mech1
           .connect(entryPointSigner)
-          .callStatic.validateUserOp(userOp, getUserOpHash(userOp), 0)
+          .validateUserOp.staticCallResult(userOp, getUserOpHash(userOp), 0)
       ).to.equal(1)
     })
 
@@ -133,7 +130,7 @@ describe("Account base contract", () => {
 
       // fund mech1 with 1 ETH
       await alice.sendTransaction({
-        to: mech1.address,
+        to: mech1.getAddress(),
         value: parseEther("1.0"),
       })
 
@@ -143,7 +140,7 @@ describe("Account base contract", () => {
           .connect(entryPointSigner)
           .validateUserOp(userOp, getUserOpHash(userOp), parseEther("0.123"))
       ).to.changeEtherBalances(
-        [mech1.address, entryPointSigner.address],
+        [mech1.getAddress(), entryPointSigner.address],
         [parseEther("-0.123"), parseEther("0.123")]
       )
     })
@@ -155,7 +152,7 @@ export const fillUserOp = async (
   op: Partial<UserOperation>,
   account: Account
 ): Promise<UserOperation> => ({
-  sender: account.address,
+  sender: account.getAddress(),
   callData: "0x",
   initCode: "0x",
   callGasLimit: 0,
@@ -170,9 +167,9 @@ export const fillUserOp = async (
 
 export const signUserOp = async (
   op: UserOperation,
-  signer: SignerWithAddress
+  signer: HardhatEthersSigner
 ): Promise<UserOperationStruct> => {
-  const message = arrayify(getUserOpHash(op))
+  const message = getBytes(getUserOpHash(op))
 
   return {
     ...op,
@@ -184,7 +181,7 @@ export function getUserOpHash(op: UserOperation): string {
   const { chainId } = network.config
 
   const userOpHash = keccak256(packUserOp(op))
-  const enc = defaultAbiCoder.encode(
+  const enc = AbiCoder.defaultAbiCoder().encode(
     ["bytes32", "address", "uint256"],
     [userOpHash, entryPoint, chainId]
   )
@@ -193,10 +190,8 @@ export function getUserOpHash(op: UserOperation): string {
 
 function packUserOp(op: UserOperation): string {
   const userOpAbiType =
-    Account__factory.createInterface().functions[
-      "validateUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes),bytes32,uint256)"
-    ].inputs[0]
-  const encoded = defaultAbiCoder.encode(
+    Account__factory.createInterface().getFunction("validateUserOp").inputs[0]
+  const encoded = AbiCoder.defaultAbiCoder().encode(
     [userOpAbiType],
     [{ ...op, signature: "0x" }]
   )

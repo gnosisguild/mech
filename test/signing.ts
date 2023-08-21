@@ -11,17 +11,19 @@ describe("signing", () => {
   // Network to that snapshot in every test.
   async function deployMech1() {
     const TestToken = await ethers.getContractFactory("ERC721Token")
-    const ERC721Mech = await ethers.getContractFactory("ERC721Mech")
+    const ERC721TokenboundMech = await ethers.getContractFactory(
+      "ERC721TokenboundMech"
+    )
     const [deployer, alice, bob, eve] = await ethers.getSigners()
 
     const testToken = await TestToken.deploy()
-    const mech1 = await ERC721Mech.deploy(testToken.address, 1)
+    const mech1 = await ERC721TokenboundMech.deploy(testToken.getAddress(), 1)
 
-    await mech1.deployed()
-    await testToken.mintToken(alice.address, 1)
+    await mech1.waitForDeployment()
+    await testToken.mintToken(alice.getAddress(), 1)
 
     // Fixtures can return anything you consider useful for your tests
-    return { ERC721Mech, testToken, mech1, alice, bob, eve }
+    return { ERC721TokenboundMech, testToken, mech1, alice, bob, eve }
   }
 
   describe("signWithMech()", () => {
@@ -31,10 +33,13 @@ describe("signing", () => {
       const message = "Congratulations!"
 
       const operatorSignature = await alice.signMessage(message)
-      const mechSignature = signWithMech(mech1.address, operatorSignature)
+      const mechSignature = signWithMech(
+        await mech1.getAddress(),
+        operatorSignature
+      )
 
       const isValidSig = await verifyMessage({
-        signer: mech1.address,
+        signer: mech1.getAddress(),
         message,
         signature: mechSignature,
         provider: ethers.provider,

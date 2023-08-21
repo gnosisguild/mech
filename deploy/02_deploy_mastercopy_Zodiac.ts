@@ -3,7 +3,6 @@ import { DeployFunction } from "hardhat-deploy/types"
 import {
   calculateZodiacMechMastercopyAddress,
   deployZodiacMechMastercopy,
-  ZODIAC_MASTERCOPY_INIT_DATA,
 } from "../sdk"
 
 const deployMastercopyZodiac: DeployFunction = async (hre) => {
@@ -11,7 +10,7 @@ const deployMastercopyZodiac: DeployFunction = async (hre) => {
   return
 
   const [signer] = await hre.ethers.getSigners()
-  const deployer = hre.ethers.provider.getSigner(signer.address)
+  const deployer = await hre.ethers.provider.getSigner(signer.address)
 
   await deployZodiacMechMastercopy(deployer)
   const address = calculateZodiacMechMastercopyAddress()
@@ -19,7 +18,7 @@ const deployMastercopyZodiac: DeployFunction = async (hre) => {
   try {
     await hre.run("verify:verify", {
       address,
-      constructorArguments: ZODIAC_MASTERCOPY_INIT_DATA,
+      constructorArguments: [],
     })
   } catch (e) {
     if (
