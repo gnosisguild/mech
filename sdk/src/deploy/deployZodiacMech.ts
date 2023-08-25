@@ -60,7 +60,7 @@ export const makeZodiacMechDeployTransaction = ({
 }: {
   /** Addresses of the Zodiac modules */
   modules: `0x${string}`[]
-  salt: `0x${string}`
+  salt?: `0x${string}`
 }) => {
   const initCall = encodeFunctionData({
     abi: ZodiacMech__factory.abi,

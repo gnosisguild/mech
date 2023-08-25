@@ -2,9 +2,9 @@
 pragma solidity ^0.8.12;
 
 import "@erc6551/reference/src/interfaces/IERC6551Account.sol";
+import "@erc6551/reference/src/lib/ERC6551AccountLib.sol";
 
 import "./Mech.sol";
-import "../libraries/MinimalProxyStore.sol";
 
 /**
  * @dev A Mech that is operated by the holder of a designated token, implements the ERC6551 standard and is deployed through the ERC6551 registry
@@ -22,11 +22,7 @@ abstract contract TokenboundMech is Mech, IERC6551Account {
         view
         returns (uint256 chainId, address tokenContract, uint256 tokenId)
     {
-        return
-            abi.decode(
-                MinimalProxyStore.getContext(address(this)),
-                (uint256, address, uint256)
-            );
+        return ERC6551AccountLib.token();
     }
 
     receive() external payable override(Receiver, IERC6551Account) {}

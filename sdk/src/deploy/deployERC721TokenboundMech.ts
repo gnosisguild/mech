@@ -13,34 +13,25 @@ import {
   ERC6551_REGISTRY_ADDRESS,
 } from "../constants"
 
-import { deployMastercopy, mechProxyBytecode } from "./factory"
+import { deployMastercopy, erc6551ProxyBytecode } from "./factory"
 
-export const calculateERC721TokenboundMechAddress = ({
-  chainId,
-  token,
-  tokenId,
-  salt = DEFAULT_SALT,
-}: {
+export const calculateERC721TokenboundMechAddress = (context: {
   /** Address of the ERC721 token contract */
   chainId: number
   /** Address of the ERC721 token contract */
   token: `0x${string}`
   /** ID of the ERC721 token */
   tokenId: bigint
-  salt: `0x${string}`
+  salt?: `0x${string}`
+  from?: `0x${string}`
 }) => {
-  const context = encodeAbiParameters(
-    [{ type: "uint256" }, { type: "address" }, { type: "uint256" }],
-    [BigInt(chainId), token, tokenId]
-  )
-
   return getCreate2Address({
-    bytecode: mechProxyBytecode(
+    bytecode: erc6551ProxyBytecode(
       calculateERC721TokenboundMechMastercopyAddress(),
       context
     ),
-    from: ERC6551_REGISTRY_ADDRESS,
-    salt,
+    from: context.from || ERC6551_REGISTRY_ADDRESS,
+    salt: context.salt || DEFAULT_SALT,
   })
 }
 
@@ -57,6 +48,7 @@ export const makeERC721TokenboundMechDeployTransaction = ({
   token,
   tokenId,
   salt = DEFAULT_SALT,
+  from = ERC6551_REGISTRY_ADDRESS,
 }: {
   /** ID of the chain the token lives on */
   chainId: number
@@ -64,10 +56,11 @@ export const makeERC721TokenboundMechDeployTransaction = ({
   token: `0x${string}`
   /** ID of the ERC721 token */
   tokenId: bigint
-  salt: string
+  salt?: string
+  from?: `0x${string}`
 }) => {
   return {
-    to: ERC6551_REGISTRY_ADDRESS,
+    to: from,
     data: encodeFunctionData({
       abi: ERC6551_REGISTRY_ABI,
       functionName: "createAccount",
@@ -77,6 +70,7 @@ export const makeERC721TokenboundMechDeployTransaction = ({
         token,
         tokenId,
         salt,
+        "0x",
       ],
     }),
   }
@@ -89,6 +83,7 @@ export const deployERC721TokenboundMech = async (
     token,
     tokenId,
     salt = DEFAULT_SALT,
+    from = ERC6551_REGISTRY_ADDRESS,
   }: {
     /** ID of the chain the token lives on, default to the current chain of walletClient */
     chainId?: number
@@ -96,7 +91,8 @@ export const deployERC721TokenboundMech = async (
     token: `0x${string}`
     /** ID of the ERC721 token */
     tokenId: bigint
-    salt: `0x${string}`
+    salt?: `0x${string}`
+    from?: `0x${string}`
   }
 ) => {
   const { chain, account } = walletClient
@@ -110,6 +106,7 @@ export const deployERC721TokenboundMech = async (
     token,
     tokenId,
     salt,
+    from,
   })
 
   return walletClient.sendTransaction({

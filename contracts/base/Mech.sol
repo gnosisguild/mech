@@ -188,6 +188,7 @@ abstract contract Mech is IMech, Account, Receiver {
         bytes4 interfaceId
     ) public pure virtual returns (bool) {
         return
+            interfaceId == type(IMech).interfaceId ||
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IAccount).interfaceId ||
             interfaceId == type(IERC1271).interfaceId ||

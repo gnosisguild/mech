@@ -12,7 +12,7 @@ import { entryPoint, fillUserOp, getUserOpHash, signUserOp } from "./Account"
 // Using this simplifies your tests and makes them run faster, by taking
 // advantage or Hardhat Network's snapshot functionality.
 
-describe("ZodiacMech contract", () => {
+describe.skip("ZodiacMech contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.

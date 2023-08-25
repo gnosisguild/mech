@@ -32,7 +32,7 @@ export const calculateERC1155ThresholdMechAddress = ({
   minBalances: bigint[]
   /** minimum total balance over all tokens */
   minTotalBalance: bigint
-  salt: `0x${string}`
+  salt?: `0x${string}`
 }) => {
   const context = encodeAbiParameters(
     [
@@ -77,7 +77,7 @@ export const makeERC1155ThresholdMechDeployTransaction = ({
   minBalances: bigint[]
   /** minimum total balance over all tokens */
   minTotalBalance: bigint
-  salt: `0x${string}`
+  salt?: `0x${string}`
 }) => {
   const context = encodeAbiParameters(
     [
@@ -121,7 +121,7 @@ export const deployERC1155ThresholdMech = async (
     minBalances: bigint[]
     /** minimum total balance over all tokens */
     minTotalBalance: bigint
-    salt: `0x${string}`
+    salt?: `0x${string}`
   }
 ) => {
   const { chain, account } = walletClient

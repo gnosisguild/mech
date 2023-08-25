@@ -16,6 +16,67 @@ export const DEFAULT_SALT =
 export const SENTINEL_MODULES =
   "0x0000000000000000000000000000000000000001" as const
 
+export const ERC2470_SINGLETON_FACTORY_ABI = [
+  {
+    type: "function",
+    name: "deploy",
+    constant: false,
+    payable: false,
+    inputs: [
+      {
+        type: "bytes",
+        name: "_initCode",
+      },
+      {
+        type: "bytes32",
+        name: "_salt",
+      },
+    ],
+    outputs: [
+      {
+        type: "address",
+        name: "createdContract",
+      },
+    ],
+  },
+]
+
 export const ERC6551_REGISTRY_ABI = [
-  "createAccount(address implementation, uint256 chainId, address tokenContract, uint256 tokenId, uint256 salt, bytes initData) returns (address)",
+  {
+    type: "function",
+    name: "createAccount",
+    constant: false,
+    payable: false,
+    inputs: [
+      {
+        type: "address",
+        name: "implementation",
+      },
+      {
+        type: "uint256",
+        name: "chainId",
+      },
+      {
+        type: "address",
+        name: "tokenContract",
+      },
+      {
+        type: "uint256",
+        name: "tokenId",
+      },
+      {
+        type: "uint256",
+        name: "salt",
+      },
+      {
+        type: "bytes",
+        name: "initData",
+      },
+    ],
+    outputs: [
+      {
+        type: "address",
+      },
+    ],
+  },
 ]

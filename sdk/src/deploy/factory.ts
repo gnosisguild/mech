@@ -8,7 +8,11 @@ import {
 } from "viem"
 
 import { MechFactory__factory } from "../../../typechain-types"
-import { ERC2470_SINGLETON_FACTORY_ADDRESS } from "../constants"
+import {
+  DEFAULT_SALT,
+  ERC2470_SINGLETON_FACTORY_ABI,
+  ERC2470_SINGLETON_FACTORY_ADDRESS,
+} from "../constants"
 
 export const mechProxyBytecode = (
   implementation: `0x${string}`,
@@ -31,6 +35,43 @@ export const mechProxyBytecode = (
   ])
 }
 
+export const erc6551ProxyBytecode = (
+  implementation: `0x${string}`,
+  {
+    chainId,
+    token,
+    tokenId,
+    salt = DEFAULT_SALT,
+  }: {
+    /** ID of the chain the token lives on, default to the current chain of walletClient */
+    chainId: number
+    /** Address of the ERC721 token contract */
+    token: `0x${string}`
+    /** ID of the ERC721 token */
+    tokenId: bigint
+    salt?: `0x${string}`
+  }
+) => {
+  if (implementation.length !== 42) {
+    throw new Error(`Invalid implementation address: ${implementation}`)
+  }
+
+  return concat([
+    "0x3d60ad80600a3d3981f3363d3d373d3d3d363d73",
+    implementation,
+    "0x5af43d82803e903d91602b57fd5bf3",
+    encodeAbiParameters(
+      [
+        { type: "uint256" },
+        { type: "uint256" },
+        { type: "address" },
+        { type: "uint256" },
+      ],
+      [BigInt(salt), BigInt(chainId), token, tokenId]
+    ),
+  ])
+}
+
 /**
  * Deploy a mastercopy via the ERC-2470 singleton factory.
  */
@@ -40,20 +81,18 @@ export const deployMastercopy = async (
 ) => {
   const singletonFactory = getContract({
     address: ERC2470_SINGLETON_FACTORY_ADDRESS,
-    abi: [
-      "function deploy(bytes memory _initCode, bytes32 _salt) public returns (address payable createdContract)",
-    ],
+    abi: ERC2470_SINGLETON_FACTORY_ABI,
     walletClient,
   })
 
-  await singletonFactory.write.deploy([bytecode])
+  return await singletonFactory.write.deploy([bytecode, DEFAULT_SALT])
 }
 
 /**
  * Deploy MechFactory via the ERC-2470 singleton factory.
  */
 export const deployMechFactory = async (walletClient: WalletClient) => {
-  await deployMastercopy(walletClient, MechFactory__factory.bytecode)
+  return await deployMastercopy(walletClient, MechFactory__factory.bytecode)
 }
 
 /**
