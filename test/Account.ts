@@ -4,6 +4,11 @@ import { expect } from "chai"
 import { AbiCoder, getBytes, keccak256, parseEther } from "ethers"
 import { ethers, network } from "hardhat"
 
+import { ERC721TokenboundMech__factory } from "../sdk/build/cjs/typechain-types"
+import {
+  calculateERC721TokenboundMechAddress,
+  deployERC721TokenboundMech,
+} from "../sdk/src"
 import { ZERO_ADDRESS } from "../sdk/src/constants"
 import { Account__factory, Mech__factory } from "../typechain-types"
 import {
@@ -11,38 +16,55 @@ import {
   UserOperationStruct,
 } from "../typechain-types/contracts/base/Account"
 
-export const entryPoint = "0x0576a174D229E3cFA37253523E645A78A0C91B57"
+import { deployFactories } from "./utils"
 
-describe("Account base contract", () => {
+export const entryPoint = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
+
+describe.only("Account base contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
   async function deployMech1() {
-    const TestToken = await ethers.getContractFactory("ERC721Token")
-    const ERC721TokenboundMech = await ethers.getContractFactory(
-      "ERC721TokenboundMech"
-    )
-    const [deployer, alice, bob] = await ethers.getSigners()
+    const { deployer, deployerClient, erc6551Registry, alice, bob } =
+      await deployFactories()
 
+    const TestToken = await ethers.getContractFactory("ERC721Token")
     const testToken = await TestToken.deploy()
-    const mech1 = await ERC721TokenboundMech.deploy(testToken.getAddress(), 1)
+    const testTokenAddress = (await testToken.getAddress()) as `0x${string}`
+
+    const chainId = deployerClient.chain.id
+    const registryAddress =
+      (await erc6551Registry.getAddress()) as `0x${string}`
+
+    await deployERC721TokenboundMech(deployerClient, {
+      token: testTokenAddress,
+      tokenId: 1n,
+      from: registryAddress,
+    })
 
     // make alice the operator of mech1
     await testToken.mintToken(alice.address, 1)
-
-    await mech1.waitForDeployment()
 
     await network.provider.request({
       method: "hardhat_impersonateAccount",
       params: [entryPoint],
     })
     const entryPointSigner = await ethers.getSigner(entryPoint)
+
     // fund the entry point
     await deployer.sendTransaction({ to: entryPoint, value: parseEther("1.0") })
 
+    const mech1 = ERC721TokenboundMech__factory.connect(
+      calculateERC721TokenboundMechAddress({
+        chainId,
+        token: testTokenAddress,
+        tokenId: 1n,
+        from: registryAddress,
+      })
+    )
+
     // Fixtures can return anything you consider useful for your tests
     return {
-      ERC721TokenboundMech,
       testToken,
       mech1,
       alice,
@@ -58,7 +80,7 @@ describe("Account base contract", () => {
 
   describe("validateUserOp()", () => {
     it("reverts if called by another address than the entry point", async () => {
-      const { mech1, alice } = await loadFixture(deployMech1)
+      const { mech1, alice, entryPointSigner } = await loadFixture(deployMech1)
 
       const userOp = await signUserOp(
         await fillUserOp(
@@ -71,7 +93,7 @@ describe("Account base contract", () => {
       )
 
       await expect(
-        mech1.validateUserOp(userOp, getUserOpHash(userOp), 0)
+        mech1.connect(alice).validateUserOp(userOp, getUserOpHash(userOp), 0)
       ).to.be.revertedWith("account: not from EntryPoint")
     })
 
@@ -140,7 +162,7 @@ describe("Account base contract", () => {
           .connect(entryPointSigner)
           .validateUserOp(userOp, getUserOpHash(userOp), parseEther("0.123"))
       ).to.changeEtherBalances(
-        [mech1.getAddress(), entryPointSigner.address],
+        [await mech1.getAddress(), entryPointSigner.address],
         [parseEther("-0.123"), parseEther("0.123")]
       )
     })
@@ -152,7 +174,7 @@ export const fillUserOp = async (
   op: Partial<UserOperation>,
   account: Account
 ): Promise<UserOperation> => ({
-  sender: account.getAddress(),
+  sender: await account.getAddress(),
   callData: "0x",
   initCode: "0x",
   callGasLimit: 0,

@@ -1,14 +1,7 @@
 import { defaultAbiCoder } from "@ethersproject/abi"
-import { JsonRpcProvider } from "@ethersproject/providers"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { expect } from "chai"
 import hre, { ethers } from "hardhat"
-import { createWalletClient, custom as customTransport } from "viem"
-import { hardhat } from "viem/chains"
-
-// We use `loadFixture` to share common setups (or fixtures) between tests.
-// Using this simplifies your tests and makes them run faster, by taking
-// advantage or Hardhat Network's snapshot functionality.
 
 import {
   calculateERC1155ThresholdMechAddress,
@@ -23,10 +16,8 @@ import {
   deployERC1155ThresholdMechMastercopy,
   deployERC1155TokenboundMech,
   deployERC1155TokenboundMechMastercopy,
-  deployERC2470SingletonFactory,
   deployERC721TokenboundMech,
   deployERC721TokenboundMechMastercopy,
-  deployMechFactory,
   deployZodiacMech,
   deployZodiacMechMastercopy,
 } from "../sdk"
@@ -36,45 +27,18 @@ import {
   ZERO_ADDRESS,
 } from "../sdk/src/constants"
 import {
-  ERC1155Mech__factory,
   ERC1155TokenboundMech__factory,
-  ERC721Mech__factory,
   ERC721TokenboundMech__factory,
   ZodiacMech__factory,
 } from "../typechain-types"
 
+import { deployFactories } from "./utils"
+
+// We use `loadFixture` to share common setups (or fixtures) between tests.
+// Using this simplifies your tests and makes them run faster, by taking
+// advantage or Hardhat Network's snapshot functionality.
+
 describe("deterministic deployment", () => {
-  /** deploy ERC2470 singleton factory, MechFactory, and ERC6551 registry */
-  async function deployFactories() {
-    const [signer, alice] = await hre.ethers.getSigners()
-    const deployer = await hre.ethers.provider.getSigner(
-      await signer.getAddress()
-    )
-
-    const ERC6551Registry = await ethers.getContractFactory("ERC6551Registry")
-    const erc6551Registry = await ERC6551Registry.deploy()
-
-    const deployerClient = createWalletClient({
-      chain: hardhat,
-      account: (await signer.getAddress()) as `0x${string}`,
-      transport: customTransport({
-        request({ method, params }) {
-          return hre.ethers.provider.send(method, params)
-        },
-      }),
-    })
-
-    await deployERC2470SingletonFactory(deployerClient)
-    await deployMechFactory(deployerClient)
-
-    return {
-      erc6551Registry,
-      deployer,
-      deployerClient,
-      alice,
-    }
-  }
-
   describe("calculateERC721TokenboundMechAddress()", () => {
     it("returns the correct address", async () => {
       const { deployerClient, erc6551Registry } = await loadFixture(
