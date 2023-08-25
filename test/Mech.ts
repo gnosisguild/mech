@@ -3,9 +3,6 @@ import { expect } from "chai"
 import { hashMessage } from "ethers"
 import { ethers } from "hardhat"
 
-// We use `loadFixture` to share common setups (or fixtures) between tests.
-// Using this simplifies your tests and makes them run faster, by taking
-// advantage or Hardhat Network's snapshot functionality.
 import {
   calculateERC721TokenboundMechAddress,
   deployERC721TokenboundMech,
@@ -18,7 +15,7 @@ import { deployFactories } from "./utils"
 
 const EIP1271_MAGIC_VALUE = "0x1626ba7e"
 
-describe.only("Mech base contract", () => {
+describe("Mech base contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
@@ -265,6 +262,20 @@ describe.only("Mech base contract", () => {
       ).to.be.revertedWith(
         "Only callable by the mech operator or the entry point contract"
       )
+      // same with the other overload
+      await expect(
+        mech1
+          .connect(bob)
+          ["execute(address,uint256,bytes,uint8,uint256)"](
+            testToken.getAddress(),
+            0n,
+            testTx.data as string,
+            0n,
+            0n
+          )
+      ).to.be.revertedWith(
+        "Only callable by the mech operator or the entry point contract"
+      )
     })
 
     it("reverts with original data if the meta transaction reverts", async () => {
@@ -289,6 +300,18 @@ describe.only("Mech base contract", () => {
             await testToken.getAddress(),
             0n,
             revertingTxData,
+            0n
+          )
+      ).to.be.revertedWith("ERC721: caller is not token owner or approved")
+      // same with the other overload
+      await expect(
+        mech1
+          .connect(alice)
+          ["execute(address,uint256,bytes,uint8,uint256)"](
+            await testToken.getAddress(),
+            0n,
+            revertingTxData,
+            0n,
             0n
           )
       ).to.be.revertedWith("ERC721: caller is not token owner or approved")
