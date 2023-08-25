@@ -152,7 +152,7 @@ abstract contract Mech is IMech, Account, Receiver {
         uint256 value,
         bytes calldata data,
         Enum.Operation operation
-    ) external payable returns (bytes memory returnData) {
+    ) external payable onlyOperator returns (bytes memory returnData) {
         bool success;
         (success, returnData) = _exec(to, value, data, operation, gasleft());
 

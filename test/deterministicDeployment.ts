@@ -34,10 +34,6 @@ import {
 
 import { deployFactories } from "./utils"
 
-// We use `loadFixture` to share common setups (or fixtures) between tests.
-// Using this simplifies your tests and makes them run faster, by taking
-// advantage or Hardhat Network's snapshot functionality.
-
 describe("deterministic deployment", () => {
   describe("calculateERC721TokenboundMechAddress()", () => {
     it("returns the correct address", async () => {

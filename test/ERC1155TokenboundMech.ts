@@ -3,15 +3,15 @@ import { expect } from "chai"
 import { ethers } from "hardhat"
 
 import {
-  calculateERC721TokenboundMechAddress,
-  deployERC721TokenboundMech,
-  deployERC721TokenboundMechMastercopy,
+  calculateERC1155TokenboundMechAddress,
+  deployERC1155TokenboundMech,
+  deployERC1155TokenboundMechMastercopy,
 } from "../sdk/src"
-import { ERC721TokenboundMech__factory } from "../typechain-types"
+import { ERC1155TokenboundMech__factory } from "../typechain-types"
 
 import { deployFactories } from "./utils"
 
-describe("ERC721TokenboundMech contract", () => {
+describe("ERC1155TokenboundMech contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
@@ -19,9 +19,9 @@ describe("ERC721TokenboundMech contract", () => {
     const { deployerClient, erc6551Registry, alice, bob } =
       await deployFactories()
 
-    await deployERC721TokenboundMechMastercopy(deployerClient)
+    await deployERC1155TokenboundMechMastercopy(deployerClient)
 
-    const TestToken = await ethers.getContractFactory("ERC721Token")
+    const TestToken = await ethers.getContractFactory("ERC1155Token")
     const testToken = await TestToken.deploy()
     const testTokenAddress = (await testToken.getAddress()) as `0x${string}`
 
@@ -29,14 +29,14 @@ describe("ERC721TokenboundMech contract", () => {
     const registryAddress =
       (await erc6551Registry.getAddress()) as `0x${string}`
 
-    await deployERC721TokenboundMech(deployerClient, {
+    await deployERC1155TokenboundMech(deployerClient, {
       token: testTokenAddress,
       tokenId: 1n,
       from: registryAddress,
     })
 
-    const mech1 = ERC721TokenboundMech__factory.connect(
-      calculateERC721TokenboundMechAddress({
+    const mech1 = ERC1155TokenboundMech__factory.connect(
+      calculateERC1155TokenboundMechAddress({
         chainId,
         token: testTokenAddress,
         tokenId: 1n,
@@ -68,13 +68,17 @@ describe("ERC721TokenboundMech contract", () => {
   })
 
   describe("isOperator()", () => {
-    it("returns true for the owner of the linked NFT", async () => {
-      const { mech1, testToken, alice } = await loadFixture(deployMech1)
+    it("returns true for any holder of the linked tokenId", async () => {
+      const { mech1, testToken, alice, bob } = await loadFixture(deployMech1)
       // mech1 is linked to testToken#1
 
       // mint testToken#1 to alice
-      await testToken.mintToken(alice.address, 1n)
+      await testToken.mintToken(alice.address, 1n, 1n, "0x")
+      // mint testToken#1 to bob
+      await testToken.mintToken(bob.address, 1n, 1n, "0x")
+
       expect(await mech1.isOperator(alice.address)).to.equal(true)
+      expect(await mech1.isOperator(bob.address)).to.equal(true)
     })
 
     it("returns false for any other address", async () => {
@@ -82,9 +86,9 @@ describe("ERC721TokenboundMech contract", () => {
       // mech1 is linked to testToken#1
 
       // mint testToken#1 to alice
-      await testToken.mintToken(alice.address, 1n)
+      await testToken.mintToken(alice.address, 1n, 1n, "0x")
       // mint testToken#2 to bob
-      await testToken.mintToken(bob.address, 2n)
+      await testToken.mintToken(bob.address, 2n, 1n, "0x")
 
       // bob does not hold mech1 since he doesn't own testToken#1
       expect(await mech1.isOperator(bob.address)).to.equal(false)
@@ -96,7 +100,7 @@ describe("ERC721TokenboundMech contract", () => {
 
       // testToken#1 has not been minted
       expect(mech1.isOperator(alice.address)).to.be.revertedWith(
-        "ERC721: invalid token ID"
+        "ERC1155: invalid token ID"
       )
     })
   })
