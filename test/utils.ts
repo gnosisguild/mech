@@ -2,7 +2,14 @@ import hre, { ethers } from "hardhat"
 import { createWalletClient, custom as customTransport } from "viem"
 import { hardhat } from "viem/chains"
 
-import { deployERC2470SingletonFactory, deployMechFactory } from "../sdk"
+import {
+  deployERC1155ThresholdMechMastercopy,
+  deployERC1155TokenboundMechMastercopy,
+  deployERC2470SingletonFactory,
+  deployERC721TokenboundMechMastercopy,
+  deployMechFactory,
+  deployZodiacMechMastercopy,
+} from "../sdk"
 
 /** deploy ERC2470 singleton factory, MechFactory, and ERC6551 registry */
 export async function deployFactories() {

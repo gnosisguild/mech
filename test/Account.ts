@@ -8,6 +8,7 @@ import { ERC721TokenboundMech__factory } from "../sdk/build/cjs/typechain-types"
 import {
   calculateERC721TokenboundMechAddress,
   deployERC721TokenboundMech,
+  deployERC721TokenboundMechMastercopy,
 } from "../sdk/src"
 import { ZERO_ADDRESS } from "../sdk/src/constants"
 import { Account__factory, Mech__factory } from "../typechain-types"
@@ -20,13 +21,15 @@ import { deployFactories } from "./utils"
 
 export const entryPoint = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
 
-describe.only("Account base contract", () => {
+describe("Account base contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
   async function deployMech1() {
     const { deployer, deployerClient, erc6551Registry, alice, bob } =
       await deployFactories()
+
+    await deployERC721TokenboundMechMastercopy(deployerClient)
 
     const TestToken = await ethers.getContractFactory("ERC721Token")
     const testToken = await TestToken.deploy()
@@ -41,6 +44,14 @@ describe.only("Account base contract", () => {
       tokenId: 1n,
       from: registryAddress,
     })
+    const mech1 = ERC721TokenboundMech__factory.connect(
+      calculateERC721TokenboundMechAddress({
+        chainId,
+        token: testTokenAddress,
+        tokenId: 1n,
+        from: registryAddress,
+      })
+    )
 
     // make alice the operator of mech1
     await testToken.mintToken(alice.address, 1)
@@ -53,15 +64,6 @@ describe.only("Account base contract", () => {
 
     // fund the entry point
     await deployer.sendTransaction({ to: entryPoint, value: parseEther("1.0") })
-
-    const mech1 = ERC721TokenboundMech__factory.connect(
-      calculateERC721TokenboundMechAddress({
-        chainId,
-        token: testTokenAddress,
-        tokenId: 1n,
-        from: registryAddress,
-      })
-    )
 
     // Fixtures can return anything you consider useful for your tests
     return {
@@ -80,7 +82,7 @@ describe.only("Account base contract", () => {
 
   describe("validateUserOp()", () => {
     it("reverts if called by another address than the entry point", async () => {
-      const { mech1, alice, entryPointSigner } = await loadFixture(deployMech1)
+      const { mech1, alice } = await loadFixture(deployMech1)
 
       const userOp = await signUserOp(
         await fillUserOp(
@@ -110,11 +112,10 @@ describe.only("Account base contract", () => {
         alice
       )
 
-      expect(
-        await mech1
-          .connect(entryPointSigner)
-          .validateUserOp.staticCallResult(userOp, getUserOpHash(userOp), 0)
-      ).to.equal(0)
+      const [result] = await mech1
+        .connect(entryPointSigner)
+        .validateUserOp.staticCallResult(userOp, getUserOpHash(userOp), 0)
+      expect(result).to.equal(0n)
     })
 
     it("returns 1 for any other ECDSA signature", async () => {
@@ -130,11 +131,10 @@ describe.only("Account base contract", () => {
         bob
       )
 
-      expect(
-        await mech1
-          .connect(entryPointSigner)
-          .validateUserOp.staticCallResult(userOp, getUserOpHash(userOp), 0)
-      ).to.equal(1)
+      const [result] = await mech1
+        .connect(entryPointSigner)
+        .validateUserOp.staticCallResult(userOp, getUserOpHash(userOp), 0)
+      expect(result).to.equal(1n)
     })
 
     it("sends the pre-fund to sender if the user op has valid signature", async () => {
