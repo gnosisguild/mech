@@ -1,19 +1,26 @@
 import { DeployFunction } from "hardhat-deploy/types"
+import { createWalletClient, custom as customTransport } from "viem"
 
 import {
-  calculateZodiacMechMastercopyAddress,
-  deployZodiacMechMastercopy,
+  calculateERC721TokenboundMechMastercopyAddress,
+  deployERC721TokenboundMechMastercopy,
 } from "../sdk"
 
-const deployMastercopyZodiac: DeployFunction = async (hre) => {
-  // TODO disabled for now
-  return
-
+const deployMastercopyERC721Tokenbound: DeployFunction = async (hre) => {
   const [signer] = await hre.ethers.getSigners()
   const deployer = await hre.ethers.provider.getSigner(signer.address)
 
-  await deployZodiacMechMastercopy(deployer)
-  const address = calculateZodiacMechMastercopyAddress()
+  const deployerClient = createWalletClient({
+    account: deployer.address as `0x${string}`,
+    transport: customTransport({
+      async request({ method, params }) {
+        return deployer.provider.send(method, params)
+      },
+    }),
+  })
+
+  await deployERC721TokenboundMechMastercopy(deployerClient)
+  const address = calculateERC721TokenboundMechMastercopyAddress()
 
   try {
     await hre.run("verify:verify", {
@@ -37,6 +44,6 @@ const deployMastercopyZodiac: DeployFunction = async (hre) => {
   }
 }
 
-deployMastercopyZodiac.tags = ["ZodiacMech"]
+deployMastercopyERC721Tokenbound.tags = ["ERC721TokenboundMech"]
 
-export default deployMastercopyZodiac
+export default deployMastercopyERC721Tokenbound

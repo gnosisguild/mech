@@ -1,4 +1,5 @@
 import { DeployFunction } from "hardhat-deploy/types"
+import { createWalletClient, custom as customTransport } from "viem"
 
 import {
   calculateERC1155TokenboundMechMastercopyAddress,
@@ -7,9 +8,18 @@ import {
 
 const deployMastercopyERC1155Tokenbound: DeployFunction = async (hre) => {
   const [signer] = await hre.ethers.getSigners()
-  const deployer = hre.ethers.provider.getSigner(signer.address)
+  const deployer = await hre.ethers.provider.getSigner(signer.address)
 
-  await deployERC1155TokenboundMechMastercopy(deployer)
+  const deployerClient = createWalletClient({
+    account: deployer.address as `0x${string}`,
+    transport: customTransport({
+      async request({ method, params }) {
+        return deployer.provider.send(method, params)
+      },
+    }),
+  })
+
+  await deployERC1155TokenboundMechMastercopy(deployerClient)
   const address = calculateERC1155TokenboundMechMastercopyAddress()
 
   try {

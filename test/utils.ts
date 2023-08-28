@@ -17,7 +17,7 @@ export async function deployFactories() {
 
   const ERC6551Registry = await ethers.getContractFactory("ERC6551Registry")
   const erc6551Registry = await ERC6551Registry.deploy()
-  deployer.populateTransaction
+
   const deployerClient = createTestClient({
     account: deployer.address as `0x${string}`,
     chain: hardhat,
