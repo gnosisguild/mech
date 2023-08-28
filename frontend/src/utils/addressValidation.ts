@@ -1,4 +1,4 @@
-import { getAddress } from "ethers/lib/utils"
+import { getAddress } from "viem"
 
 export const validateAddress = (address: string) => {
   try {

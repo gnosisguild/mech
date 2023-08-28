@@ -1,19 +1,16 @@
 import {
-  calculateERC1155MechAddress,
-  calculateERC721MechAddress,
+  calculateERC1155TokenboundMechAddress,
+  calculateERC721TokenboundMechAddress,
 } from "mech-sdk"
 import { MechNFT } from "../hooks/useNFTsByOwner"
 
 export const calculateMechAddress = (token: MechNFT) => {
+  const context = {
+    chainId: parseInt(token.blockchain.shortChainID),
+    token: token.contractAddress as `0x${string}`,
+    tokenId: BigInt(token.nft.tokenID),
+  }
   return token.tokenStandard === "ERC-1155"
-    ? calculateERC1155MechAddress(
-        token.contractAddress,
-        [token.nft.tokenID],
-        [1],
-        1
-      )
-    : calculateERC721MechAddress(
-        token.contractAddress,
-        BigInt(token.nft.tokenID)
-      )
+    ? calculateERC1155TokenboundMechAddress(context)
+    : calculateERC721TokenboundMechAddress(context)
 }
