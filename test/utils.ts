@@ -1,15 +1,12 @@
 import hre, { ethers } from "hardhat"
-import { createWalletClient, custom as customTransport } from "viem"
+import {
+  createTestClient,
+  custom as customTransport,
+  walletActions,
+} from "viem"
 import { hardhat } from "viem/chains"
 
-import {
-  deployERC1155ThresholdMechMastercopy,
-  deployERC1155TokenboundMechMastercopy,
-  deployERC2470SingletonFactory,
-  deployERC721TokenboundMechMastercopy,
-  deployMechFactory,
-  deployZodiacMechMastercopy,
-} from "../sdk"
+import { deployERC2470SingletonFactory, deployMechFactory } from "../sdk/src"
 
 /** deploy ERC2470 singleton factory, MechFactory, and ERC6551 registry */
 export async function deployFactories() {
@@ -20,16 +17,17 @@ export async function deployFactories() {
 
   const ERC6551Registry = await ethers.getContractFactory("ERC6551Registry")
   const erc6551Registry = await ERC6551Registry.deploy()
-
-  const deployerClient = createWalletClient({
+  deployer.populateTransaction
+  const deployerClient = createTestClient({
+    account: deployer.address as `0x${string}`,
     chain: hardhat,
-    account: (await signer.getAddress()) as `0x${string}`,
+    mode: "hardhat",
     transport: customTransport({
-      request({ method, params }) {
-        return hre.ethers.provider.send(method, params)
+      async request({ method, params }) {
+        return deployer.provider.send(method, params)
       },
     }),
-  })
+  }).extend(walletActions)
 
   await deployERC2470SingletonFactory(deployerClient)
   await deployMechFactory(deployerClient)
