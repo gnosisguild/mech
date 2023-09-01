@@ -1,3 +1,4 @@
+import { TokenBalance } from "@0xsequence/indexer"
 import { useEffect, useState } from "react"
 import {
   PublicClient,
@@ -9,7 +10,6 @@ import {
 } from "wagmi"
 import { calculateMechAddress } from "../utils/calculateMechAddress"
 import { makeMechDeployTransaction } from "../utils/deployMech"
-import { MechNFT } from "./useNFTsByOwner"
 
 interface QueryKeyArgs {
   address: `0x${string}`
@@ -29,7 +29,7 @@ function queryFn(client: PublicClient) {
   }
 }
 
-export const useDeployMech = (token: MechNFT | null) => {
+export const useDeployMech = (token: TokenBalance | null) => {
   const mechAddress = token && calculateMechAddress(token)
   const chainId = useChainId()
 
@@ -66,7 +66,7 @@ export const useDeployMech = (token: MechNFT | null) => {
   return { deployed, deploy, deployPending }
 }
 
-export const useDeployedMechs = (nfts: MechNFT[]) => {
+export const useDeployedMechs = (nfts: TokenBalance[]) => {
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export const useDeployedMechs = (nfts: MechNFT[]) => {
         "mechDeployed",
         {
           address: calculateMechAddress(nft),
-          chainId: parseInt(nft.blockchain.shortChainID),
+          chainId: nft.chainId,
         },
       ])
     })
