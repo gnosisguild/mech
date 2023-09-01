@@ -1,7 +1,7 @@
 import React from "react"
+import { TokenBalance } from "@0xsequence/indexer"
 import { useParams } from "react-router-dom"
 import Layout from "../../components/Layout"
-import useNFT from "../../hooks/useNFT"
 import NFTItem from "../../components/NFTItem"
 
 import classes from "./Mech.module.css"
@@ -13,6 +13,7 @@ import { useDeployMech } from "../../hooks/useDeployMech"
 import MechDeploy from "../../components/Deploy"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import { CHAINS } from "../../chains"
+import useTokenBalances from "../../hooks/useTokenBalances"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -35,15 +36,16 @@ const Mech: React.FC = () => {
     throw new Error("token must be a valid address")
   }
 
-  const { data, error, isLoading } = useNFT({
-    contractAddress,
-    tokenId: tokenId,
+  const { balances, error, isLoading } = useTokenBalances({
+    tokenContract: contractAddress,
     chainId: chain.id,
+    tokenId: tokenId,
   })
+  const balance: TokenBalance | null = balances[0]
 
-  const { deployed, deploy, deployPending } = useDeployMech(data)
+  const { deployed, deploy, deployPending } = useDeployMech(balance)
 
-  const mechAddress = data && calculateMechAddress(data)
+  const mechAddress = balance && calculateMechAddress(balance)
 
   const handleRequest = useHandleRequest(mechAddress)
 
@@ -51,9 +53,9 @@ const Mech: React.FC = () => {
     <Layout mechAddress={mechAddress || undefined}>
       <div className={classes.container}>
         {isLoading && <Spinner />}
-        {!error && !isLoading && data && mechAddress && (
+        {!error && !isLoading && balance && mechAddress && (
           <>
-            <NFTItem nftData={data} />
+            <NFTItem tokenBalance={balance} />
 
             <ProvideWalletConnect
               chainId={chain.id}

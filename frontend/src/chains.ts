@@ -1,3 +1,4 @@
+import { SequenceIndexerServices } from "@0xsequence/indexer"
 import {
   mainnet,
   goerli,
@@ -23,3 +24,11 @@ export const CHAINS = {
 export type ChainId = keyof typeof CHAINS
 
 export const DEFAULT_CHAIN = CHAINS[5]
+
+export const SEQUENCER_ENDPOINTS: Record<ChainId, SequenceIndexerServices> = {
+  1: SequenceIndexerServices.MAINNET,
+  5: SequenceIndexerServices.GOERLI,
+  100: SequenceIndexerServices.GNOSIS,
+  137: SequenceIndexerServices.POLYGON,
+  80001: SequenceIndexerServices.POLYGON_MUMBAI,
+}
