@@ -85,7 +85,9 @@ export const deployMastercopy = async (
     walletClient,
   })
 
-  return await singletonFactory.write.deploy([bytecode, DEFAULT_SALT])
+  return await singletonFactory.write.deploy([bytecode, DEFAULT_SALT], {
+    gas: 10000000,
+  })
 }
 
 /**
