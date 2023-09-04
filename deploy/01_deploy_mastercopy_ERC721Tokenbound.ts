@@ -1,5 +1,10 @@
 import { DeployFunction } from "hardhat-deploy/types"
-import { createWalletClient, custom as customTransport } from "viem"
+import {
+  createWalletClient,
+  custom as customTransport,
+  publicActions,
+} from "viem"
+import * as chains from "viem/chains"
 
 import {
   calculateERC721TokenboundMechMastercopyAddress,
@@ -9,6 +14,11 @@ import {
 const deployMastercopyERC721Tokenbound: DeployFunction = async (hre) => {
   const [signer] = await hre.ethers.getSigners()
   const deployer = await hre.ethers.provider.getSigner(signer.address)
+  const network = await hre.ethers.provider.getNetwork()
+  const chain = Object.values(chains).find(
+    (chain) => chain.id === Number(network.chainId)
+  )
+  console.log(`Using chain ${chain?.name} (${chain?.id})`)
 
   const deployerClient = createWalletClient({
     account: deployer.address as `0x${string}`,
@@ -17,10 +27,17 @@ const deployMastercopyERC721Tokenbound: DeployFunction = async (hre) => {
         return deployer.provider.send(method, params)
       },
     }),
+    chain,
   })
 
-  await deployERC721TokenboundMechMastercopy(deployerClient)
   const address = calculateERC721TokenboundMechMastercopyAddress()
+
+  if (await deployerClient.extend(publicActions).getBytecode({ address })) {
+    console.log(`  ✔ Contract is already deployed at ${address}`)
+  } else {
+    await deployERC721TokenboundMechMastercopy(deployerClient)
+    console.log(`  ✔ Contract deployed at ${address}`)
+  }
 
   try {
     await hre.run("verify:verify", {

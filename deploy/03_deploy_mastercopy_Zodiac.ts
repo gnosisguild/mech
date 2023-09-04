@@ -1,5 +1,6 @@
 import { DeployFunction } from "hardhat-deploy/types"
 import { createWalletClient, custom as customTransport } from "viem"
+import * as chains from "viem/chains"
 
 import {
   calculateZodiacMechMastercopyAddress,
@@ -12,6 +13,11 @@ const deployMastercopyZodiac: DeployFunction = async (hre) => {
 
   const [signer] = await hre.ethers.getSigners()
   const deployer = await hre.ethers.provider.getSigner(signer.address)
+  const network = await hre.ethers.provider.getNetwork()
+  const chain = Object.values(chains).find(
+    (chain) => chain.id === Number(network.chainId)
+  )
+  console.log(`Using chain ${chain?.name} (${chain?.id})`)
 
   const deployerClient = createWalletClient({
     account: deployer.address as `0x${string}`,
@@ -20,6 +26,7 @@ const deployMastercopyZodiac: DeployFunction = async (hre) => {
         return deployer.provider.send(method, params)
       },
     }),
+    chain,
   })
 
   await deployZodiacMechMastercopy(deployerClient)
