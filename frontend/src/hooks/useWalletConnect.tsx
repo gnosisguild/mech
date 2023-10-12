@@ -1,5 +1,5 @@
 import { Core } from "@walletconnect/core"
-// import { buildApprovedNamespaces } from "@walletconnect/utils"
+import { buildApprovedNamespaces } from "@walletconnect/utils"
 import Web3WalletClient, {
   Web3Wallet,
   Web3WalletTypes,
@@ -132,50 +132,40 @@ export const ProvideWalletConnect: React.FC<Props> = ({
       console.debug("session_proposal", proposal)
       const { requiredNamespaces } = proposal.params
 
-      // eip155 namespace should be present
-      if (!requiredNamespaces.eip155) {
-        const error = `Unsupported chains. No eip155 namespace present in the session proposal`
-        console.warn(error, proposal)
-        await client.rejectSession({
-          id: proposal.id,
-          reason: {
-            code: UNSUPPORTED_CHAIN_ERROR_CODE,
-            message: error,
+      const requiredAccounts =
+        requiredNamespaces.eip155.chains?.map(
+          (chain) => `${chain}:${mechAddress}`
+        ) || []
+      const requiredChains = requiredNamespaces.eip155.chains || []
+      const requiredEvents = requiredNamespaces.eip155.events || []
+
+      const approvedNamespaces = buildApprovedNamespaces({
+        proposal: proposal.params,
+        supportedNamespaces: {
+          eip155: {
+            chains: [...requiredChains, `eip155:${chain.id}`],
+            methods: [
+              "eth_sendTransaction",
+              "eth_signTransaction",
+              "eth_sign",
+              "personal_sign",
+              "eth_signTypedData",
+              "signTypedData_v1",
+              "eth_signTypedData_v3",
+              "eth_signTypedData_v4",
+            ],
+            events: requiredEvents,
+            accounts: [
+              ...requiredAccounts,
+              `eip155:${chain.id}:${mechAddress}`,
+            ],
           },
-        })
-        return
-      }
-
-      // chain should be present
-      // const isChainIdPresent = requiredNamespaces.eip155.chains?.some(
-      //   (ns) => ns === `eip155:${chain.id}`
-      // )
-      // if (!isChainIdPresent) {
-      //   const error = `Unsupported chains. No eip155:${chain.id} namespace present in the session proposal`
-      //   console.warn(error, proposal)
-      //   await client.rejectSession({
-      //     id: proposal.id,
-      //     reason: {
-      //       code: UNSUPPORTED_CHAIN_ERROR_CODE,
-      //       message: error,
-      //     },
-      //   })
-      //   return
-      // }
-
-      const accounts = requiredNamespaces.eip155.chains?.map(
-        (chain) => `${chain}:${mechAddress}`
-      )
+        },
+      })
 
       const approveProps = {
         id: proposal.id,
-        namespaces: {
-          eip155: {
-            accounts: accounts || [`eip155:${chain.id}:${mechAddress}`],
-            methods: requiredNamespaces.eip155.methods,
-            events: requiredNamespaces.eip155.events,
-          },
-        },
+        namespaces: approvedNamespaces,
       }
       console.log("approve session", approveProps)
       const { topic, peer } = await client.approveSession(approveProps)
@@ -336,7 +326,6 @@ const useWalletConnect = () => {
 export default useWalletConnect
 
 // see https://docs.walletconnect.com/2.0/specs/sign/error-codes
-const UNSUPPORTED_CHAIN_ERROR_CODE = 5100
 const INVALID_METHOD_ERROR_CODE = 1001
 const USER_REJECTED_REQUEST_CODE = 4001
 const USER_DISCONNECTED_CODE = 6000
