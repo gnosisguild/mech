@@ -71,13 +71,17 @@ export const useDeployedMechs = (nfts: TokenBalance[]) => {
 
   useEffect(() => {
     nfts.forEach((nft) => {
-      queryClient.ensureQueryData([
-        "mechDeployed",
-        {
-          address: calculateMechAddress(nft),
-          chainId: nft.chainId,
-        },
-      ])
+      queryClient
+        .ensureQueryData([
+          "mechDeployed",
+          {
+            address: calculateMechAddress(nft),
+            chainId: nft.chainId,
+          },
+        ])
+        .catch((e) => {
+          /* when switching networks, this might throw an error (`Missing queryFn for queryKey`) */
+        })
     })
   }, [queryClient, nfts])
 
