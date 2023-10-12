@@ -1,4 +1,8 @@
-import { SequenceIndexerClient, TokenBalance } from "@0xsequence/indexer"
+import {
+  SequenceIndexerClient,
+  TokenBalance,
+  ContractType,
+} from "@0xsequence/indexer"
 import { useEffect, useState } from "react"
 import { ChainId, SEQUENCER_ENDPOINTS } from "../chains"
 
@@ -32,7 +36,47 @@ const useTokenBalances = ({
           contractAddress: tokenContract,
           tokenID: tokenId,
         })
-        setBalances(tokenBalances.balances)
+
+        let balances = tokenBalances.balances.filter(
+          (balance) =>
+            balance.contractType === ContractType.ERC20 ||
+            balance.contractType === ContractType.ERC721 ||
+            balance.contractType === ContractType.ERC1155
+        )
+
+        // Inconveniently, the Sequence API sets all tokenIDs to 0 if fetched without contractAddress
+        if (!tokenContract) {
+          // fetch the balances for each tokenContract individually, these responses will have the correct tokenID values
+          const tokenContracts = new Set(
+            balances
+              .filter(
+                (balance) =>
+                  balance.contractType === ContractType.ERC721 ||
+                  balance.contractType === ContractType.ERC1155
+              )
+              .map((balance) => balance.contractAddress)
+          )
+
+          const nftBalances = await Promise.all(
+            [...tokenContracts].map(async (contractAddress) => {
+              const result = await indexer.getTokenBalances({
+                includeMetadata: true,
+                accountAddress,
+                contractAddress,
+              })
+
+              return result.balances
+            })
+          )
+
+          const erc20Balances = balances.filter(
+            (balance) => balance.contractType === ContractType.ERC20
+          )
+
+          balances = [...erc20Balances, ...nftBalances.flat()]
+        }
+
+        setBalances(balances)
         setIsLoading(false)
       } catch (e) {
         setError(e)
