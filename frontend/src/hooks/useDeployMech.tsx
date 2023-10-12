@@ -31,15 +31,20 @@ function queryFn(client: PublicClient) {
 
 export const useDeployMech = (token: TokenBalance | null) => {
   const mechAddress = token && calculateMechAddress(token)
-  const chainId = useChainId()
 
-  const publicClient = usePublicClient()
+  const publicClient = usePublicClient({ chainId: token?.chainId })
   const { data: deployed } = useQuery<boolean>(
-    ["mechDeployed", { address: mechAddress, chainId }] as const,
-    { queryFn: queryFn(publicClient) as any, enabled: !!mechAddress }
+    [
+      "mechDeployed",
+      { address: mechAddress, chainId: token?.chainId },
+    ] as const,
+    {
+      queryFn: queryFn(publicClient) as any,
+      enabled: !!mechAddress,
+    }
   )
 
-  const { data: walletClient } = useWalletClient()
+  const { data: walletClient } = useWalletClient({ chainId: token?.chainId })
 
   const queryClient = useQueryClient()
 
@@ -52,7 +57,7 @@ export const useDeployMech = (token: TokenBalance | null) => {
       const hash = await walletClient.sendTransaction(tx)
       const receipt = await publicClient.waitForTransactionReceipt({ hash })
       queryClient.setQueryData(
-        ["mechDeployed", { address: mechAddress, chainId }],
+        ["mechDeployed", { address: mechAddress, chainId: token.chainId }],
         true
       )
       return receipt
