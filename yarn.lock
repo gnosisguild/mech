@@ -10982,14 +10982,14 @@ __metadata:
     cryptocurrency-icons: ^0.18.1
     ethereum-blockies-base64: ^1.0.2
     ethers: ^6.8.0
-    mech-sdk: "workspace:^"
+    mech-sdk: "workspace:*"
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.15.0
     react-scripts: 5.0.1
     typescript: ^5.2.2
     typescript-plugin-css-modules: ^5.0.1
-    viem: ^1.16.4
+    viem: ^1.16.5
     wagmi: ^1.4.3
   languageName: unknown
   linkType: soft
@@ -14379,7 +14379,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"mech-sdk@workspace:^, mech-sdk@workspace:sdk":
+"mech-sdk@workspace:*, mech-sdk@workspace:sdk":
   version: 0.0.0-use.local
   resolution: "mech-sdk@workspace:sdk"
   dependencies:
@@ -14392,7 +14392,7 @@ __metadata:
     ethers: ^6.8.0
     rimraf: ^4.4.1
     typescript: ^5.2.2
-    viem: ^1.16.4
+    viem: ^1.16.5
   languageName: unknown
   linkType: soft
 
@@ -20398,9 +20398,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^1.16.4":
-  version: 1.16.4
-  resolution: "viem@npm:1.16.4"
+"viem@npm:^1.16.5":
+  version: 1.16.5
+  resolution: "viem@npm:1.16.5"
   dependencies:
     "@adraffy/ens-normalize": 1.9.4
     "@noble/curves": 1.2.0
@@ -20415,7 +20415,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: a9932a74be1f32e06d0bc823fdd46feea5954c2ef0060334550461974503e3811095af008fd10a039d369d830016c034bed36d4ededee29ac0fd5d460a57c69c
+  checksum: cc07bbc8ebf616c2cc6e14f08eea59d1b34df294d1dcba72090bf10e224e87c17014db593bcff223fe6c7c30999448d786d67d9e18691906f51900db940af821
   languageName: node
   linkType: hard
 
