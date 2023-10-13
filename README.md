@@ -32,14 +32,14 @@ Mech implements the [EIP-4337](https://eips.ethereum.org/EIPS/eip-4337) account 
 Returns true if `signer` is allowed to operate the Mech.
 Sub classes implement this function for defining the specific operator criteria.
 
-### `execute(address to, uint256 value, bytes data, Enum.Operation operation)`
+### `execute(address to, uint256 value, bytes data, uint8 operation)`
 
 Allows the operator to make the Mech execute a transaction.
 
 - `operation: 0` for a regular call
 - `operation: 1` for a delegate call
 
-### `execute(address to, uint256 value, bytes data, Enum.Operation operation, uint256 txGas)`
+### `execute(address to, uint256 value, bytes data, uint8 operation, uint256 txGas)`
 
 Allows the operator to make the Mech execute a transaction restricting the gas amount made available to the direct execution of the internal meta transaction.
 Any remaining transaction gas must only be spent for surrounding checks of the operator criteria.

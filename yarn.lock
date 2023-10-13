@@ -2186,10 +2186,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@erc6551/reference@https://github.com/erc6551/reference.git#commit=df75cd1bab5fb8e320940783df5f14c6d8aaa0f2":
-  version: 0.2.0
-  resolution: "@erc6551/reference@https://github.com/erc6551/reference.git#commit=df75cd1bab5fb8e320940783df5f14c6d8aaa0f2"
-  checksum: dd351b2be6b1fa25bf427ee6bc24e65e5ce678924cfbda9264ce34140129d8186bc54596a0f1a47287264f8c9b4e84e1310edf9273ab9a2916fd6659932eb543
+"@erc6551/reference@https://github.com/erc6551/reference.git#commit=a38d3fe531c6c644d4880f41229ef49252804b92":
+  version: 0.2.1
+  resolution: "@erc6551/reference@https://github.com/erc6551/reference.git#commit=a38d3fe531c6c644d4880f41229ef49252804b92"
+  checksum: 5e9f17574757fd51b966836e141275f2b4b3cdcdb5a8c287ac260c241861822529806eb5da049f804a20ab76cec24b67c423b8eadb772dbc8b58b2cda42caf29
   languageName: node
   linkType: hard
 
@@ -14336,7 +14336,7 @@ __metadata:
   dependencies:
     "@account-abstraction/contracts": ^0.6.0
     "@ambire/signature-validator": ^1.3.1
-    "@erc6551/reference": "https://github.com/erc6551/reference.git#commit=df75cd1bab5fb8e320940783df5f14c6d8aaa0f2"
+    "@erc6551/reference": "https://github.com/erc6551/reference.git#commit=a38d3fe531c6c644d4880f41229ef49252804b92"
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/providers": ^5.7.2

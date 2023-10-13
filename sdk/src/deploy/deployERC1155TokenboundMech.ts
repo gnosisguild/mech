@@ -1,9 +1,4 @@
-import {
-  encodeAbiParameters,
-  encodeFunctionData,
-  getCreate2Address,
-  WalletClient,
-} from "viem"
+import { encodeFunctionData, getCreate2Address, WalletClient } from "viem"
 
 import { ERC1155TokenboundMech__factory } from "../../../typechain-types"
 import {
@@ -66,11 +61,10 @@ export const makeERC1155TokenboundMechDeployTransaction = ({
       functionName: "createAccount",
       args: [
         calculateERC1155TokenboundMechMastercopyAddress(),
+        salt,
         chainId,
         token,
         tokenId,
-        salt,
-        "0x",
       ],
     }),
   }

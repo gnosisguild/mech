@@ -2,7 +2,6 @@
 pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -100,13 +99,15 @@ abstract contract Mech is IMech, Account, Receiver {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation,
+        uint8 operation,
         uint256 txGas
     ) internal returns (bool success, bytes memory returnData) {
-        if (operation == Enum.Operation.DelegateCall) {
+        if (operation == 0) {
+            (success, returnData) = to.call{gas: txGas, value: value}(data);
+        } else if (operation == 1) {
             (success, returnData) = to.delegatecall{gas: txGas}(data);
         } else {
-            (success, returnData) = to.call{gas: txGas, value: value}(data);
+            revert("Invalid operation");
         }
     }
 
@@ -121,7 +122,7 @@ abstract contract Mech is IMech, Account, Receiver {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation,
+        uint8 operation,
         uint256 txGas
     ) public payable onlyOperator returns (bytes memory returnData) {
         bool success;
@@ -151,7 +152,7 @@ abstract contract Mech is IMech, Account, Receiver {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation
+        uint8 operation
     ) external payable onlyOperator returns (bytes memory returnData) {
         bool success;
         (success, returnData) = _exec(to, value, data, operation, gasleft());

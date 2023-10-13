@@ -3,10 +3,9 @@ pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@erc6551/reference/src/interfaces/IERC6551Executable.sol";
-import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@account-abstraction/contracts/interfaces/IAccount.sol";
 
-interface IMech is IAccount, IERC1271 /*, IERC6551Executable */ {
+interface IMech is IAccount, IERC1271, IERC6551Executable {
     /**
      * @dev Return if the passed address is authorized to sign on behalf of the mech, must be implemented by the child contract
      * @param signer The address to check
@@ -23,7 +22,7 @@ interface IMech is IAccount, IERC1271 /*, IERC6551Executable */ {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation
+        uint8 operation
     ) external payable returns (bytes memory returnData);
 
     /// @dev Executes either a delegatecall or a call with provided parameters, with a specified gas limit for the meta transaction
@@ -37,7 +36,7 @@ interface IMech is IAccount, IERC1271 /*, IERC6551Executable */ {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation,
+        uint8 operation,
         uint256 txGas
     ) external payable returns (bytes memory returnData);
 }

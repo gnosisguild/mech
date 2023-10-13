@@ -62,7 +62,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         bytes calldata data,
         Enum.Operation operation
     ) public onlyOperator returns (bool success) {
-        (success, ) = _exec(to, value, data, operation, gasleft());
+        (success, ) = _exec(to, value, data, uint8(operation), gasleft());
     }
 
     /// @dev Passes a transaction to the avatar, expects return data.
@@ -77,7 +77,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         bytes calldata data,
         Enum.Operation operation
     ) public onlyOperator returns (bool success, bytes memory returnData) {
-        return _exec(to, value, data, operation, gasleft());
+        return _exec(to, value, data, uint8(operation), gasleft());
     }
 
     /// @dev Disables a module on the modifier.
