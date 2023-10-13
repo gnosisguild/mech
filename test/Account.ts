@@ -4,14 +4,17 @@ import { expect } from "chai"
 import { AbiCoder, getBytes, keccak256, parseEther } from "ethers"
 import { ethers, network } from "hardhat"
 
-import { ERC721TokenboundMech__factory } from "../sdk/build/cjs/typechain-types"
 import {
   calculateERC721TokenboundMechAddress,
   deployERC721TokenboundMech,
   deployERC721TokenboundMechMastercopy,
 } from "../sdk/src"
 import { ZERO_ADDRESS } from "../sdk/src/constants"
-import { Account__factory, Mech__factory } from "../typechain-types"
+import {
+  Account__factory,
+  ERC721TokenboundMech__factory,
+  Mech__factory,
+} from "../typechain-types"
 import {
   Account,
   UserOperationStruct,

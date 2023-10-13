@@ -3,41 +3,57 @@ import { expect } from "chai"
 import { parseEther, randomBytes } from "ethers"
 import { ethers } from "hardhat"
 
+import {
+  calculateERC721TokenboundMechAddress,
+  deployERC721TokenboundMech,
+  deployERC721TokenboundMechMastercopy,
+} from "../sdk/src"
+import { ERC721TokenboundMech__factory } from "../typechain-types"
+
+import { deployFactories } from "./utils"
+
 describe("Receiver base contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
   async function deployMech1() {
-    const test721 = await ethers.getContractFactory("ERC721Token")
-    const test1155 = await ethers.getContractFactory("ERC1155Token")
-    const test20 = await ethers.getContractFactory("ERC20Token")
-    const ERC721TokenboundMech = await ethers.getContractFactory(
-      "ERC721TokenboundMech"
+    const { deployerClient, erc6551Registry, alice } = await deployFactories()
+
+    await deployERC721TokenboundMechMastercopy(deployerClient)
+
+    const TestToken = await ethers.getContractFactory("ERC721Token")
+    const testToken = await TestToken.deploy()
+    const testTokenAddress = (await testToken.getAddress()) as `0x${string}`
+
+    const chainId = deployerClient.chain.id
+    const registryAddress =
+      (await erc6551Registry.getAddress()) as `0x${string}`
+
+    await deployERC721TokenboundMech(deployerClient, {
+      token: testTokenAddress,
+      tokenId: 1n,
+      from: registryAddress,
+    })
+
+    const mech1 = ERC721TokenboundMech__factory.connect(
+      calculateERC721TokenboundMechAddress({
+        chainId,
+        token: testTokenAddress,
+        tokenId: 1n,
+        from: registryAddress,
+      }),
+      ethers.provider
     )
-    const [deployer, alice, bob] = await ethers.getSigners()
 
-    const test721Token = await test721.deploy()
-    const test1155Token = await test1155.deploy()
-    const test20Token = await test20.deploy()
-    const mech1 = await ERC721TokenboundMech.deploy(
-      test721Token.getAddress(),
-      1
-    )
-
-    await mech1.waitForDeployment()
-
-    // send alice a nft associated with the mech
-    await test721Token.mintToken(alice.getAddress(), 1)
+    // make alice the operator of mech1
+    await testToken.mintToken(alice.address, 1n)
 
     // Fixtures can return anything you consider useful for your tests
     return {
-      ERC721TokenboundMech,
-      test721Token,
-      test1155Token,
-      test20Token,
+      testToken,
       mech1,
       alice,
-      bob,
+      chainId,
     }
   }
 
@@ -47,7 +63,7 @@ describe("Receiver base contract", () => {
       const [deployer] = await ethers.getSigners()
 
       await deployer.sendTransaction({
-        to: mech1.getAddress(),
+        to: await mech1.getAddress(),
         value: parseEther("1.0"),
       })
 
@@ -57,82 +73,118 @@ describe("Receiver base contract", () => {
     })
 
     it("can receive and send erc20 tokens", async () => {
-      const { mech1, test20Token, alice } = await loadFixture(deployMech1)
-      await test20Token.mintToken(mech1.getAddress(), 1000)
-      expect(await test20Token.balanceOf(mech1.getAddress())).to.equal(1000)
+      const { mech1, alice } = await loadFixture(deployMech1)
+
+      const Erc20Token = await ethers.getContractFactory("ERC20Token")
+      const erc20Token = await Erc20Token.deploy()
+
+      await erc20Token.mintToken(await mech1.getAddress(), 1000)
+      expect(await erc20Token.balanceOf(await mech1.getAddress())).to.equal(
+        1000
+      )
 
       await mech1
         .connect(alice)
         ["execute(address,uint256,bytes,uint8)"](
-          test20Token.getAddress(),
+          await erc20Token.getAddress(),
           0,
-          test20Token.interface.encodeFunctionData("transfer", [
-            alice.getAddress(),
+          erc20Token.interface.encodeFunctionData("transfer", [
+            await alice.getAddress(),
             500,
           ]),
           0
         )
 
-      expect(await test20Token.balanceOf(alice.getAddress())).to.equal(500)
+      expect(await erc20Token.balanceOf(await alice.getAddress())).to.equal(500)
     })
 
     it("can receive erc721 tokens", async () => {
-      const { mech1, test721Token, alice } = await loadFixture(deployMech1)
+      const { mech1, testToken, alice } = await loadFixture(deployMech1)
+
       // mint alice another nft to send to the mech
-      await test721Token.mintToken(alice.getAddress(), 2)
+      await testToken.mintToken(await alice.getAddress(), 2)
 
       await alice.sendTransaction({
-        to: test721Token.getAddress(),
+        to: await testToken.getAddress(),
         value: 0,
-        data: test721Token.interface.encodeFunctionData(
+        data: testToken.interface.encodeFunctionData(
           "safeTransferFrom(address,address,uint256)",
-          [alice.getAddress(), mech1.getAddress(), 2]
+          [await alice.getAddress(), await mech1.getAddress(), 2]
         ),
       })
-      expect(await test721Token.ownerOf(2)).to.equal(mech1.getAddress())
+      expect(await testToken.ownerOf(2)).to.equal(await mech1.getAddress())
     })
 
     it("can receive erc1155 tokens", async () => {
-      const { mech1, test1155Token, alice } = await loadFixture(deployMech1)
+      const { mech1, alice } = await loadFixture(deployMech1)
+
+      const Erc1155Token = await ethers.getContractFactory("ERC1155Token")
+      const erc1155Token = await Erc1155Token.deploy()
+
       // mint alice an 1155 nft to send to the mech
-      await test1155Token.mintToken(alice.getAddress(), 1, 2, randomBytes(0))
+      await erc1155Token.mintToken(
+        await alice.getAddress(),
+        1,
+        2,
+        randomBytes(0)
+      )
 
       await alice.sendTransaction({
-        to: test1155Token.getAddress(),
+        to: await erc1155Token.getAddress(),
         value: 0,
-        data: test1155Token.interface.encodeFunctionData("safeTransferFrom", [
-          alice.getAddress(),
-          mech1.getAddress(),
+        data: erc1155Token.interface.encodeFunctionData("safeTransferFrom", [
+          await alice.getAddress(),
+          await mech1.getAddress(),
           1,
           2,
           randomBytes(0),
         ]),
       })
-      expect(await test1155Token.balanceOf(mech1.getAddress(), 1)).to.equal(2)
+      expect(
+        await erc1155Token.balanceOf(await mech1.getAddress(), 1)
+      ).to.equal(2)
     })
 
     it("can receive erc1155 token batches", async () => {
-      const { mech1, test1155Token, alice } = await loadFixture(deployMech1)
+      const { mech1, alice } = await loadFixture(deployMech1)
+
+      const Erc1155Token = await ethers.getContractFactory("ERC1155Token")
+      const erc1155Token = await Erc1155Token.deploy()
+
       // mint alice some tokens
-      await test1155Token.mintToken(alice.getAddress(), 1, 10, randomBytes(0))
-      await test1155Token.mintToken(alice.getAddress(), 2, 20, randomBytes(0))
+      await erc1155Token.mintToken(
+        await alice.getAddress(),
+        1,
+        10,
+        randomBytes(0)
+      )
+      await erc1155Token.mintToken(
+        await alice.getAddress(),
+        2,
+        20,
+        randomBytes(0)
+      )
 
       await alice.sendTransaction({
-        to: test1155Token.getAddress(),
+        to: await erc1155Token.getAddress(),
         value: 0,
-        data: test1155Token.interface.encodeFunctionData(
+        data: erc1155Token.interface.encodeFunctionData(
           "safeBatchTransferFrom",
           [
-            alice.getAddress(),
-            mech1.getAddress(),
+            await alice.getAddress(),
+            await mech1.getAddress(),
             [1, 2],
             [10, 20],
             randomBytes(0),
           ]
         ),
       })
-      expect(await test1155Token.balanceOf(mech1.getAddress(), 1)).to.equal(10)
-      expect(await test1155Token.balanceOf(mech1.getAddress(), 2)).to.equal(20)
+      expect(
+        await erc1155Token.balanceOf(await mech1.getAddress(), 1)
+      ).to.equal(10)
+      expect(
+        await erc1155Token.balanceOf(await mech1.getAddress(), 2)
+      ).to.equal(20)
     })
   })
 })
