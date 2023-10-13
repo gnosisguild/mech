@@ -1,22 +1,16 @@
+import { TokenBalance, ContractType } from "@0xsequence/indexer"
 import {
-  makeERC1155MechDeployTransaction,
-  makeERC721MechDeployTransaction,
+  makeERC1155TokenboundMechDeployTransaction,
+  makeERC721TokenboundMechDeployTransaction,
 } from "mech-sdk"
-import { MechNFT } from "../hooks/useNFTsByOwner"
 
-export const makeMechDeployTransaction = (token: MechNFT) => {
-  const chainId = parseInt(token.blockchain.shortChainID)
-  return token.tokenStandard === "ERC-1155"
-    ? makeERC1155MechDeployTransaction(
-        token.contractAddress,
-        [token.nft.tokenID],
-        [1],
-        0,
-        chainId
-      )
-    : makeERC721MechDeployTransaction(
-        token.contractAddress,
-        BigInt(token.nft.tokenID),
-        chainId
-      )
+export const makeMechDeployTransaction = (token: TokenBalance) => {
+  const context = {
+    chainId: token.chainId,
+    token: token.contractAddress as `0x${string}`,
+    tokenId: BigInt(token.tokenID),
+  }
+  return token.contractType === ContractType.ERC1155
+    ? makeERC1155TokenboundMechDeployTransaction(context)
+    : makeERC721TokenboundMechDeployTransaction(context)
 }

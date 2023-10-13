@@ -1,25 +1,41 @@
 import { DeployFunction } from "hardhat-deploy/types"
+import { createWalletClient, custom as customTransport } from "viem"
+import * as chains from "viem/chains"
 
 import {
   calculateZodiacMechMastercopyAddress,
   deployZodiacMechMastercopy,
-  ZODIAC_MASTERCOPY_INIT_DATA,
-} from "../sdk"
+} from "../sdk/build/cjs/sdk/src"
 
 const deployMastercopyZodiac: DeployFunction = async (hre) => {
   // TODO disabled for now
   return
 
   const [signer] = await hre.ethers.getSigners()
-  const deployer = hre.ethers.provider.getSigner(signer.address)
+  const deployer = await hre.ethers.provider.getSigner(signer.address)
+  const network = await hre.ethers.provider.getNetwork()
+  const chain = Object.values(chains).find(
+    (chain) => chain.id === Number(network.chainId)
+  )
+  console.log(`Using chain ${chain?.name} (${chain?.id})`)
 
-  await deployZodiacMechMastercopy(deployer)
+  const deployerClient = createWalletClient({
+    account: deployer.address as `0x${string}`,
+    transport: customTransport({
+      async request({ method, params }) {
+        return deployer.provider.send(method, params)
+      },
+    }),
+    chain,
+  })
+
+  await deployZodiacMechMastercopy(deployerClient)
   const address = calculateZodiacMechMastercopyAddress()
 
   try {
     await hre.run("verify:verify", {
       address,
-      constructorArguments: ZODIAC_MASTERCOPY_INIT_DATA,
+      constructorArguments: [],
     })
   } catch (e) {
     if (

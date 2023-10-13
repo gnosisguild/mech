@@ -1,131 +1,117 @@
-import { defaultAbiCoder } from "@ethersproject/abi"
-import { JsonRpcProvider, JsonRpcSigner } from "@ethersproject/providers"
 import {
-  deployAndSetUpCustomModule,
-  deployMastercopyWithInitData,
-  SupportedNetworks,
-} from "@gnosis.pm/zodiac"
-import {
+  concat,
+  encodeAbiParameters,
+  encodeFunctionData,
   getCreate2Address,
   keccak256,
-  solidityKeccak256,
-} from "ethers/lib/utils"
+  WalletClient,
+} from "viem"
 
 import {
-  IFactoryFriendly__factory,
+  MechFactory__factory,
   ZodiacMech__factory,
 } from "../../../typechain-types"
 import {
   DEFAULT_SALT,
   ERC2470_SINGLETON_FACTORY_ADDRESS,
-  MODULE_PROXY_FACTORY_ADDRESS,
+  MECH_FACTORY_ADDRESS,
 } from "../constants"
+
+import { deployMastercopy, mechProxyBytecode } from "./factory"
 
 export const calculateZodiacMechAddress = (
   /** Addresses of the Zodiac modules */
-  modules: string[],
-  salt: string = DEFAULT_SALT
+  modules: `0x${string}`[],
+  salt: `0x${string}` = DEFAULT_SALT
 ) => {
-  const initData =
-    IFactoryFriendly__factory.createInterface().encodeFunctionData("setUp", [
-      defaultAbiCoder.encode(["address[]"], [modules]),
-    ])
-
-  // ERC-1167 minimal proxy bytecode
-  const byteCode =
-    "0x602d8060093d393df3363d3d373d3d3d363d73" +
-    calculateZodiacMechMastercopyAddress().toLowerCase().slice(2) +
-    "5af43d82803e903d91602b57fd5bf3"
-
-  return getCreate2Address(
-    MODULE_PROXY_FACTORY_ADDRESS,
-    solidityKeccak256(
-      ["bytes32", "uint256"],
-      [solidityKeccak256(["bytes"], [initData]), salt]
-    ),
-    keccak256(byteCode)
+  const initData = ZodiacMech__factory.createInterface().encodeFunctionData(
+    "setUp",
+    [encodeAbiParameters([{ type: "address[]" }], [modules])]
   ) as `0x${string}`
+
+  return getCreate2Address({
+    bytecode: mechProxyBytecode(
+      calculateZodiacMechMastercopyAddress(),
+      new Uint8Array(0)
+    ),
+    from: MECH_FACTORY_ADDRESS,
+    salt: keccak256(concat([keccak256(initData), salt])),
+  })
 }
 
-export const ZODIAC_MASTERCOPY_INIT_DATA = [[]]
+const MASTERCOPY_INIT_DATA = [] as const
 
 export const calculateZodiacMechMastercopyAddress = () => {
-  const initData = defaultAbiCoder.encode(
-    ["address[]"],
-    ZODIAC_MASTERCOPY_INIT_DATA
+  const initData = encodeAbiParameters(
+    [{ type: "address[]" }],
+    [MASTERCOPY_INIT_DATA]
   )
-  return getCreate2Address(
-    ERC2470_SINGLETON_FACTORY_ADDRESS,
-    DEFAULT_SALT,
-    keccak256(ZodiacMech__factory.bytecode + initData.slice(2))
-  ) as `0x${string}`
+  return getCreate2Address({
+    bytecode: (ZodiacMech__factory.bytecode +
+      initData.slice(2)) as `0x${string}`,
+    from: ERC2470_SINGLETON_FACTORY_ADDRESS,
+    salt: DEFAULT_SALT,
+  })
 }
 
-export const makeZodiacMechDeployTransaction = (
+export const makeZodiacMechDeployTransaction = ({
+  modules,
+  salt = DEFAULT_SALT,
+}: {
   /** Addresses of the Zodiac modules */
-  modules: string[],
-  chainId: number,
-  salt: string = DEFAULT_SALT
-) => {
-  const { transaction } = deployAndSetUpCustomModule(
-    calculateZodiacMechMastercopyAddress(),
-    ZodiacMech__factory.abi,
-    {
-      types: ["address[]"],
-      values: [modules],
-    },
-    new JsonRpcProvider(undefined, chainId), // this provider instance is never really be used in deployAndSetUpCustomModule(),
-    chainId,
-    salt
-  )
+  modules: `0x${string}`[]
+  salt?: `0x${string}`
+}) => {
+  const initCall = encodeFunctionData({
+    abi: ZodiacMech__factory.abi,
+    functionName: "setUp",
+    args: [encodeAbiParameters([{ type: "address[]" }], [modules])],
+  })
 
   return {
-    to: transaction.to as `0x${string}`,
-    data: transaction.data as `0x${string}`,
-    value: transaction.value.toBigInt(),
+    to: MECH_FACTORY_ADDRESS,
+    data: encodeFunctionData({
+      abi: MechFactory__factory.abi,
+      functionName: "deployMech",
+      args: [calculateZodiacMechMastercopyAddress(), "0x", initCall, salt],
+    }),
   }
 }
 
 export const deployZodiacMech = async (
-  /** Addresses of the Zodiac modules */
-  modules: string[],
-  signer: JsonRpcSigner,
-  salt: string = DEFAULT_SALT
+  walletClient: WalletClient,
+  {
+    modules,
+    salt = DEFAULT_SALT,
+  }: {
+    /** Addresses of the Zodiac modules */
+    modules: `0x${string}`[]
+    salt?: `0x${string}`
+  }
 ) => {
-  // make sure the mech does not already exist
-  const deterministicAddress = calculateZodiacMechAddress(modules, salt)
-  if ((await signer.provider.getCode(deterministicAddress)) !== "0x") {
-    throw new Error(
-      `A mech with the same set of modules and salt already exists at ${deterministicAddress}`
-    )
-  }
+  const { chain, account } = walletClient
+  if (!chain) throw new Error("No chain defined in walletClient")
+  if (!account) throw new Error("No account defined in walletClient")
 
-  const { chainId } = signer.provider.network
-  // make sure the network is supported
-  if (!Object.values(SupportedNetworks).includes(chainId)) {
-    throw new Error(`Network #${chainId} is not supported yet.`)
-  }
-  // make sure the mastercopy is deployed
-  const mastercopyAddress = calculateZodiacMechMastercopyAddress()
-  if ((await signer.provider.getCode(mastercopyAddress)) === "0x") {
-    throw new Error(
-      `ZodiacMech mastercopy is not deployed on network #${chainId} yet. Please deploy it first.`
-    )
-  }
+  const transaction = makeZodiacMechDeployTransaction({ modules, salt })
 
-  const transaction = makeZodiacMechDeployTransaction(modules, chainId, salt)
-
-  return signer.sendTransaction(transaction)
+  return walletClient.sendTransaction({
+    ...transaction,
+    account,
+    chain,
+  })
 }
 
-export const deployZodiacMechMastercopy = async (signer: JsonRpcSigner) => {
-  const initData = defaultAbiCoder.encode(
-    ["address[]"],
-    ZODIAC_MASTERCOPY_INIT_DATA
+export const deployZodiacMechMastercopy = async (
+  walletClient: WalletClient
+) => {
+  const initData = encodeAbiParameters(
+    [{ type: "address[]" }],
+    [MASTERCOPY_INIT_DATA]
   )
-  return (await deployMastercopyWithInitData(
-    signer,
-    ZodiacMech__factory.bytecode + initData.slice(2),
-    DEFAULT_SALT
-  )) as `0x${string}`
+
+  return await deployMastercopy(
+    walletClient,
+    concat([ZodiacMech__factory.bytecode, initData])
+  )
 }

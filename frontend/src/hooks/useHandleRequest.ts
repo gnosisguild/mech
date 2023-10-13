@@ -1,4 +1,4 @@
-import { makeExecTransaction, signWithMech } from "mech-sdk"
+import { makeExecuteTransaction, signWithMech } from "mech-sdk"
 import { useCallback } from "react"
 import { useWalletClient } from "wagmi"
 import { ProvideWalletConnect } from "./useWalletConnect"
@@ -23,12 +23,12 @@ export const useHandleRequest = (mechAddress: `0x${string}` | null) => {
           const txFields = request.params[0] as TransactionFields
           // use ethers signer to auto-populate gas and nonce rather than using provider.send
           return await client.sendTransaction(
-            makeExecTransaction(mechAddress, txFields)
+            makeExecuteTransaction(mechAddress, txFields)
           )
         }
         case "eth_signTransaction": {
           const txFields = request.params[0] as TransactionFields
-          const tx = makeExecTransaction(mechAddress, txFields)
+          const tx = makeExecuteTransaction(mechAddress, txFields)
           return await client.request({
             method: "eth_signTransaction",
             params: [tx],
@@ -38,19 +38,19 @@ export const useHandleRequest = (mechAddress: `0x${string}` | null) => {
         case "eth_sign": {
           // replace mech address with signer address in the params
           const [, message] = request.params
-          const ecdsaSignature = await client.request({
+          const ecdsaSignature = (await client.request({
             method: request.method,
             params: [client.account, message],
-          } as any) // TODO the viem types are giving us a hard time here
+          } as any)) as `0x${string}` // TODO the viem types are giving us a hard time here
           return signWithMech(mechAddress, ecdsaSignature)
         }
         case "personal_sign": {
           // replace mech address with signer address in the params
           const [message, , password] = request.params
-          const ecdsaSignature = await client.request({
+          const ecdsaSignature = (await client.request({
             method: request.method,
             params: [message, client.account, password],
-          } as any) // TODO the viem types are giving us a hard time here
+          } as any)) as `0x${string}` // TODO the viem types are giving us a hard time here
           return signWithMech(mechAddress, ecdsaSignature)
         }
 
@@ -59,10 +59,10 @@ export const useHandleRequest = (mechAddress: `0x${string}` | null) => {
         case "eth_signTypedData_v3":
         case "eth_signTypedData_v4": {
           const typedData = request.params[1] as any
-          const ecdsaSignature = await client.request({
+          const ecdsaSignature = (await client.request({
             method: request.method,
             params: [client.account, typedData],
-          } as any) // TODO the viem types are giving us a hard time here
+          } as any)) as `0x${string}` // TODO the viem types are giving us a hard time here
           return signWithMech(mechAddress, ecdsaSignature)
         }
 

@@ -1,3 +1,4 @@
+import { TokenBalance } from "@0xsequence/indexer"
 import { useEffect, useState } from "react"
 import {
   PublicClient,
@@ -9,7 +10,6 @@ import {
 } from "wagmi"
 import { calculateMechAddress } from "../utils/calculateMechAddress"
 import { makeMechDeployTransaction } from "../utils/deployMech"
-import { MechNFT } from "./useNFTsByOwner"
 
 interface QueryKeyArgs {
   address: `0x${string}`
@@ -29,17 +29,22 @@ function queryFn(client: PublicClient) {
   }
 }
 
-export const useDeployMech = (token: MechNFT | null) => {
+export const useDeployMech = (token: TokenBalance | null) => {
   const mechAddress = token && calculateMechAddress(token)
-  const chainId = useChainId()
 
-  const publicClient = usePublicClient()
+  const publicClient = usePublicClient({ chainId: token?.chainId })
   const { data: deployed } = useQuery<boolean>(
-    ["mechDeployed", { address: mechAddress, chainId }] as const,
-    { queryFn: queryFn(publicClient) as any, enabled: !!mechAddress }
+    [
+      "mechDeployed",
+      { address: mechAddress, chainId: token?.chainId },
+    ] as const,
+    {
+      queryFn: queryFn(publicClient) as any,
+      enabled: !!mechAddress,
+    }
   )
 
-  const { data: walletClient } = useWalletClient()
+  const { data: walletClient } = useWalletClient({ chainId: token?.chainId })
 
   const queryClient = useQueryClient()
 
@@ -52,7 +57,7 @@ export const useDeployMech = (token: MechNFT | null) => {
       const hash = await walletClient.sendTransaction(tx)
       const receipt = await publicClient.waitForTransactionReceipt({ hash })
       queryClient.setQueryData(
-        ["mechDeployed", { address: mechAddress, chainId }],
+        ["mechDeployed", { address: mechAddress, chainId: token.chainId }],
         true
       )
       return receipt
@@ -66,18 +71,22 @@ export const useDeployMech = (token: MechNFT | null) => {
   return { deployed, deploy, deployPending }
 }
 
-export const useDeployedMechs = (nfts: MechNFT[]) => {
+export const useDeployedMechs = (nfts: TokenBalance[]) => {
   const queryClient = useQueryClient()
 
   useEffect(() => {
     nfts.forEach((nft) => {
-      queryClient.ensureQueryData([
-        "mechDeployed",
-        {
-          address: calculateMechAddress(nft),
-          chainId: parseInt(nft.blockchain.shortChainID),
-        },
-      ])
+      queryClient
+        .ensureQueryData([
+          "mechDeployed",
+          {
+            address: calculateMechAddress(nft),
+            chainId: nft.chainId,
+          },
+        ])
+        .catch((e) => {
+          /* when switching networks, this might throw an error (`Missing queryFn for queryKey`) */
+        })
     })
   }, [queryClient, nfts])
 

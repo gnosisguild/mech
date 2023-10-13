@@ -1,7 +1,5 @@
 import React, { useState } from "react"
-import useWalletConnect, {
-  SessionWithMetadata,
-} from "../../hooks/useWalletConnect"
+import useWalletConnect, { Session } from "../../hooks/useWalletConnect"
 import Spinner from "../Spinner"
 
 import classes from "./Connect.module.css"
@@ -14,7 +12,7 @@ const MechConnect: React.FC = () => {
 
   const disconnectAll = () => {
     sessions.forEach((session) => {
-      disconnect(session.legacy ? session.uri : session.topic)
+      disconnect(session.topic)
     })
   }
 
@@ -77,7 +75,7 @@ const MechConnect: React.FC = () => {
 export default MechConnect
 
 const SessionItem: React.FC<{
-  session: SessionWithMetadata
+  session: Session
   disconnect: (uriOrTopic: string) => void
 }> = ({ session, disconnect }) => {
   const icon = session.metadata?.icons[0] || walletConnectLogo
@@ -100,7 +98,7 @@ const SessionItem: React.FC<{
       </a>
       <Button
         secondary
-        onClick={() => disconnect(session.legacy ? session.uri : session.topic)}
+        onClick={() => disconnect(session.topic)}
         className={classes.disconnect}
         title="Disconnect"
       >
