@@ -14,22 +14,22 @@ abstract contract Account is BaseAccount {
     // return value in case of signature validation success, with no time-range.
     uint256 private constant SIG_VALIDATION_SUCCEEDED = 0;
 
-    uint256 private _nonce = 0;
-
     /**
-     * @dev Hard-code the ERC4337 entry point contract address for gas efficiency
+     * @dev Hard-code the ERC4337 entry point contract address so it cannot be changed by anyone
      */
     IEntryPoint private constant _entryPoint =
-        IEntryPoint(0x0576a174D229E3cFA37253523E645A78A0C91B57);
-
-    /// @inheritdoc BaseAccount
-    function nonce() public view virtual override returns (uint256) {
-        return _nonce;
-    }
+        IEntryPoint(0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789);
 
     /// @inheritdoc BaseAccount
     function entryPoint() public view virtual override returns (IEntryPoint) {
         return _entryPoint;
+    }
+
+    /// @inheritdoc BaseAccount
+    function _validateNonce(uint256 nonce) internal view virtual override {
+        // First 192 bits are the sequence key, remaining 64 bits are the sequence number
+        // We only use the nonce sequence with key 0, so no out-of-order nonce is possible.
+        require(nonce < type(uint64).max, "Invalid nonce");
     }
 
     /**
@@ -59,15 +59,4 @@ abstract contract Account is BaseAccount {
         bytes32 hash,
         bytes memory signature
     ) public view virtual returns (bytes4 magicValue);
-
-    /**
-     * @dev Validate the current nonce matches the UserOperation nonce, then increment nonce to prevent replay of this user operation.
-     * Called only if initCode is empty (since "nonce" field is used as "salt" on account creation)
-     * @param userOp The user operation to validate.
-     */
-    function _validateAndUpdateNonce(
-        UserOperation calldata userOp
-    ) internal virtual override {
-        require(_nonce++ == userOp.nonce, "Invalid nonce");
-    }
 }

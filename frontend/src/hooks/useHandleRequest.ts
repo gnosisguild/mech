@@ -1,16 +1,20 @@
-import { makeExecTransaction, signWithMech } from "mech-sdk"
+import { makeExecuteTransaction, signWithMech } from "mech-sdk"
 import { useCallback } from "react"
-import { useJsonRpcSigner } from "./useJsonRpcSigner"
+import { useWalletClient } from "wagmi"
 import { ProvideWalletConnect } from "./useWalletConnect"
 
-export const useHandleRequest = (mechAddress: string) => {
-  const signer = useJsonRpcSigner()
+export const useHandleRequest = (mechAddress: `0x${string}` | null) => {
+  const { data: client } = useWalletClient()
 
   const handleRequest = useCallback<HandleRequest>(
     async ({ session, request }) => {
+      if (!mechAddress) {
+        throw new Error("mech address not available")
+      }
+
       console.debug("handle request", { session, request })
-      if (!signer) {
-        throw new Error("signer not available")
+      if (!client) {
+        throw new Error("client not available")
       }
 
       switch (request.method) {
@@ -18,35 +22,35 @@ export const useHandleRequest = (mechAddress: string) => {
         case "eth_sendTransaction": {
           const txFields = request.params[0] as TransactionFields
           // use ethers signer to auto-populate gas and nonce rather than using provider.send
-          const res = await signer.sendTransaction(
-            makeExecTransaction(mechAddress, txFields)
+          return await client.sendTransaction(
+            makeExecuteTransaction(mechAddress, txFields)
           )
-          return res.hash
         }
         case "eth_signTransaction": {
           const txFields = request.params[0] as TransactionFields
-          return await signer.signTransaction(
-            makeExecTransaction(mechAddress, txFields)
-          )
+          const tx = makeExecuteTransaction(mechAddress, txFields)
+          return await client.request({
+            method: "eth_signTransaction",
+            params: [tx],
+          } as any) // TODO the viem types are giving us a hard time here
         }
 
         case "eth_sign": {
           // replace mech address with signer address in the params
           const [, message] = request.params
-          const ecdsaSignature = await signer.provider.send(request.method, [
-            await signer.getAddress(),
-            message,
-          ])
+          const ecdsaSignature = (await client.request({
+            method: request.method,
+            params: [client.account, message],
+          } as any)) as `0x${string}` // TODO the viem types are giving us a hard time here
           return signWithMech(mechAddress, ecdsaSignature)
         }
         case "personal_sign": {
           // replace mech address with signer address in the params
           const [message, , password] = request.params
-          const ecdsaSignature = await signer.provider.send(request.method, [
-            message,
-            await signer.getAddress(),
-            password,
-          ])
+          const ecdsaSignature = (await client.request({
+            method: request.method,
+            params: [message, client.account, password],
+          } as any)) as `0x${string}` // TODO the viem types are giving us a hard time here
           return signWithMech(mechAddress, ecdsaSignature)
         }
 
@@ -55,19 +59,19 @@ export const useHandleRequest = (mechAddress: string) => {
         case "eth_signTypedData_v3":
         case "eth_signTypedData_v4": {
           const typedData = request.params[1] as any
-          console.log(typeof typedData, { typedData })
-
-          const ecdsaSignature = await signer.provider.send(request.method, [
-            await signer.getAddress(),
-            typedData,
-          ])
-          console.log({ ecdsaSignature })
+          const ecdsaSignature = (await client.request({
+            method: request.method,
+            params: [client.account, typedData],
+          } as any)) as `0x${string}` // TODO the viem types are giving us a hard time here
           return signWithMech(mechAddress, ecdsaSignature)
         }
 
         default:
           try {
-            return await signer.provider.send(request.method, request.params)
+            return await client.request({
+              method: request.method,
+              params: request.params,
+            } as any) // TODO the viem types are giving us a hard time here
           } catch (e: any) {
             let jsonRpcBody
             try {
@@ -90,7 +94,7 @@ export const useHandleRequest = (mechAddress: string) => {
           }
       }
     },
-    [mechAddress, signer]
+    [mechAddress, client]
   )
 
   return handleRequest
@@ -101,10 +105,10 @@ type HandleRequest = React.ComponentProps<
 >["onRequest"]
 
 interface TransactionFields {
-  data: string
-  from: string
+  data: `0x${string}`
+  from: `0x${string}`
   gas: string
-  to: string
+  to: `0x${string}`
   value: string
 }
 

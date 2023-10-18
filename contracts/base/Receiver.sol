@@ -13,7 +13,7 @@ contract Receiver is
     ERC777TokensRecipient,
     ERC721TokenReceiver
 {
-    receive() external payable {}
+    receive() external payable virtual {}
 
     function onERC1155Received(
         address,
@@ -21,7 +21,7 @@ contract Receiver is
         uint256,
         uint256,
         bytes calldata
-    ) external pure override returns (bytes4) {
+    ) external view virtual override returns (bytes4) {
         return 0xf23a6e61;
     }
 
@@ -31,7 +31,7 @@ contract Receiver is
         uint256[] calldata,
         uint256[] calldata,
         bytes calldata
-    ) external pure override returns (bytes4) {
+    ) external view virtual override returns (bytes4) {
         return 0xbc197c81;
     }
 
@@ -40,7 +40,7 @@ contract Receiver is
         address,
         uint256,
         bytes calldata
-    ) external pure override returns (bytes4) {
+    ) external view virtual override returns (bytes4) {
         return 0x150b7a02;
     }
 

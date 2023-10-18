@@ -1,59 +1,57 @@
+import { TokenBalance } from "@0xsequence/indexer"
 import classes from "./NFTItem.module.css"
 import { useState } from "react"
 import { shortenAddress } from "../../utils/shortenAddress"
 import copy from "copy-to-clipboard"
 import clsx from "clsx"
 
-import useAccountBalance from "../../hooks/useAccountBalance"
+import useTokenBalances from "../../hooks/useTokenBalances"
 import Spinner from "../Spinner"
 import { useDeployMech } from "../../hooks/useDeployMech"
-import { calculateERC721MechAddress } from "mech-sdk"
-import { MechNFT } from "../../hooks/useNFTsByOwner"
+
+import { calculateMechAddress } from "../../utils/calculateMechAddress"
+import { formatUnits } from "viem"
 
 interface Props {
-  token: string
-  tokenId: string
-  nftData: MechNFT
-  operatorAddress?: string
+  tokenBalance: TokenBalance
 }
 
-const NFTItem: React.FC<Props> = ({
-  token,
-  tokenId,
-  nftData,
-  operatorAddress,
-}) => {
-  const mechAddress = calculateERC721MechAddress(token, tokenId)
+const NFTItem: React.FC<Props> = ({ tokenBalance }) => {
+  const mechAddress = calculateMechAddress(tokenBalance)
+  const operatorAddress = tokenBalance.accountAddress
 
   const [imageError, setImageError] = useState(false)
 
   const {
-    isLoading: assetsLoading,
-    data: assetsData,
-    error: assetsError,
-  } = useAccountBalance({ address: mechAddress })
+    balances: mechBalances,
+    isLoading: mechBalancesLoading,
+    error: mechBalancesError,
+  } = useTokenBalances({
+    accountAddress: mechAddress,
+    chainId: tokenBalance.chainId,
+  })
 
-  const { deployed } = useDeployMech(token, tokenId)
-
+  const { deployed } = useDeployMech(tokenBalance)
+  const name =
+    tokenBalance.tokenMetadata?.name || tokenBalance.contractInfo?.name || "..."
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
-        <p className={classes.tokenName}>
-          {nftData.nft.title || nftData.nft.contractTitle || "..."}
+        <p className={classes.tokenName}>{name}</p>
+
+        <p className={classes.tokenId} title={tokenBalance.tokenID}>
+          {tokenBalance.tokenID}
         </p>
-        {nftData.nft.tokenID.length < 5 && (
-          <p className={classes.tokenId}>{nftData.nft.tokenID || "..."}</p>
-        )}
       </div>
       <div className={classes.main}>
-        {(imageError || !nftData.nft.previews) && (
+        {(imageError || !tokenBalance.tokenMetadata?.image) && (
           <div className={classes.noImage}></div>
         )}
-        {!imageError && nftData.nft.previews && (
+        {!imageError && tokenBalance.tokenMetadata?.image && (
           <div className={classes.imageContainer}>
             <img
-              src={nftData.nft.previews[0].URI}
-              alt={nftData.nft.contractTitle}
+              src={tokenBalance.tokenMetadata?.image}
+              alt={name}
               className={classes.image}
               onError={() => setImageError(true)}
             />
@@ -78,6 +76,7 @@ const NFTItem: React.FC<Props> = ({
             <div
               className={clsx(classes.infoItem, classes.address)}
               onClick={() => copy(mechAddress)}
+              title={mechAddress}
             >
               {shortenAddress(mechAddress)}
             </div>
@@ -91,45 +90,50 @@ const NFTItem: React.FC<Props> = ({
               onClick={
                 operatorAddress ? () => copy(operatorAddress) : undefined
               }
+              title={operatorAddress}
             >
-              {operatorAddress ? shortenAddress(operatorAddress) : "\u2014"}
+              <div className={classes.ellipsis}>
+                {operatorAddress ? shortenAddress(operatorAddress) : "\u2014"}
+              </div>
             </div>
           </li>
-          <li>
+          {/* <li>
             <label>Balance</label>
             <div className={clsx(classes.infoItem)}>
               {assetsError || !assetsData
                 ? "n/a"
                 : `$ ${assetsData.totalBalanceUSD}`}
             </div>
-          </li>
+          </li> */}
         </ul>
       </div>
       <label>Assets</label>
       <div
         className={clsx(
           classes.assetsContainer,
-          assetsData && assetsData.assets.length === 0 && classes.empty
+          mechBalances.length === 0 && classes.empty
         )}
       >
-        {assetsError && <p>Failed to load assets</p>}
-        {assetsLoading && <Spinner />}
-        {assetsData && (
-          <>
-            {assetsData.assets.length === 0 && <p>No assets found</p>}
-            <ul className={classes.assetList}>
-              {assetsData.assets.map((asset, index) => (
-                <li key={index} className={classes.asset}>
-                  <div className={classes.name}>{asset.name}</div>
-                  <div className={classes.value}>
-                    <p>{asset.pretty}</p>
-                    <p>{asset.symbol}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+        {mechBalancesError && <p>Failed to load assets</p>}
+        {mechBalancesLoading && <Spinner />}
+
+        {mechBalances.length === 0 && <p>No assets found</p>}
+        <ul className={classes.assetList}>
+          {mechBalances.map((balance, index) => (
+            <li key={index} className={classes.asset}>
+              <div className={classes.name}>{balance.contractInfo?.name}</div>
+              <div className={classes.value}>
+                <p>
+                  {formatUnits(
+                    BigInt(balance.balance),
+                    balance.contractInfo?.decimals || 0
+                  )}
+                </p>
+                <p>{balance.contractInfo?.symbol}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )

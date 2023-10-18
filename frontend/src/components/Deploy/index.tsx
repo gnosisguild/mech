@@ -3,11 +3,10 @@ import Spinner from "../Spinner"
 
 import classes from "./Deploy.module.css"
 import Button from "../Button"
-import { TransactionReceipt } from "@ethersproject/providers"
 
 interface Props {
   deployPending: boolean
-  deploy: () => Promise<TransactionReceipt | undefined>
+  deploy: () => Promise<any>
 }
 
 const MechDeploy: React.FC<Props> = ({ deployPending, deploy }) => {

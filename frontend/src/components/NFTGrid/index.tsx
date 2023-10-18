@@ -1,50 +1,43 @@
-import { useEffect, useState } from "react"
-
-import useNFTsByOwner, { MechNFT } from "../../hooks/useNFTsByOwner"
+import { ContractType, TokenBalance } from "@0xsequence/indexer"
 import NFTGridItem from "../NFTGridItem"
 import Spinner from "../Spinner"
-import Button from "../Button"
 
 import classes from "./NFTGrid.module.css"
 import clsx from "clsx"
+import { useChainId } from "wagmi"
+import { useDeployedMechs } from "../../hooks/useDeployMech"
+import { calculateMechAddress } from "../../utils/calculateMechAddress"
+import useTokenBalances from "../../hooks/useTokenBalances"
 
 interface Props {
   address: string
 }
 
 const NFTGrid: React.FC<Props> = ({ address }) => {
-  const [pageToken, setPageToken] = useState<string | undefined>(undefined)
+  const chainId = useChainId()
 
-  const { data, isLoading } = useNFTsByOwner({
-    walletAddress: address,
-    blockchain: "gor",
-    pageToken,
+  const { balances, isLoading } = useTokenBalances({
+    accountAddress: address,
+    chainId,
   })
 
-  const [nftData, setNftData] = useState<MechNFT[]>([])
+  const nftBalances = balances.filter(
+    (balance) =>
+      balance.contractType === ContractType.ERC721 ||
+      balance.contractType === ContractType.ERC1155
+  )
 
-  useEffect(() => {
-    setNftData((nftData) => {
-      if (nftData.length === 0) {
-        return data?.assets || []
-      }
-      const ids = new Set(
-        nftData.map((nft) => nft.nft.tokenID + nft.contractAddress)
-      )
+  const deployedMechs = useDeployedMechs(nftBalances)
 
-      // merge and dedupe
-      return [
-        ...nftData,
-        ...data?.assets.filter(
-          (nft) => !ids.has(nft.nft.tokenID + nft.contractAddress)
-        ),
-      ]
-    })
-  }, [data])
+  const isDeployed = (nft: TokenBalance) =>
+    deployedMechs.some(
+      (mech) =>
+        mech.chainId === chainId &&
+        mech.address.toLowerCase() === calculateMechAddress(nft).toLowerCase()
+    )
 
-  const deployed = nftData.filter((nft) => nft.hasMech)
-
-  const undeployed = nftData.filter((nft) => !nft.hasMech)
+  const deployed = nftBalances.filter(isDeployed)
+  const undeployed = nftBalances.filter((nft) => !isDeployed(nft))
 
   return (
     <div className={classes.container}>
@@ -62,7 +55,7 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
       <ul className={classes.grid}>
         {deployed.map((nft, index) => (
           <li key={`${index}-${nft.contractAddress}`}>
-            <NFTGridItem nftData={nft} />
+            <NFTGridItem tokenBalance={nft} />
           </li>
         ))}
       </ul>
@@ -76,24 +69,12 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
         <ul className={classes.grid}>
           {undeployed.map((nft, index) => (
             <li key={`${index}-${nft.contractAddress}`}>
-              <NFTGridItem nftData={nft} />
+              <NFTGridItem tokenBalance={nft} />
             </li>
           ))}
         </ul>
       )}
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <Button
-          onClick={() => {
-            console.log("set page token")
-            setPageToken(data?.nextPageToken)
-          }}
-          secondary
-        >
-          Load more
-        </Button>
-      )}
+      {isLoading && <Spinner />}
     </div>
   )
 }

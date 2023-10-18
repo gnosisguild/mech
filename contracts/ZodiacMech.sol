@@ -31,7 +31,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
     }
 
     /// @dev This function can be called whenever no modules are enabled, meaning anyone could come and call setUp() then. We keep this behavior to not brick the mech in that case.
-    function setUp(bytes memory initParams) public override {
+    function setUp(bytes memory initParams) public {
         require(
             modules[address(SENTINEL_MODULES)] == address(0),
             "Already initialized"
@@ -44,18 +44,6 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         for (uint256 i = 0; i < _modules.length; i++) {
             _enableModule(_modules[i]);
         }
-    }
-
-    function nonce() public view override returns (uint256) {
-        // Here we use the nonce variable of the SafeStorage contract rather than that of the Mech contract.
-        // This is for keeping the nonce sequence of Safes that got upgraded to ZodiacMechs.
-        return safeNonce;
-    }
-
-    function _validateAndUpdateNonce(
-        UserOperation calldata userOp
-    ) internal override {
-        require(safeNonce++ == userOp.nonce, "Invalid nonce");
     }
 
     function isOperator(address signer) public view override returns (bool) {
@@ -74,7 +62,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         bytes calldata data,
         Enum.Operation operation
     ) public onlyOperator returns (bool success) {
-        (success, ) = _exec(to, value, data, operation, gasleft());
+        (success, ) = _exec(to, value, data, uint8(operation), gasleft());
     }
 
     /// @dev Passes a transaction to the avatar, expects return data.
@@ -89,7 +77,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         bytes calldata data,
         Enum.Operation operation
     ) public onlyOperator returns (bool success, bytes memory returnData) {
-        return _exec(to, value, data, operation, gasleft());
+        return _exec(to, value, data, uint8(operation), gasleft());
     }
 
     /// @dev Disables a module on the modifier.

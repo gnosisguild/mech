@@ -2,7 +2,12 @@
 pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import "@account-abstraction/contracts/interfaces/IAccount.sol";
 
 import "./Receiver.sol";
 import "./Account.sol";
@@ -93,14 +98,16 @@ abstract contract Mech is IMech, Account, Receiver {
     function _exec(
         address to,
         uint256 value,
-        bytes memory data,
-        Enum.Operation operation,
+        bytes calldata data,
+        uint8 operation,
         uint256 txGas
     ) internal returns (bool success, bytes memory returnData) {
-        if (operation == Enum.Operation.DelegateCall) {
+        if (operation == 0) {
+            (success, returnData) = to.call{gas: txGas, value: value}(data);
+        } else if (operation == 1) {
             (success, returnData) = to.delegatecall{gas: txGas}(data);
         } else {
-            (success, returnData) = to.call{gas: txGas, value: value}(data);
+            revert("Invalid operation");
         }
     }
 
@@ -111,13 +118,13 @@ abstract contract Mech is IMech, Account, Receiver {
     /// @param operation Operation type of transaction.
     /// @param txGas Gas to send for executing the meta transaction, if 0 all left will be sent
     /// @return returnData Return data of the call
-    function exec(
+    function execute(
         address to,
         uint256 value,
-        bytes memory data,
-        Enum.Operation operation,
+        bytes calldata data,
+        uint8 operation,
         uint256 txGas
-    ) public onlyOperator returns (bytes memory returnData) {
+    ) public payable onlyOperator returns (bytes memory returnData) {
         bool success;
         (success, returnData) = _exec(
             to,
@@ -126,6 +133,29 @@ abstract contract Mech is IMech, Account, Receiver {
             operation,
             txGas == 0 ? gasleft() : txGas
         );
+
+        if (!success) {
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                revert(add(returnData, 0x20), mload(returnData))
+            }
+        }
+    }
+
+    /// @dev Allows the mech operator to execute arbitrary transactions
+    /// @param to Destination address of transaction.
+    /// @param value Ether value of transaction.
+    /// @param data Data payload of transaction.
+    /// @param operation Operation type of transaction.
+    /// @return returnData Return data of the call
+    function execute(
+        address to,
+        uint256 value,
+        bytes calldata data,
+        uint8 operation
+    ) external payable onlyOperator returns (bytes memory returnData) {
+        bool success;
+        (success, returnData) = _exec(to, value, data, operation, gasleft());
 
         if (!success) {
             // solhint-disable-next-line no-inline-assembly
@@ -151,5 +181,19 @@ abstract contract Mech is IMech, Account, Receiver {
             s := mload(add(signature, 0x40))
             v := byte(0, mload(add(signature, 0x60)))
         }
+    }
+
+    /// @dev Returns true if a given interfaceId is supported by this account. This method can be
+    /// extended by an override
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public pure virtual returns (bool) {
+        return
+            interfaceId == type(IMech).interfaceId ||
+            interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IAccount).interfaceId ||
+            interfaceId == type(IERC1271).interfaceId ||
+            interfaceId == type(IERC1155Receiver).interfaceId ||
+            interfaceId == type(IERC6551Executable).interfaceId;
     }
 }

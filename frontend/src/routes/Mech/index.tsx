@@ -1,11 +1,7 @@
 import React from "react"
+import { TokenBalance } from "@0xsequence/indexer"
 import { useParams } from "react-router-dom"
-import { calculateERC721MechAddress } from "mech-sdk"
-import { useChainId } from "wagmi"
 import Layout from "../../components/Layout"
-import { useErc721OwnerOf } from "../../generated"
-import { BigNumber } from "ethers"
-import useNFT from "../../hooks/useNFT"
 import NFTItem from "../../components/NFTItem"
 
 import classes from "./Mech.module.css"
@@ -15,6 +11,9 @@ import { ProvideWalletConnect } from "../../hooks/useWalletConnect"
 import { useHandleRequest } from "../../hooks/useHandleRequest"
 import { useDeployMech } from "../../hooks/useDeployMech"
 import MechDeploy from "../../components/Deploy"
+import { calculateMechAddress } from "../../utils/calculateMechAddress"
+import { CHAINS } from "../../chains"
+import useTokenBalances from "../../hooks/useTokenBalances"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -22,44 +21,44 @@ const Mech: React.FC = () => {
   if (!token || !tokenId) {
     throw new Error("token and tokenId are required")
   }
-  if (!token.startsWith("0x")) {
+
+  const [chainPrefix, contractAddress] = token.split(":")
+  if (!chainPrefix || !contractAddress) {
+    throw new Error("token must be in the format <chain>:<contractAddress>")
+  }
+  const chain = Object.values(CHAINS).find((c) => c.prefix === chainPrefix)
+
+  if (!chain) {
+    throw new Error(`chain ${chainPrefix} not support`)
+  }
+
+  if (!contractAddress.startsWith("0x")) {
     throw new Error("token must be a valid address")
   }
 
-  const { data, error, isLoading } = useNFT({
-    contractAddress: token,
+  const { balances, error, isLoading } = useTokenBalances({
+    tokenContract: contractAddress,
+    chainId: chain.id,
     tokenId: tokenId,
-    blockchain: "gor",
   })
+  const balance: TokenBalance | null = balances[0]
 
-  const chainId = useChainId()
+  const { deployed, deploy, deployPending } = useDeployMech(balance)
 
-  const { data: tokenOwner } = useErc721OwnerOf({
-    address: token as `0x${string}`,
-    args: [BigNumber.from(tokenId)],
-  })
-
-  const { deployed, deploy, deployPending } = useDeployMech(token, tokenId)
-
-  const mechAddress = calculateERC721MechAddress(token, tokenId)
+  const mechAddress = balance && calculateMechAddress(balance)
 
   const handleRequest = useHandleRequest(mechAddress)
 
   return (
-    <Layout mechAddress={mechAddress}>
+    <Layout mechAddress={mechAddress || undefined}>
       <div className={classes.container}>
         {isLoading && <Spinner />}
-        {!error && !isLoading && data && (
+        {!error && !isLoading && balance && mechAddress && (
           <>
-            <NFTItem
-              token={token}
-              tokenId={tokenId}
-              nftData={data}
-              operatorAddress={tokenOwner}
-            />
+            <NFTItem tokenBalance={balance} />
 
             <ProvideWalletConnect
-              chainId={chainId}
+              chainId={chain.id}
               mechAddress={mechAddress}
               onRequest={handleRequest}
             >

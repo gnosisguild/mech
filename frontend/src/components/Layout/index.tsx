@@ -23,7 +23,6 @@ const Layout: React.FC<Props> = ({ children, mechAddress }) => {
 
   setTheme({
     themeMode: "light",
-    themeColor: "green",
   })
 
   return (
