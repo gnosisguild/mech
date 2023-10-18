@@ -27,7 +27,7 @@ const Layout: React.FC<Props> = ({ children, mechAddress }) => {
 
   return (
     <div className={classes.layout}>
-      <img src="/cockpit.jpg" alt="cockpit" className={classes.cockpit} />
+      <img src="/cockpit.png" alt="cockpit" className={classes.cockpit} />
       <header className={classes.header}>
         <div className={classes.nav}>
           <Link to="/">

@@ -35,10 +35,9 @@
 
 .mech {
   position: absolute;
-  bottom: -2px;
-  left: -40%;
+  bottom: -14px;
+  left: -29%;
   height: 100%;
-  transform: scale(1.55);
 }
 
 .demoInfo {
