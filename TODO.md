@@ -9,4 +9,3 @@
 ## SDK
 
 - get rid of zodiac dep
-- migrate to viem

@@ -2,17 +2,11 @@ import { DeployFunction } from "hardhat-deploy/types"
 import {
   createWalletClient,
   custom as customTransport,
-  getCreate2Address,
   publicActions,
 } from "viem"
 import * as chains from "viem/chains"
 
-import { deployMastercopy } from "../sdk"
-import {
-  DEFAULT_SALT,
-  ERC2470_SINGLETON_FACTORY_ADDRESS,
-  ERC6551_REGISTRY_ADDRESS,
-} from "../sdk/src/constants"
+import { ERC6551_REGISTRY_ADDRESS } from "../sdk/src/constants"
 
 const deployERC6551Registry: DeployFunction = async (hre) => {
   const [signer] = await hre.ethers.getSigners()
