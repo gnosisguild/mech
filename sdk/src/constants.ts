@@ -2,7 +2,7 @@ export const MECH_FACTORY_ADDRESS =
   "0x000000000000000000000000000000000000eeee" as const // TODO get MechFactory deployed to a nice vanity address
 
 export const ERC6551_REGISTRY_ADDRESS =
-  "0x51aD9b7E1C9c3b208c72cB3cF44B9aA24Ecf9477" as const
+  "0x000000006551c19487814612e58FE06813775758" as const
 
 export const ERC2470_SINGLETON_FACTORY_ADDRESS =
   "0xce0042b868300000d44a59004da54a005ffdcf9f" as const
