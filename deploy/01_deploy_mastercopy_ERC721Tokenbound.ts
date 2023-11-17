@@ -35,8 +35,8 @@ const deployMastercopyERC721Tokenbound: DeployFunction = async (hre) => {
   if (await deployerClient.extend(publicActions).getBytecode({ address })) {
     console.log(`  ✔ Contract is already deployed at ${address}`)
   } else {
-    await deployERC721TokenboundMechMastercopy(deployerClient)
-    console.log(`  ✔ Contract deployed at ${address}`)
+    const txHash = await deployERC721TokenboundMechMastercopy(deployerClient)
+    console.log(`  ✔ Contract deployed at ${address} (tx hash: ${txHash})`)
   }
 
   try {

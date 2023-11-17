@@ -1,8 +1,14 @@
-import { encodeFunctionData, getCreate2Address, WalletClient } from "viem"
+import {
+  encodeFunctionData,
+  getContract,
+  getCreate2Address,
+  WalletClient,
+} from "viem"
 
 import { ERC721TokenboundMech__factory } from "../../../typechain-types"
 import {
   DEFAULT_SALT,
+  ERC2470_SINGLETON_FACTORY_ABI,
   ERC2470_SINGLETON_FACTORY_ADDRESS,
   ERC6551_REGISTRY_ABI,
   ERC6551_REGISTRY_ADDRESS,
@@ -113,8 +119,16 @@ export const deployERC721TokenboundMech = async (
 export const deployERC721TokenboundMechMastercopy = async (
   walletClient: WalletClient
 ) => {
-  return await deployMastercopy(
+  const singletonFactory = getContract({
+    address: ERC2470_SINGLETON_FACTORY_ADDRESS,
+    abi: ERC2470_SINGLETON_FACTORY_ABI,
     walletClient,
-    ERC721TokenboundMech__factory.bytecode
+  })
+
+  return await singletonFactory.write.deploy(
+    [ERC721TokenboundMech__factory.bytecode, DEFAULT_SALT],
+    {
+      gas: 2000000,
+    }
   )
 }
