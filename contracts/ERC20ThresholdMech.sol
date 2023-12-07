@@ -22,7 +22,7 @@ contract ERC20ThresholdMech is ThresholdMech {
     }
 
     function isOperator(address signer) public view override returns (bool) {
-        (address token, uint256 minBalance) = this.threshold();
+        (address token, uint256 minBalance) = threshold();
 
         return IERC20(token).balanceOf(signer) >= minBalance;
     }

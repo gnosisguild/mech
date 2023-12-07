@@ -18,7 +18,7 @@ abstract contract TokenboundMech is Mech, IERC6551Account {
     }
 
     function token()
-        external
+        public
         view
         returns (uint256 chainId, address tokenContract, uint256 tokenId)
     {

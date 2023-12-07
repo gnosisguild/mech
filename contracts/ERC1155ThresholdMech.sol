@@ -32,7 +32,7 @@ contract ERC1155ThresholdMech is ThresholdMech {
             uint256[] memory tokenIds,
             uint256[] memory minBalances,
             uint256 minTotalBalance
-        ) = this.threshold();
+        ) = threshold();
 
         uint256 balanceSum = 0;
         for (uint256 i = 0; i < tokenIds.length; i++) {

@@ -9,8 +9,7 @@ import "./base/TokenboundMech.sol";
  */
 contract ERC1155TokenboundMech is TokenboundMech {
     function isOperator(address signer) public view override returns (bool) {
-        (uint256 chainId, address tokenContract, uint256 tokenId) = this
-            .token();
+        (uint256 chainId, address tokenContract, uint256 tokenId) = token();
         if (chainId != block.chainid) return false;
         return IERC1155(tokenContract).balanceOf(signer, tokenId) > 0;
     }
@@ -26,7 +25,7 @@ contract ERC1155TokenboundMech is TokenboundMech {
             uint256 chainId,
             address boundTokenContract,
             uint256 boundTokenId
-        ) = this.token();
+        ) = token();
 
         if (
             chainId == block.chainid &&
@@ -56,7 +55,7 @@ contract ERC1155TokenboundMech is TokenboundMech {
             uint256 chainId,
             address boundTokenContract,
             uint256 boundTokenId
-        ) = this.token();
+        ) = token();
 
         if (chainId == block.chainid && msg.sender == boundTokenContract) {
             // We block the transfer only if the sender has no balance left after the transfer.
