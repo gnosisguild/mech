@@ -142,3 +142,12 @@ The same mechanism is implemented by the 6551 account registry.
 The ZodiacMech uses the same storage layout at the Safe contracts, meaning that an existing Safe instance can be migrated to the ZodiacMech implementation.
 For migrating a Safe it needs to delegate call the [SafeMigration.sol](contracts/libraries/SafeMigration.sol) contract's `migrate()` function.
 This will revoke access for the Safe owners so that the account will only be controlled by enabled modules going forwards.
+
+#### Security hint on `getModulesPaginated()`
+
+\*\*Attention:\*\* You must never trust the result of `getModulesPaginated()` without extra validation.
+Modules can add other modules without these appearing in the list returned by `getModulesPaginated` by writing directly to storage slots via delegate calls.
+
+This caveat is [known](https://blog.openzeppelin.com/backdooring-gnosis-safe-multisig-wallets) for Safe and also extends to Zodiac Modifiers and Avatars, like ZodiacMech.
+
+For validating that the return value of `getModulesPaginated` indeed includes the full set of enabled modules it is required to calculate the ZodiacMech contract's storage hash and compare it with the value retrieved via [eth_getProof](https://docs.infura.io/networks/ethereum/json-rpc-methods/eth_getproof).
