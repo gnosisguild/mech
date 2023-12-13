@@ -10,8 +10,7 @@ import "./base/TokenboundMech.sol";
  */
 contract ERC721TokenboundMech is TokenboundMech {
     function isOperator(address signer) public view override returns (bool) {
-        (uint256 chainId, address tokenContract, uint256 tokenId) = token();
-        if (chainId != block.chainid) return false;
+        (, address tokenContract, uint256 tokenId) = token();
         return
             IERC721(tokenContract).ownerOf(tokenId) == signer &&
             signer != address(0);
@@ -23,16 +22,10 @@ contract ERC721TokenboundMech is TokenboundMech {
         uint256 receivedTokenId,
         bytes calldata
     ) external view override returns (bytes4) {
-        (
-            uint256 chainId,
-            address boundTokenContract,
-            uint256 boundTokenId
-        ) = token();
+        (, address boundTokenContract, uint256 boundTokenId) = token();
 
         if (
-            chainId == block.chainid &&
-            msg.sender == boundTokenContract &&
-            receivedTokenId == boundTokenId
+            msg.sender == boundTokenContract && receivedTokenId == boundTokenId
         ) {
             revert OwnershipCycle();
         }
