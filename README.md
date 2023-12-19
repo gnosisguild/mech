@@ -145,7 +145,7 @@ This will revoke access for the Safe owners so that the account will only be con
 
 #### Security hint on `getModulesPaginated()`
 
-\*\*Attention:\*\* You must never trust the result of `getModulesPaginated()` without extra validation.
+**Attention:** You must never trust the result of `getModulesPaginated()` without extra validation.
 Modules can add other modules without these appearing in the list returned by `getModulesPaginated` by writing directly to storage slots via delegate calls.
 
 This caveat is [known](https://blog.openzeppelin.com/backdooring-gnosis-safe-multisig-wallets) for Safe and also extends to Zodiac Modifiers and Avatars, like ZodiacMech.
