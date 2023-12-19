@@ -50,7 +50,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         return isModuleEnabled(signer);
     }
 
-    /// @dev Passes a transaction to the avatar.
+    /// @dev Passes a transaction to the mech.
     /// @notice Can only be called by enabled modules.
     /// @param to Destination address of module transaction.
     /// @param value Ether value of mo  dule transaction.
@@ -65,7 +65,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         (success, ) = _exec(to, value, data, uint8(operation), gasleft());
     }
 
-    /// @dev Passes a transaction to the avatar, expects return data.
+    /// @dev Passes a transaction to the mech, expects return data.
     /// @notice Can only be called by enabled modules.
     /// @param to Destination address of module transaction.
     /// @param value Ether value of module transaction.
@@ -80,7 +80,7 @@ contract ZodiacMech is SafeStorage, Mech, IAvatar {
         return _exec(to, value, data, uint8(operation), gasleft());
     }
 
-    /// @dev Disables a module on the modifier.
+    /// @dev Disables a module on the mech.
     /// @notice This can only be called by the owner.
     /// @param prevModule Module that pointed to the module to be removed in the linked list.
     /// @param module Module to be removed.
