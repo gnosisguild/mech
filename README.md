@@ -44,6 +44,10 @@ Allows the operator to make the Mech execute a transaction.
 Allows the operator to make the Mech execute a transaction restricting the gas amount made available to the direct execution of the internal meta transaction.
 Any remaining transaction gas must only be spent for surrounding checks of the operator criteria.
 
+## Audits
+
+All mech contracts have been audited by [G0 Group](https://github.com/g0-group). Audit reports can be found in the [audits](audits/) directory.
+
 ## Contribute
 
 The repo is structured as a monorepo with `mech-contracts` as the container package exporting the contract sources and artifacts.
