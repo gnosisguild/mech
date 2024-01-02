@@ -1,5 +1,5 @@
 import {
-  SequenceIndexerClient,
+  SequenceIndexer,
   TokenBalance,
   ContractType,
 } from "@0xsequence/indexer"
@@ -13,6 +13,8 @@ interface Props {
   tokenId?: string
 }
 
+const API_KEY = process.env.REACT_APP_SEQUENCE_API_KEY || ""
+
 const useTokenBalances = ({
   accountAddress,
   chainId,
@@ -24,8 +26,9 @@ const useTokenBalances = ({
   const [error, setError] = useState<any>(null)
 
   useEffect(() => {
-    const indexer = new SequenceIndexerClient(
-      SEQUENCER_ENDPOINTS[chainId as ChainId]
+    const indexer = new SequenceIndexer(
+      SEQUENCER_ENDPOINTS[chainId as ChainId],
+      API_KEY
     )
     const fetchData = async () => {
       try {
