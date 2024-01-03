@@ -5,94 +5,95 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"0xsequence@npm:^1.2.6":
-  version: 1.4.3
-  resolution: "0xsequence@npm:1.4.3"
+"0xsequence@npm:^1.6.2":
+  version: 1.6.2
+  resolution: "0xsequence@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
-    "@0xsequence/account": 1.4.3
-    "@0xsequence/api": 1.4.3
-    "@0xsequence/auth": 1.4.3
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/guard": 1.4.3
-    "@0xsequence/indexer": 1.4.3
-    "@0xsequence/metadata": 1.4.3
-    "@0xsequence/migration": 1.4.3
-    "@0xsequence/multicall": 1.4.3
-    "@0xsequence/network": 1.4.3
-    "@0xsequence/provider": 1.4.3
-    "@0xsequence/relayer": 1.4.3
-    "@0xsequence/sessions": 1.4.3
-    "@0xsequence/signhub": 1.4.3
-    "@0xsequence/utils": 1.4.3
-    "@0xsequence/wallet": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/account": 1.6.2
+    "@0xsequence/api": 1.6.2
+    "@0xsequence/auth": 1.6.2
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/guard": 1.6.2
+    "@0xsequence/indexer": 1.6.2
+    "@0xsequence/metadata": 1.6.2
+    "@0xsequence/migration": 1.6.2
+    "@0xsequence/multicall": 1.6.2
+    "@0xsequence/network": 1.6.2
+    "@0xsequence/provider": 1.6.2
+    "@0xsequence/relayer": 1.6.2
+    "@0xsequence/sessions": 1.6.2
+    "@0xsequence/signhub": 1.6.2
+    "@0xsequence/utils": 1.6.2
+    "@0xsequence/wallet": 1.6.2
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 8fac0dd49414554c37c9862777fdc0ba980af2abd221fc91979b07ead1ab0e38c0963b146baf5af7e44578a417a462cfa9b65e734e7d30249a83bc2051582d18
+  checksum: a055251bcd950a3a5f94afddc75d480d4a058bad3495f0718289f1cdc4f43f12405d38358bcbb502531e97c150a2f085945ae2acd0e75d65731fac82a1921b63
   languageName: node
   linkType: hard
 
-"@0xsequence/abi@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/abi@npm:1.4.3"
-  checksum: fc698b1ef9688bf97c846589c92ac18f3c274fffe1cabb755c5ab76e0de196791a9b87d50148505e7cf25d33f4b2b0b79c3bdc739942128cc0d805cd0f8020a8
+"@0xsequence/abi@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/abi@npm:1.6.2"
+  checksum: 83182a87053b1a76f5097e763338268c81ff6156bb507765b2fa1d723db6814e97cd154cff18c1d6b29a6b3b78291027f663705e5249a36d4751bdb1305ea742
   languageName: node
   linkType: hard
 
-"@0xsequence/account@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/account@npm:1.4.3"
+"@0xsequence/account@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/account@npm:1.6.2"
   dependencies:
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/migration": 1.4.3
-    "@0xsequence/network": 1.4.3
-    "@0xsequence/relayer": 1.4.3
-    "@0xsequence/sessions": 1.4.3
-    "@0xsequence/utils": 1.4.3
-    "@0xsequence/wallet": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/migration": 1.6.2
+    "@0xsequence/network": 1.6.2
+    "@0xsequence/relayer": 1.6.2
+    "@0xsequence/sessions": 1.6.2
+    "@0xsequence/utils": 1.6.2
+    "@0xsequence/wallet": 1.6.2
     ethers: ^5.5.2
-  checksum: 4aacaba6d8320f916331da45a54b1248566a89b7178c62f00c3327264ab86226ba654cdbc990e7190cc17e840985bfa82c246e807c30b6060bb6b7ab7a8d9c76
+  checksum: 763ad2b56c36e875a6841b3839cbdd52086c22002cf5bfd8d362258720fbef96ce384d7750884fa6ee006ad94ccd701b48e3956ada0f9b99a0e50d8f58040a65
   languageName: node
   linkType: hard
 
-"@0xsequence/api@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/api@npm:1.4.3"
-  checksum: b46a168b53c6770a7c293cad2f02bdc2e964ae49b1421ad06791fa9f25bdb9535ba8e2e65073a9f4f0b15e5ef29c7357cb4ea9d0b129249dac2c00fe64729605
+"@0xsequence/api@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/api@npm:1.6.2"
+  checksum: 76b3fc7534588ddde3d542703a353fa797623027d7f4c1c6b650c4da7012347702d26d37d4956511538f56bfa23532dbbdcf0bcfbca3376d9179c95b763f0074
   languageName: node
   linkType: hard
 
-"@0xsequence/auth@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/auth@npm:1.4.3"
+"@0xsequence/auth@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/auth@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
-    "@0xsequence/account": 1.4.3
-    "@0xsequence/api": 1.4.3
-    "@0xsequence/core": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/account": 1.6.2
+    "@0xsequence/api": 1.6.2
+    "@0xsequence/core": 1.6.2
     "@0xsequence/ethauth": ^0.8.1
-    "@0xsequence/indexer": 1.4.3
-    "@0xsequence/metadata": 1.4.3
-    "@0xsequence/migration": 1.4.3
-    "@0xsequence/network": 1.4.3
-    "@0xsequence/sessions": 1.4.3
-    "@0xsequence/signhub": 1.4.3
-    "@0xsequence/utils": 1.4.3
-    "@0xsequence/wallet": 1.4.3
+    "@0xsequence/indexer": 1.6.2
+    "@0xsequence/metadata": 1.6.2
+    "@0xsequence/migration": 1.6.2
+    "@0xsequence/network": 1.6.2
+    "@0xsequence/sessions": 1.6.2
+    "@0xsequence/signhub": 1.6.2
+    "@0xsequence/utils": 1.6.2
+    "@0xsequence/wallet": 1.6.2
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: ed58c883a15b60b7fc77c2f352a1f03caf873c7a73437a40d8be7ccc35b63f13655afe83ef41f9cd9d769566983e4b38c7ee8001eb335971ff930a5c43f49d8f
+  checksum: c1965eb1780a7a6c0fdc4b6f879816ea0428924b2728e44a4cf42da05a9da44d56e3c29a3533e8015a657ea8624f82d2d8b4658fef1474f12ff89b3ab63660b1
   languageName: node
   linkType: hard
 
-"@0xsequence/core@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/core@npm:1.4.3"
+"@0xsequence/core@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/core@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
+    "@0xsequence/abi": 1.6.2
   peerDependencies:
     ethers: ">=5.5"
-  checksum: 39fdfee4d58966013d4a93144fbb4b6a552267121de6b2ca7b201419ba04c775cddc1556172731e41b59c30aa722893bd27c2938b3caea476b7c4b53838f0c43
+  checksum: e80bf76deb27818d96e9294b23597911c5397aca34d2e9e165142daf2c1384f1c2f62486c246289604f7cf0128e34a030e84c786297b16c72692f86ab5ebd363
   languageName: node
   linkType: hard
 
@@ -107,165 +108,165 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/guard@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/guard@npm:1.4.3"
+"@0xsequence/guard@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/guard@npm:1.6.2"
   dependencies:
-    "@0xsequence/account": 1.4.3
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/signhub": 1.4.3
-    "@0xsequence/utils": 1.4.3
+    "@0xsequence/account": 1.6.2
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/signhub": 1.6.2
+    "@0xsequence/utils": 1.6.2
     ethers: ^5.7.2
-  checksum: bbf306eb11b0a1fe1cda3c97b082cb2403831084786cad38ac3c82dfd9d25bfbf205142e9b9b62f8e5c0de1fd639c7784d0be85c36e083b7bee3641925fed2d5
+  checksum: d6141c55d883b7879f48ae94abe4446c281531a11e6a099a455ded0d1448dbe389ec255b9ada649105a93965fa67c7aad595c129f46dc8de36e939812e073f60
   languageName: node
   linkType: hard
 
-"@0xsequence/indexer@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/indexer@npm:1.4.3"
-  checksum: ee14436102be518302e4466945e6816cc2ead22aad65250b0029bbf21ada212037972c3a2dbdd8744a19a9d4eae1f9a1da3bce7c803e3b5c232d4995c7fb4a80
+"@0xsequence/indexer@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/indexer@npm:1.6.2"
+  checksum: e97f359b5ad2962f60b157dd0821a1cc9a65ad7ad4c1316ea1f1c69fef6ff1f8a9c928dfb983549686719296b6d31f3f97b1944fc3f61f7d43f5374bac0f8918
   languageName: node
   linkType: hard
 
-"@0xsequence/metadata@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/metadata@npm:1.4.3"
-  checksum: 522798e4ca735fc82d4f06da2c967d5aa0e52a801cd4b6bf3f5fa35bd466dc1248d6fd3a7838c6090bacb17cdb75a7e2e950030f0af8690a12e318f5ec080036
+"@0xsequence/metadata@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/metadata@npm:1.6.2"
+  checksum: 39eab731990a7dc9bdfbd2a7d787be14c565477f37974629a65aff81b598a3bed1ba9b8ddd5a78e63f3224d93f5ea104acfa3144ac3332bd5a22361b7cbef945
   languageName: node
   linkType: hard
 
-"@0xsequence/migration@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/migration@npm:1.4.3"
+"@0xsequence/migration@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/migration@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/wallet": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/wallet": 1.6.2
     ethers: ^5.5.2
-  checksum: bbb734a568176c936aaca5c98204b85cda889760623be09518500ed478a262fa22b609762e403cf46c5b6cbbafdb78c3f11ec7d2240f3002c43993eca5589489
+  checksum: 821fd4e7adde5b7e467fc44441d40bc64f8dcaa2712b093f74318fef0913f75aafb035c9ad56ecea174c1d6f9720bd1a277416a12aa9872da3d9d0dd1b84a3c4
   languageName: node
   linkType: hard
 
-"@0xsequence/multicall@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/multicall@npm:1.4.3"
+"@0xsequence/multicall@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/multicall@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
-    "@0xsequence/network": 1.4.3
-    "@0xsequence/utils": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/network": 1.6.2
+    "@0xsequence/utils": 1.6.2
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: c09f4ea5694df4731e3f6da2200de935bcfb21b7da73c631a9d0be9b7abafead0492f6755973a55bdb0e0e8cfb1671f188a5faeee7954f89511562a066bbeffd
+  checksum: c0b7643de853ff9fcc7a12f2be2fdbd8749bb1767fd2b85574d944f9e890e1d7e0a2c724dbc19e1ad2255b09f264d077a64fbae82a771fe3af0f334a389e9384
   languageName: node
   linkType: hard
 
-"@0xsequence/network@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/network@npm:1.4.3"
+"@0xsequence/network@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/network@npm:1.6.2"
   dependencies:
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/indexer": 1.4.3
-    "@0xsequence/relayer": 1.4.3
-    "@0xsequence/utils": 1.4.3
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/indexer": 1.6.2
+    "@0xsequence/relayer": 1.6.2
+    "@0xsequence/utils": 1.6.2
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 09a6038cc2f2b8dd06eed5080c52052af223a38eefbd8fd1b28d849f2ea5ea3cff95171cd0541ee37a6609b051cc3117822a63fe0e8695db7cd1f272494d5d16
+  checksum: 8618c22e9285a095a919c75f78188e58ed5dbc35c3d578f15e189c7c87385dbda9853eec72945100c078d35a8415a4aa5e69a5bfb43a55cb9b5deca4cd69bc30
   languageName: node
   linkType: hard
 
-"@0xsequence/provider@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/provider@npm:1.4.3"
+"@0xsequence/provider@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/provider@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
-    "@0xsequence/account": 1.4.3
-    "@0xsequence/auth": 1.4.3
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/migration": 1.4.3
-    "@0xsequence/network": 1.4.3
-    "@0xsequence/relayer": 1.4.3
-    "@0xsequence/utils": 1.4.3
-    "@0xsequence/wallet": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/account": 1.6.2
+    "@0xsequence/auth": 1.6.2
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/migration": 1.6.2
+    "@0xsequence/network": 1.6.2
+    "@0xsequence/relayer": 1.6.2
+    "@0xsequence/utils": 1.6.2
+    "@0xsequence/wallet": 1.6.2
     eventemitter2: ^6.4.5
     webextension-polyfill: ^0.10.0
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 5b113747533344e2525bcde9eca65bee12739302f6d91b6b4284b56e0544ba13541b012220ebafaedf92f10f0f567a3cd1caea0357f088b22a10170b3b4bf895
+  checksum: 44ac5dc919dc80929364276ff51d61570f031776fbff8108e74bb30046253677b81a05d59220fd4048283af77062336d04305c3ae779a38aed200c7bd87c8db5
   languageName: node
   linkType: hard
 
-"@0xsequence/relayer@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/relayer@npm:1.4.3"
+"@0xsequence/relayer@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/relayer@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/utils": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/utils": 1.6.2
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 17cb0dda793f8cc5f2cbb79a7a0c41804c860c1290ffb31a51cb21b290be675a5d8d32135c7e71ee4c6131801552569a3e297f8e7c7b47ebf043b21e39bd150f
+  checksum: 5a23aadc7625aa0896dde722b7827c67b94194eac4a44475419a59e7dee6ae87f0d3aea885a2c80eb87838cbdd4bf3fb1462b48263cb34f45fe2f4f4eec036e1
   languageName: node
   linkType: hard
 
-"@0xsequence/replacer@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/replacer@npm:1.4.3"
+"@0xsequence/replacer@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/replacer@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
-    "@0xsequence/core": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/core": 1.6.2
   peerDependencies:
     ethers: ">=5.5"
-  checksum: a998d2edc73f62184c0db289d0318a1c1ae369d3614fbf983cf72ddba5db541c21dba2b921d349feb63475ae02e4987e93ac25d7d217ad5e5e5ee6a76afd4b18
+  checksum: 856610b82594ab09663d7a5cdadfd50e390bbcd875bbeda33f961f444dff41fde3d187cab03f1a41cfd1646a902209d59226458ad1eb03e62faf3b49b6529bdb
   languageName: node
   linkType: hard
 
-"@0xsequence/sessions@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/sessions@npm:1.4.3"
+"@0xsequence/sessions@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/sessions@npm:1.6.2"
   dependencies:
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/migration": 1.4.3
-    "@0xsequence/replacer": 1.4.3
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/migration": 1.6.2
+    "@0xsequence/replacer": 1.6.2
     ethers: ^5.5.2
     idb: ^7.1.1
-  checksum: 2e691bd56e3df8f9d611f91efa1574d88be08e9daacb06a9cf169ac00d707c7ec672b12e2c5c5074669ebd65f6ec65332537462589dd62e8b8566ce006c70231
+  checksum: 1e9e2632d1f81bcb84409fc0a7d709bc7cb99b1b52bc1c7e027bf354eb63c9cd1b735632a96db223512fbb8fbd75872a07b7bc55aae8c64f1d30cf26af626ddd
   languageName: node
   linkType: hard
 
-"@0xsequence/signhub@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/signhub@npm:1.4.3"
+"@0xsequence/signhub@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/signhub@npm:1.6.2"
   dependencies:
-    "@0xsequence/core": 1.4.3
+    "@0xsequence/core": 1.6.2
     ethers: ^5.5.2
-  checksum: 1df2941742e97475ef7ac398185db4255028532800ef44159e9302013bf74c824bfea9b41dd807973dd7a7bc76ed638ed98f06665a077245549770a1e97a0cdb
+  checksum: 52dffff344ce4d50948ea0488a7e7984a57816e8cb903c5275342ef1534cd2d77723a0a61ba06898c17a1f08974904591732a97c94306b269282cec8a19aad6f
   languageName: node
   linkType: hard
 
-"@0xsequence/utils@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/utils@npm:1.4.3"
+"@0xsequence/utils@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/utils@npm:1.6.2"
   dependencies:
     js-base64: ^3.7.2
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: dad96c9da34f1330e8f49049ecd589c456b7bcc21872480bf0b5a857e595fec43035547ac87bf93d1458e3a58c38ced74d30df007b9c1f229340199361d82528
+  checksum: 46af3006dc534c2516c8be8ed5640288822b77536622c21222341d4129266473b92ce216ec22eb55045382d6aebc9234fee86de067ccff1620d0a0ef7bb29cb3
   languageName: node
   linkType: hard
 
-"@0xsequence/wallet@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@0xsequence/wallet@npm:1.4.3"
+"@0xsequence/wallet@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@0xsequence/wallet@npm:1.6.2"
   dependencies:
-    "@0xsequence/abi": 1.4.3
-    "@0xsequence/core": 1.4.3
-    "@0xsequence/network": 1.4.3
-    "@0xsequence/relayer": 1.4.3
-    "@0xsequence/signhub": 1.4.3
-    "@0xsequence/utils": 1.4.3
+    "@0xsequence/abi": 1.6.2
+    "@0xsequence/core": 1.6.2
+    "@0xsequence/network": 1.6.2
+    "@0xsequence/relayer": 1.6.2
+    "@0xsequence/signhub": 1.6.2
+    "@0xsequence/utils": 1.6.2
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 030774cc0f117fd2151b74313f407f3db2e568169a3094d0726124534295b2e33c56c97e16efd0677d7067cde28d7a82c335a1cf71ec9191725c90f4fa9d2a02
+  checksum: b9d612cd97066fd5a1d9a5e535b50d315b53c4128b3d9b54c9e448a8f2ed0e5097770e9614215fb11505983975aa5c5c44ddf7a54294f1a39612441dcec304fe
   languageName: node
   linkType: hard
 
@@ -11075,7 +11076,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "frontend@workspace:frontend"
   dependencies:
-    0xsequence: ^1.2.6
+    0xsequence: ^1.6.2
     "@types/react": ^18.2.21
     "@types/react-dom": ^18.2.7
     "@walletconnect/core": ^2.10.2
