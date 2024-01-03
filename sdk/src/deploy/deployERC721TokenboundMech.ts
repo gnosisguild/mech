@@ -14,7 +14,7 @@ import {
   ERC6551_REGISTRY_ADDRESS,
 } from "../constants"
 
-import { deployMastercopy, erc6551ProxyBytecode } from "./factory"
+import { erc6551ProxyBytecode } from "./factory"
 
 export const calculateERC721TokenboundMechAddress = (context: {
   /** Address of the ERC721 token contract */
