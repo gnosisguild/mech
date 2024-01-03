@@ -8,18 +8,22 @@ import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types"
 dotenv.config()
 const {
   INFURA_KEY,
+  PK,
   MNEMONIC,
   ETHERSCAN_API_KEY,
   GNOSISSCAN_API_KEY,
   POLYGONSCAN_API_KEY,
 } = process.env
-const DEFAULT_MNEMONIC =
-  "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat"
 
 const sharedNetworkConfig: HttpNetworkUserConfig = {}
-
-sharedNetworkConfig.accounts = {
-  mnemonic: MNEMONIC || DEFAULT_MNEMONIC,
+if (PK) {
+  sharedNetworkConfig.accounts = [PK]
+} else {
+  sharedNetworkConfig.accounts = {
+    mnemonic:
+      MNEMONIC ||
+      "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat",
+  }
 }
 
 const { INTEGRATION_TEST } = process.env
