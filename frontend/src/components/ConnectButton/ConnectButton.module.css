@@ -1,0 +1,18 @@
+.blockie {
+  height: 1.5em;
+}
+
+.button {
+  height: 40px;
+  padding: 0 10px;
+}
+.connectedButton {
+  padding: 5px 10px 5px 5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.connectedButton p {
+  font-family: monospace;
+}

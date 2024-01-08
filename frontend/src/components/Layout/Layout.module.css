@@ -9,6 +9,7 @@
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 100;
   width: 100%;
   display: flex;
   align-items: center;
@@ -20,19 +21,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.button {
-  height: 40px;
-  padding: 0 10px;
-}
-
-.connectedButton {
-  padding: 5px 10px 5px 5px;
-}
-
-.connectedButton p {
-  font-family: monospace;
 }
 
 .cockpit {
@@ -54,17 +42,6 @@
   margin: 100px 0;
   position: relative;
   z-index: 10;
-}
-
-.connectedAccount {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  height: 100%;
-}
-
-.blockie {
-  height: 100%;
 }
 
 .nav {

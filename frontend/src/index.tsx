@@ -1,17 +1,20 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { EthereumClient, w3mConnectors, w3mProvider } from "@web3modal/ethereum"
-
-import { Web3Modal } from "@web3modal/react"
 import { RouterProvider } from "react-router-dom"
-import "./index.css"
-
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+  lightTheme,
+} from "@rainbow-me/rainbowkit"
 import { configureChains, createConfig, WagmiConfig } from "wagmi"
+import { infuraProvider } from "wagmi/providers/infura"
+import { publicProvider } from "wagmi/providers/public"
+import { mainnet, gnosis, polygon } from "wagmi/chains"
 
-import { infuraProvider } from "@wagmi/core/providers/infura"
-import { publicProvider } from "@wagmi/core/providers/public"
+import "./index.css"
+import "@rainbow-me/rainbowkit/styles.css"
+
 import router from "./router"
-import { CHAINS } from "./chains"
 
 window.Buffer = window.Buffer || require("buffer").Buffer
 
@@ -20,27 +23,24 @@ if (!REACT_APP_WALLET_CONNECT_PROJECT_ID) {
   throw new Error("REACT_APP_WALLET_CONNECT_PROJECT_ID is not set")
 }
 
-const { chains, publicClient } = configureChains(Object.values(CHAINS), [
-  w3mProvider({
-    projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
-  }),
+const supportedChains = [mainnet, gnosis, polygon]
+const { chains, publicClient } = configureChains(supportedChains, [
   infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY || "" }),
   publicProvider(),
 ])
 
-export { chains }
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors: w3mConnectors({
-    projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
-    chains,
-  }),
-  publicClient,
+const projectId = REACT_APP_WALLET_CONNECT_PROJECT_ID
+const { connectors } = getDefaultWallets({
+  appName: "Mech",
+  projectId,
+  chains,
 })
 
-// Web3Modal Ethereum Client
-const ethereumClient = new EthereumClient(wagmiConfig, chains)
+const wagmiConfig = createConfig({
+  autoConnect: false,
+  connectors,
+  publicClient,
+})
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
@@ -50,13 +50,19 @@ const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 root.render(
   <React.StrictMode>
     <WagmiConfig config={wagmiConfig}>
-      <RouterProvider router={router} />
+      <RainbowKitProvider
+        chains={chains}
+        theme={lightTheme({
+          accentColor: "rgba(192, 255, 12, 0.3)",
+          accentColorForeground: "rgba(89, 120, 0, 1)",
+          borderRadius: "medium",
+          fontStack: "system",
+          overlayBlur: "small",
+        })}
+      >
+        <RouterProvider router={router} />
+      </RainbowKitProvider>
     </WagmiConfig>
-
-    <Web3Modal
-      projectId={REACT_APP_WALLET_CONNECT_PROJECT_ID}
-      ethereumClient={ethereumClient}
-    />
   </React.StrictMode>
 )
 

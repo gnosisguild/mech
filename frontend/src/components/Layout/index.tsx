@@ -1,15 +1,10 @@
-import { useWeb3Modal, useWeb3ModalTheme } from "@web3modal/react"
-import { useAccount } from "wagmi"
 import { ReactNode } from "react"
-
-import Button from "../Button"
 
 import classes from "./Layout.module.css"
 import { shortenAddress } from "../../utils/shortenAddress"
-import Blockie from "../Blockie"
-import clsx from "clsx"
 import { Link } from "react-router-dom"
 import ChainSelect from "../ChainSelect"
+import ConnectButton from "../ConnectButton"
 
 interface Props {
   mechAddress?: string
@@ -17,14 +12,6 @@ interface Props {
 }
 
 const Layout: React.FC<Props> = ({ children, mechAddress }) => {
-  const { setTheme } = useWeb3ModalTheme()
-  const { open } = useWeb3Modal()
-  const { address } = useAccount()
-
-  setTheme({
-    themeMode: "light",
-  })
-
   return (
     <div className={classes.layout}>
       <img src="/cockpit.png" alt="cockpit" className={classes.cockpit} />
@@ -42,20 +29,7 @@ const Layout: React.FC<Props> = ({ children, mechAddress }) => {
         </div>
         <div className={classes.buttonGroup}>
           <ChainSelect />
-          <Button
-            onClick={open}
-            className={clsx(classes.button, address && classes.connectedButton)}
-            secondary={!!address}
-          >
-            {!address ? (
-              <p>Connect Wallet</p>
-            ) : (
-              <div className={classes.connectedAccount}>
-                <Blockie className={classes.blockie} address={address} />
-                <p>{shortenAddress(address || "")}</p>
-              </div>
-            )}
-          </Button>
+          <ConnectButton />
         </div>
       </header>
       <main className={classes.main}>{children}</main>
