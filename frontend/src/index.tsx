@@ -6,10 +6,10 @@ import {
   RainbowKitProvider,
   lightTheme,
 } from "@rainbow-me/rainbowkit"
-import { configureChains, createConfig, WagmiConfig } from "wagmi"
-import { infuraProvider } from "wagmi/providers/infura"
-import { publicProvider } from "wagmi/providers/public"
+import { configureChains, createConfig, WagmiConfig, Chain } from "wagmi"
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
 import { mainnet, gnosis, polygon } from "wagmi/chains"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import "./index.css"
 import "@rainbow-me/rainbowkit/styles.css"
@@ -25,8 +25,11 @@ if (!REACT_APP_WALLET_CONNECT_PROJECT_ID) {
 
 const supportedChains = [mainnet, gnosis, polygon]
 const { chains, publicClient } = configureChains(supportedChains, [
-  infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY || "" }),
-  publicProvider(),
+  jsonRpcProvider({
+    rpc: (chain) => ({
+      http: `${process.env.REACT_APP_PROXY_URL}/${chain.id}/rpc`,
+    }),
+  }),
 ])
 
 const projectId = REACT_APP_WALLET_CONNECT_PROJECT_ID
@@ -37,7 +40,7 @@ const { connectors } = getDefaultWallets({
 })
 
 const wagmiConfig = createConfig({
-  autoConnect: false,
+  autoConnect: true,
   connectors,
   publicClient,
 })
@@ -46,23 +49,26 @@ const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
 // https://github.com/WalletConnect/walletconnect-monorepo/issues/748
 // window.Buffer = window.Buffer || require("buffer").Buffer
+const queryClient = new QueryClient()
 
 root.render(
   <React.StrictMode>
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider
-        chains={chains}
-        theme={lightTheme({
-          accentColor: "rgba(192, 255, 12, 0.3)",
-          accentColorForeground: "rgba(89, 120, 0, 1)",
-          borderRadius: "medium",
-          fontStack: "system",
-          overlayBlur: "small",
-        })}
-      >
-        <RouterProvider router={router} />
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <QueryClientProvider client={queryClient}>
+      <WagmiConfig config={wagmiConfig}>
+        <RainbowKitProvider
+          chains={chains}
+          theme={lightTheme({
+            accentColor: "rgba(192, 255, 12, 0.3)",
+            accentColorForeground: "rgba(89, 120, 0, 1)",
+            borderRadius: "medium",
+            fontStack: "system",
+            overlayBlur: "small",
+          })}
+        >
+          <RouterProvider router={router} />
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </QueryClientProvider>
   </React.StrictMode>
 )
 

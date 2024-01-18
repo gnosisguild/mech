@@ -1,4 +1,3 @@
-import { ContractType, TokenBalance } from "@0xsequence/indexer"
 import NFTGridItem from "../NFTGridItem"
 import Spinner from "../Spinner"
 
@@ -8,6 +7,8 @@ import { useChainId } from "wagmi"
 import { useDeployedMechs } from "../../hooks/useDeployMech"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import useTokenBalances from "../../hooks/useTokenBalances"
+import { getNFTContext, getNFTContexts } from "../../utils/getNFTContext"
+import { MoralisNFT } from "../../types/Token"
 
 interface Props {
   address: string
@@ -15,30 +16,26 @@ interface Props {
 
 const NFTGrid: React.FC<Props> = ({ address }) => {
   const chainId = useChainId()
-
-  const { balances, isLoading } = useTokenBalances({
+  console.log("chainId", chainId)
+  const { data, isLoading, error } = useTokenBalances({
     accountAddress: address,
     chainId,
   })
+  const nftBalances = data?.nfts || []
 
-  const nftBalances = balances.filter(
-    (balance) =>
-      balance.contractType === ContractType.ERC721 ||
-      balance.contractType === ContractType.ERC1155
-  )
+  const deployedMechs = useDeployedMechs(getNFTContexts(nftBalances), chainId)
 
-  const deployedMechs = useDeployedMechs(nftBalances)
-
-  const isDeployed = (nft: TokenBalance) =>
+  const isDeployed = (nft: MoralisNFT) =>
     deployedMechs.some(
       (mech) =>
         mech.chainId === chainId &&
-        mech.address.toLowerCase() === calculateMechAddress(nft).toLowerCase()
+        mech.address.toLowerCase() ===
+          calculateMechAddress(getNFTContext(nft), chainId).toLowerCase()
     )
 
   const deployed = nftBalances.filter(isDeployed)
   const undeployed = nftBalances.filter((nft) => !isDeployed(nft))
-
+  console.log("undeployed", undeployed.length)
   return (
     <div className={classes.container}>
       <div className={classes.categoryContainer}>
@@ -54,8 +51,8 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
       )}
       <ul className={classes.grid}>
         {deployed.map((nft, index) => (
-          <li key={`${index}-${nft.contractAddress}`}>
-            <NFTGridItem tokenBalance={nft} />
+          <li key={`${index}-${nft.token_address}`}>
+            <NFTGridItem chainId={chainId} nft={nft} />
           </li>
         ))}
       </ul>
@@ -68,8 +65,8 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
       {undeployed.length > 0 && (
         <ul className={classes.grid}>
           {undeployed.map((nft, index) => (
-            <li key={`${index}-${nft.contractAddress}`}>
-              <NFTGridItem tokenBalance={nft} />
+            <li key={`${index}-${nft.token_address}`}>
+              <NFTGridItem chainId={chainId} nft={nft} />
             </li>
           ))}
         </ul>

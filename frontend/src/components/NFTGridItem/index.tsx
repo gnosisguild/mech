@@ -1,4 +1,3 @@
-import { TokenBalance } from "@0xsequence/indexer"
 import { useState } from "react"
 import copy from "copy-to-clipboard"
 import clsx from "clsx"
@@ -10,46 +9,51 @@ import { shortenAddress } from "../../utils/shortenAddress"
 import Spinner from "../Spinner"
 import ChainIcon from "../ChainIcon"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
-import { CHAINS, ChainId } from "../../chains"
+import { CHAINS } from "../../chains"
 import { useDeployMech } from "../../hooks/useDeployMech"
+import { MoralisNFT } from "../../types/Token"
+import { getNFTContext } from "../../utils/getNFTContext"
 
 interface Props {
-  tokenBalance: TokenBalance
+  nft: MoralisNFT
+  chainId: number
 }
 
-const NFTGridItem: React.FC<Props> = ({ tokenBalance }) => {
+const NFTGridItem: React.FC<Props> = ({ nft, chainId }) => {
   const [imageError, setImageError] = useState(false)
 
-  const chain = CHAINS[tokenBalance.chainId as ChainId]
+  const chain = CHAINS[chainId]
 
-  const mechAddress = calculateMechAddress(tokenBalance)
-  const { deploy, deployPending, deployed } = useDeployMech(tokenBalance)
+  const mechAddress = calculateMechAddress(getNFTContext(nft), chainId)
+  const { deploy, deployPending, deployed } = useDeployMech(
+    getNFTContext(nft),
+    chainId
+  )
 
-  const name =
-    tokenBalance.tokenMetadata?.name || tokenBalance.contractInfo?.name
+  const name = nft.name || nft.metadata?.name
 
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
         <p className={classes.tokenName}>
           <Link
-            to={`mechs/${chain.prefix}:${tokenBalance.contractAddress}/${tokenBalance.tokenID}`}
+            to={`mechs/${chain.prefix}:${nft.token_address}/${nft.token_id}`}
           >
             {name || "..."}
           </Link>
         </p>
-        {tokenBalance.tokenID.length < 5 && (
-          <p className={classes.tokenId}>{tokenBalance.tokenID || "..."}</p>
+        {nft.token_id.length < 5 && (
+          <p className={classes.tokenId}>{nft.token_id || "..."}</p>
         )}
       </div>
       <div className={classes.main}>
-        {(imageError || !tokenBalance.tokenMetadata?.image) && (
+        {(imageError || !nft.metadata?.image) && (
           <div className={classes.noImage}></div>
         )}
-        {!imageError && tokenBalance.tokenMetadata?.image && (
+        {!imageError && nft.metadata?.image && (
           <div className={classes.imageContainer}>
             <img
-              src={tokenBalance.tokenMetadata?.image}
+              src={nft.metadata?.image}
               alt={name}
               className={classes.image}
               onError={() => setImageError(true)}
@@ -70,9 +74,7 @@ const NFTGridItem: React.FC<Props> = ({ tokenBalance }) => {
         </div>
       </div>
       {deployed ? (
-        <Link
-          to={`mechs/${chain.prefix}:${tokenBalance.contractAddress}/${tokenBalance.tokenID}`}
-        >
+        <Link to={`mechs/${chain.prefix}:${nft.token_address}/${nft.token_id}`}>
           <Button className={classes.useButton} onClick={() => {}}>
             Use Mech
           </Button>

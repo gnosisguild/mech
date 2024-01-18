@@ -1,16 +1,16 @@
-import { TokenBalance, ContractType } from "@0xsequence/indexer"
 import {
   calculateERC1155TokenboundMechAddress,
   calculateERC721TokenboundMechAddress,
 } from "mech-sdk"
+import { NFTContext } from "../types/Token"
 
-export const calculateMechAddress = (token: TokenBalance) => {
+export const calculateMechAddress = (token: NFTContext, chainId: number) => {
   const context = {
-    chainId: token.chainId,
-    token: token.contractAddress as `0x${string}`,
-    tokenId: BigInt(token.tokenID),
+    chainId,
+    token: token.tokenAddress as `0x${string}`,
+    tokenId: BigInt(token.tokenId),
   }
-  return token.contractType === ContractType.ERC1155
+  return token.contractType === "ERC1155"
     ? calculateERC1155TokenboundMechAddress(context)
     : calculateERC721TokenboundMechAddress(context)
 }
