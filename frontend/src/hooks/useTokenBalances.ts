@@ -36,7 +36,7 @@ const useTokenBalances = ({ accountAddress, chainId }: Props) => {
           throw new Error("ERC20 request failed")
         }
         const erc20Json = await erc20Res.json()
-        const erc20Data = erc20Json.result as MoralisFungible[]
+        const erc20Data = erc20Json as MoralisFungible[]
 
         // get native balance
         const nativeRes = await fetch(

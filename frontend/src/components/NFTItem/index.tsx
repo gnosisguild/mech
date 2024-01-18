@@ -33,8 +33,8 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
     chainId,
   })
 
+  console.log(data)
   const mechBalances = data ? [data.native, ...data.erc20s] : []
-
   const { deployed } = useDeployMech(getNFTContext(nft), chainId)
   const name = nft.name || nft.metadata?.name || "..."
   return (

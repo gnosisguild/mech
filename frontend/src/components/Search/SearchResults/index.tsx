@@ -18,8 +18,10 @@ const SearchResults = ({ results }: { results: SearchResult[] }) => {
           <li className={classes.category} key={`mech-${result.address}`}>
             <h2>Deployed Mech</h2>
             <ul className={classes.categoryResults}>
-              <li key={index} className={classes.result}>
-                {result.type === "nft" && <NFTResult result={result} />}
+              <li>
+                <a href={`/mech/${result.address}`} className={classes.result}>
+                  {result.type === "mech" && <NFTResult result={result} />}
+                </a>
               </li>
             </ul>
           </li>
@@ -30,8 +32,13 @@ const SearchResults = ({ results }: { results: SearchResult[] }) => {
           <li className={classes.category} key={`nft-${result.address}`}>
             <h2>NFT Collection</h2>
             <ul className={classes.categoryResults}>
-              <li key={index} className={classes.result}>
-                {result.type === "nft" && <NFTResult result={result} />}
+              <li>
+                <a
+                  href={`/collection/${result.address}`}
+                  className={classes.result}
+                >
+                  {result.type === "nft" && <NFTResult result={result} />}
+                </a>
               </li>
             </ul>
           </li>
@@ -42,8 +49,15 @@ const SearchResults = ({ results }: { results: SearchResult[] }) => {
           <li className={classes.category} key={`account-${result.address}`}>
             <h2>Account</h2>
             <ul className={classes.categoryResults}>
-              <li key={index} className={classes.result}>
-                {result.type === "account" && <AccountResult result={result} />}
+              <li>
+                <a
+                  href={`/account/${result.address}`}
+                  className={classes.result}
+                >
+                  {result.type === "account" && (
+                    <AccountResult result={result} />
+                  )}
+                </a>
               </li>
             </ul>
           </li>

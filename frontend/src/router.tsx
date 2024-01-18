@@ -10,7 +10,7 @@ export default createBrowserRouter([
     element: <Landing />,
   },
   {
-    path: "mechs/:token/:tokenId",
+    path: "mech/:token/:tokenId",
     element: <Mech />,
   },
   {

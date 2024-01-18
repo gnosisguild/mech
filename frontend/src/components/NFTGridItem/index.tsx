@@ -37,7 +37,7 @@ const NFTGridItem: React.FC<Props> = ({ nft, chainId }) => {
       <div className={classes.header}>
         <p className={classes.tokenName}>
           <Link
-            to={`mechs/${chain.prefix}:${nft.token_address}/${nft.token_id}`}
+            to={`/mech/${chain.prefix}:${nft.token_address}/${nft.token_id}`}
           >
             {name || "..."}
           </Link>
