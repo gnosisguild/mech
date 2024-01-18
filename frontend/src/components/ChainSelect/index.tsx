@@ -15,8 +15,7 @@ const ChainSelect = () => {
   const ref = useClickAway(() => {
     setShowDropdown(false)
   })
-  console.log("chain ID", currentChainId)
-  console.log("switchNetwork", switchNetwork)
+
   return (
     <div className={classes.container} ref={ref}>
       <Button

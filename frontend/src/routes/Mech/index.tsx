@@ -1,5 +1,4 @@
 import React from "react"
-import { TokenBalance } from "@0xsequence/indexer"
 import { useParams } from "react-router-dom"
 import Layout from "../../components/Layout"
 import NFTItem from "../../components/NFTItem"
@@ -14,6 +13,8 @@ import MechDeploy from "../../components/Deploy"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import { CHAINS } from "../../chains"
 import useTokenBalances from "../../hooks/useTokenBalances"
+import useNFTMetadata from "../../hooks/useTokenMetadata"
+import { getNFTContext } from "../../utils/getNFTContext"
 
 const Mech: React.FC = () => {
   const { token, tokenId } = useParams()
@@ -36,16 +37,24 @@ const Mech: React.FC = () => {
     throw new Error("token must be a valid address")
   }
 
-  const { balances, error, isLoading } = useTokenBalances({
-    tokenContract: contractAddress,
+  const {
+    data: nft,
+    isLoading,
+    error,
+  } = useNFTMetadata({
     chainId: chain.id,
-    tokenId: tokenId,
+    tokenAddress: contractAddress,
+    tokenId,
   })
-  const balance: TokenBalance | null = balances[0]
 
-  const { deployed, deploy, deployPending } = useDeployMech(balance)
+  const { deployed, deploy, deployPending } = useDeployMech(
+    nft ? getNFTContext(nft) : null,
+    chain.id
+  )
 
-  const mechAddress = balance && calculateMechAddress(balance)
+  const mechAddress = nft
+    ? calculateMechAddress(getNFTContext(nft), chain.id)
+    : null
 
   const handleRequest = useHandleRequest(mechAddress)
 
@@ -53,9 +62,9 @@ const Mech: React.FC = () => {
     <Layout mechAddress={mechAddress || undefined}>
       <div className={classes.container}>
         {isLoading && <Spinner />}
-        {!error && !isLoading && balance && mechAddress && (
+        {!error && !isLoading && nft && mechAddress && (
           <>
-            <NFTItem tokenBalance={balance} />
+            <NFTItem nft={nft} chainId={chain.id} />
 
             <ProvideWalletConnect
               chainId={chain.id}

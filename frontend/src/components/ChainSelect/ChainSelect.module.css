@@ -40,7 +40,7 @@
   position: absolute;
   top: 50px;
   right: 0;
-  background: var(--box-bg);
+  background: rgb(248 212 226);
   border-radius: 10px;
   padding: 6px;
   min-width: 200px;

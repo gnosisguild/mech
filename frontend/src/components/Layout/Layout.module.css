@@ -46,15 +46,15 @@
 
 .nav {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: var(--box-bg);
-  border-radius: 20px;
-  padding: 5px 10px;
+  gap: 1rem;
+  flex-grow: 1;
 }
 
 .nav h1 {
   font-size: 36px;
+  background-color: var(--box-bg);
+  border-radius: 20px;
+  padding: 5px 10px;
 }
 
 .nav a {

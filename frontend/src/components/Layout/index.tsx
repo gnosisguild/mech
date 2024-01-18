@@ -5,6 +5,7 @@ import { shortenAddress } from "../../utils/shortenAddress"
 import { Link } from "react-router-dom"
 import ChainSelect from "../ChainSelect"
 import ConnectButton from "../ConnectButton"
+import Search from "../Search"
 
 interface Props {
   mechAddress?: string
@@ -20,12 +21,7 @@ const Layout: React.FC<Props> = ({ children, mechAddress }) => {
           <Link to="/">
             <h1>Mech</h1>
           </Link>
-          {mechAddress && (
-            <>
-              <h1>/</h1>
-              <h1>{shortenAddress(mechAddress)}</h1>
-            </>
-          )}
+          <Search />
         </div>
         <div className={classes.buttonGroup}>
           <ChainSelect />
