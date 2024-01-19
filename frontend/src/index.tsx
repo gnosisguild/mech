@@ -1,17 +1,20 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { EthereumClient, w3mConnectors, w3mProvider } from "@web3modal/ethereum"
-
-import { Web3Modal } from "@web3modal/react"
 import { RouterProvider } from "react-router-dom"
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+  lightTheme,
+} from "@rainbow-me/rainbowkit"
+import { configureChains, createConfig, WagmiConfig, Chain } from "wagmi"
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
+import { mainnet, gnosis, polygon } from "wagmi/chains"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+
 import "./index.css"
+import "@rainbow-me/rainbowkit/styles.css"
 
-import { configureChains, createConfig, WagmiConfig } from "wagmi"
-
-import { infuraProvider } from "@wagmi/core/providers/infura"
-import { publicProvider } from "@wagmi/core/providers/public"
 import router from "./router"
-import { CHAINS } from "./chains"
 
 window.Buffer = window.Buffer || require("buffer").Buffer
 
@@ -20,43 +23,52 @@ if (!REACT_APP_WALLET_CONNECT_PROJECT_ID) {
   throw new Error("REACT_APP_WALLET_CONNECT_PROJECT_ID is not set")
 }
 
-const { chains, publicClient } = configureChains(Object.values(CHAINS), [
-  w3mProvider({
-    projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
+const supportedChains = [mainnet, gnosis, polygon]
+const { chains, publicClient } = configureChains(supportedChains, [
+  jsonRpcProvider({
+    rpc: (chain) => ({
+      http: `${process.env.REACT_APP_PROXY_URL}/${chain.id}/rpc`,
+    }),
   }),
-  infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY || "" }),
-  publicProvider(),
 ])
 
-export { chains }
+const projectId = REACT_APP_WALLET_CONNECT_PROJECT_ID
+const { connectors } = getDefaultWallets({
+  appName: "Mech",
+  projectId,
+  chains,
+})
 
 const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors: w3mConnectors({
-    projectId: REACT_APP_WALLET_CONNECT_PROJECT_ID,
-    chains,
-  }),
+  connectors,
   publicClient,
 })
-
-// Web3Modal Ethereum Client
-const ethereumClient = new EthereumClient(wagmiConfig, chains)
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 
 // https://github.com/WalletConnect/walletconnect-monorepo/issues/748
 // window.Buffer = window.Buffer || require("buffer").Buffer
+const queryClient = new QueryClient()
 
 root.render(
   <React.StrictMode>
-    <WagmiConfig config={wagmiConfig}>
-      <RouterProvider router={router} />
-    </WagmiConfig>
-
-    <Web3Modal
-      projectId={REACT_APP_WALLET_CONNECT_PROJECT_ID}
-      ethereumClient={ethereumClient}
-    />
+    <QueryClientProvider client={queryClient}>
+      <WagmiConfig config={wagmiConfig}>
+        <RainbowKitProvider
+          chains={chains}
+          theme={lightTheme({
+            accentColor: "rgba(192, 255, 12, 0.3)",
+            accentColorForeground: "rgba(89, 120, 0, 1)",
+            borderRadius: "medium",
+            fontStack: "system",
+            overlayBlur: "small",
+          })}
+        >
+          <RouterProvider router={router} />
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </QueryClientProvider>
   </React.StrictMode>
 )
 

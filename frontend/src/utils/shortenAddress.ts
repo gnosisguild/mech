@@ -1,11 +1,11 @@
 import { validateAddress } from "./addressValidation"
 
-const VISIBLE_END = 4
-const VISIBLE_START = 4
-
-export const shortenAddress = (address: string): string => {
+export const shortenAddress = (
+  address: string,
+  visibleDigits: number = 4
+): string => {
   const checksumAddress = validateAddress(address)
-  const start = checksumAddress.substring(0, VISIBLE_START + 2)
-  const end = checksumAddress.substring(42 - VISIBLE_END, 42)
+  const start = checksumAddress.substring(0, visibleDigits + 2)
+  const end = checksumAddress.substring(42 - visibleDigits, 42)
   return `${start}...${end}`
 }

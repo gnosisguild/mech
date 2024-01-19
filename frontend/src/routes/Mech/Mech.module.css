@@ -3,9 +3,7 @@
   align-items: flex-start;
   justify-content: center;
   gap: 50px;
-  width: 72%;
-  max-width: 2000px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 /* @media (max-width: 800px) {

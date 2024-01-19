@@ -87,8 +87,5 @@
     "@gnosis.pm/safe-contracts": "^1.3.0",
     "@openzeppelin/contracts": "^4.9.3"
   },
-  "resolutions": {
-    "@walletconnect/ethereum-provider": "2.7.0"
-  },
   "packageManager": "yarn@3.7.0"
 }

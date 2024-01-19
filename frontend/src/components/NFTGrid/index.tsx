@@ -1,82 +1,89 @@
-import { ContractType, TokenBalance } from "@0xsequence/indexer"
 import NFTGridItem from "../NFTGridItem"
 import Spinner from "../Spinner"
 
 import classes from "./NFTGrid.module.css"
-import clsx from "clsx"
 import { useChainId } from "wagmi"
 import { useDeployedMechs } from "../../hooks/useDeployMech"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import useTokenBalances from "../../hooks/useTokenBalances"
+import { getNFTContext, getNFTContexts } from "../../utils/getNFTContext"
+import { MoralisNFT } from "../../types/Token"
+import useCollection from "../../hooks/useCollection"
 
 interface Props {
   address: string
 }
 
-const NFTGrid: React.FC<Props> = ({ address }) => {
+export const AccountNftGrid: React.FC<Props> = ({ address }) => {
   const chainId = useChainId()
-
-  const { balances, isLoading } = useTokenBalances({
+  const { data, isLoading, error } = useTokenBalances({
     accountAddress: address,
     chainId,
   })
+  const nftBalances = data?.nfts || []
 
-  const nftBalances = balances.filter(
-    (balance) =>
-      balance.contractType === ContractType.ERC721 ||
-      balance.contractType === ContractType.ERC1155
-  )
+  const deployedMechs = useDeployedMechs(getNFTContexts(nftBalances), chainId)
 
-  const deployedMechs = useDeployedMechs(nftBalances)
-
-  const isDeployed = (nft: TokenBalance) =>
+  const isDeployed = (nft: MoralisNFT) =>
     deployedMechs.some(
       (mech) =>
         mech.chainId === chainId &&
-        mech.address.toLowerCase() === calculateMechAddress(nft).toLowerCase()
+        mech.address.toLowerCase() ===
+          calculateMechAddress(getNFTContext(nft), chainId).toLowerCase()
     )
 
-  const deployed = nftBalances.filter(isDeployed)
-  const undeployed = nftBalances.filter((nft) => !isDeployed(nft))
+  const nfts = nftBalances.map((nft) => ({ ...nft, deployed: isDeployed(nft) }))
+
+  if (isLoading) return <Spinner />
+
+  if (nfts.length === 0) {
+    return (
+      <div className={classes.noNfts}>
+        <p>No NFTs found</p>
+      </div>
+    )
+  }
 
   return (
-    <div className={classes.container}>
-      <div className={classes.categoryContainer}>
-        <div className={classes.category}>
-          <div className={classes.indicator}></div>
-          <h2>Deployed</h2>
-        </div>
-      </div>
-      {deployed.length === 0 && (
-        <div className={classes.noDeployed}>
-          <p>No mechs deployed</p>
-        </div>
-      )}
-      <ul className={classes.grid}>
-        {deployed.map((nft, index) => (
-          <li key={`${index}-${nft.contractAddress}`}>
-            <NFTGridItem tokenBalance={nft} />
-          </li>
-        ))}
-      </ul>
-      <div className={classes.categoryContainer}>
-        <div className={classes.category}>
-          <div className={clsx(classes.indicator, classes.undeployed)}></div>
-          <h2>Undeployed</h2>
-        </div>
-      </div>
-      {undeployed.length > 0 && (
-        <ul className={classes.grid}>
-          {undeployed.map((nft, index) => (
-            <li key={`${index}-${nft.contractAddress}`}>
-              <NFTGridItem tokenBalance={nft} />
-            </li>
-          ))}
-        </ul>
-      )}
-      {isLoading && <Spinner />}
-    </div>
+    <ul className={classes.grid}>
+      {nfts.map((nft, index) => (
+        <li key={`${index}-${nft.token_address}`}>
+          <NFTGridItem chainId={chainId} nft={nft} showCollectionName />
+        </li>
+      ))}
+    </ul>
   )
 }
 
-export default NFTGrid
+export const CollectionNftGrid: React.FC<Props> = ({ address }) => {
+  const chainId = useChainId()
+  const { data, isLoading, error } = useCollection({
+    tokenAddress: address,
+    chainId,
+  })
+  const nftBalances = data || []
+
+  const deployedMechs = useDeployedMechs(getNFTContexts(nftBalances), chainId)
+
+  const isDeployed = (nft: MoralisNFT) =>
+    deployedMechs.some(
+      (mech) =>
+        mech.chainId === chainId &&
+        mech.address.toLowerCase() ===
+          calculateMechAddress(getNFTContext(nft), chainId).toLowerCase()
+    )
+
+  const nfts = nftBalances.map((nft) => ({ ...nft, deployed: isDeployed(nft) }))
+
+  if (isLoading) return <Spinner />
+
+  return (
+    <ul className={classes.grid}>
+      {nfts.map((nft, index) => (
+        <li key={`${index}-${nft.token_address}`}>
+          <NFTGridItem chainId={chainId} nft={nft} />
+        </li>
+      ))}
+    </ul>
+  )
+}

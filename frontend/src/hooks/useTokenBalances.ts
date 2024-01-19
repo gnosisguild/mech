@@ -1,96 +1,79 @@
-import {
-  SequenceIndexer,
-  TokenBalance,
-  ContractType,
-} from "@0xsequence/indexer"
-import { useEffect, useState } from "react"
-import { ChainId, SEQUENCER_ENDPOINTS } from "../chains"
+import { useQuery } from "@tanstack/react-query"
+import { CHAINS } from "../chains"
+import { MoralisFungible, MoralisNFT } from "../types/Token"
 
 interface Props {
   accountAddress?: string
   chainId: number
-  tokenContract?: string
-  tokenId?: string
 }
 
-const API_KEY = process.env.REACT_APP_SEQUENCE_API_KEY || ""
+if (!process.env.REACT_APP_PROXY_URL) {
+  throw new Error("REACT_APP_PROXY_URL not set")
+}
 
-const useTokenBalances = ({
-  accountAddress,
-  chainId,
-  tokenContract,
-  tokenId,
-}: Props) => {
-  const [balances, setBalances] = useState<TokenBalance[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<any>(null)
+const useTokenBalances = ({ accountAddress, chainId }: Props) => {
+  return useQuery({
+    queryKey: ["tokenBalances", chainId, accountAddress],
+    queryFn: async () => {
+      if (!chainId || !accountAddress) throw new Error("No chainId or account")
 
-  useEffect(() => {
-    const indexer = new SequenceIndexer(
-      SEQUENCER_ENDPOINTS[chainId as ChainId],
-      API_KEY
-    )
-    const fetchData = async () => {
       try {
-        setIsLoading(true)
-        const tokenBalances = await indexer.getTokenBalances({
-          includeMetadata: true,
-          accountAddress,
-          contractAddress: tokenContract,
-          tokenID: tokenId,
-        })
-
-        let balances = tokenBalances.balances.filter(
-          (balance) =>
-            balance.contractType === ContractType.ERC20 ||
-            balance.contractType === ContractType.ERC721 ||
-            balance.contractType === ContractType.ERC1155
+        // get nfts
+        const nftRes = await fetch(
+          `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/${accountAddress}/nft`
         )
-
-        // Inconveniently, the Sequence API sets all tokenIDs to 0 if fetched without contractAddress
-        if (!tokenContract) {
-          // fetch the balances for each tokenContract individually, these responses will have the correct tokenID values
-          const tokenContracts = new Set(
-            balances
-              .filter(
-                (balance) =>
-                  balance.contractType === ContractType.ERC721 ||
-                  balance.contractType === ContractType.ERC1155
-              )
-              .map((balance) => balance.contractAddress)
-          )
-
-          const nftBalances = await Promise.all(
-            [...tokenContracts].map(async (contractAddress) => {
-              const result = await indexer.getTokenBalances({
-                includeMetadata: true,
-                accountAddress,
-                contractAddress,
-              })
-
-              return result.balances
-            })
-          )
-
-          const erc20Balances = balances.filter(
-            (balance) => balance.contractType === ContractType.ERC20
-          )
-
-          balances = [...erc20Balances, ...nftBalances.flat()]
+        if (!nftRes.ok) {
+          throw new Error("NFT request failed")
         }
+        const nftJson = await nftRes.json()
+        const nftData = nftJson.result as MoralisNFT[]
 
-        setBalances(balances)
-        setIsLoading(false)
-      } catch (e) {
-        setError(e)
-        setIsLoading(false)
+        // get erc20s
+        const erc20Res = await fetch(
+          `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/${accountAddress}/erc20`
+        )
+        if (!erc20Res.ok) {
+          throw new Error("ERC20 request failed")
+        }
+        const erc20Json = await erc20Res.json()
+        const erc20Data = erc20Json as MoralisFungible[]
+
+        // get native balance
+        const nativeRes = await fetch(
+          `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/${accountAddress}/balance`
+        )
+        if (!nativeRes.ok) {
+          throw new Error("Native request failed")
+        }
+        const nativeJson = await nativeRes.json()
+        const nativeData = {
+          balance: nativeJson.balance as string,
+          decimals: CHAINS[chainId].nativeCurrency.decimals,
+          name: CHAINS[chainId].nativeCurrency.name,
+          symbol: CHAINS[chainId].nativeCurrency.symbol,
+        } as MoralisFungible
+
+        return {
+          nfts: nftData,
+          erc20s: erc20Data,
+          native: nativeData,
+        }
+      } catch (error) {
+        console.error(error)
+        return {
+          nfts: [],
+          erc20s: [],
+          native: {
+            balance: "0",
+            decimals: CHAINS[chainId].nativeCurrency.decimals,
+            name: CHAINS[chainId].nativeCurrency.name,
+            symbol: CHAINS[chainId].nativeCurrency.symbol,
+          },
+        }
       }
-    }
-
-    fetchData()
-  }, [accountAddress, tokenContract, tokenId, chainId])
-
-  return { balances, isLoading, error }
+    },
+    enabled: !!chainId && !!accountAddress,
+  })
 }
 
 export default useTokenBalances

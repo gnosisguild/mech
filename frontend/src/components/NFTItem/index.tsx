@@ -1,4 +1,3 @@
-import { TokenBalance } from "@0xsequence/indexer"
 import classes from "./NFTItem.module.css"
 import { useState } from "react"
 import { shortenAddress } from "../../utils/shortenAddress"
@@ -11,46 +10,51 @@ import { useDeployMech } from "../../hooks/useDeployMech"
 
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import { formatUnits } from "viem"
+import { MoralisNFT } from "../../types/Token"
+import { getNFTContext } from "../../utils/getNFTContext"
+import { AccountNftGrid } from "../NFTGrid"
 
 interface Props {
-  tokenBalance: TokenBalance
+  nft: MoralisNFT
+  chainId: number
 }
 
-const NFTItem: React.FC<Props> = ({ tokenBalance }) => {
-  const mechAddress = calculateMechAddress(tokenBalance)
-  const operatorAddress = tokenBalance.accountAddress
+const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
+  const mechAddress = calculateMechAddress(getNFTContext(nft), chainId)
+  const operatorAddress = nft.owner_of
 
   const [imageError, setImageError] = useState(false)
 
   const {
-    balances: mechBalances,
+    data,
     isLoading: mechBalancesLoading,
     error: mechBalancesError,
   } = useTokenBalances({
     accountAddress: mechAddress,
-    chainId: tokenBalance.chainId,
+    chainId,
   })
 
-  const { deployed } = useDeployMech(tokenBalance)
-  const name =
-    tokenBalance.tokenMetadata?.name || tokenBalance.contractInfo?.name || "..."
+  const mechBalances = data ? [data.native, ...data.erc20s] : []
+  const { deployed } = useDeployMech(getNFTContext(nft), chainId)
+  const metadata = JSON.parse(nft.metadata || "{}")
+  const name = nft.name || metadata?.name || "..."
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
         <p className={classes.tokenName}>{name}</p>
 
-        <p className={classes.tokenId} title={tokenBalance.tokenID}>
-          {tokenBalance.tokenID}
+        <p className={classes.tokenId} title={nft.token_id}>
+          {nft.token_id}
         </p>
       </div>
       <div className={classes.main}>
-        {(imageError || !tokenBalance.tokenMetadata?.image) && (
+        {(imageError || !metadata?.image) && (
           <div className={classes.noImage}></div>
         )}
-        {!imageError && tokenBalance.tokenMetadata?.image && (
+        {!imageError && metadata?.image && (
           <div className={classes.imageContainer}>
             <img
-              src={tokenBalance.tokenMetadata?.image}
+              src={metadata?.image}
               alt={name}
               className={classes.image}
               onError={() => setImageError(true)}
@@ -78,7 +82,7 @@ const NFTItem: React.FC<Props> = ({ tokenBalance }) => {
               onClick={() => copy(mechAddress)}
               title={mechAddress}
             >
-              {shortenAddress(mechAddress)}
+              {shortenAddress(mechAddress, 6)}
             </div>
           </li>
           <li>
@@ -93,21 +97,15 @@ const NFTItem: React.FC<Props> = ({ tokenBalance }) => {
               title={operatorAddress}
             >
               <div className={classes.ellipsis}>
-                {operatorAddress ? shortenAddress(operatorAddress) : "\u2014"}
+                {operatorAddress
+                  ? shortenAddress(operatorAddress, 6)
+                  : "\u2014"}
               </div>
             </div>
           </li>
-          {/* <li>
-            <label>Balance</label>
-            <div className={clsx(classes.infoItem)}>
-              {assetsError || !assetsData
-                ? "n/a"
-                : `$ ${assetsData.totalBalanceUSD}`}
-            </div>
-          </li> */}
         </ul>
       </div>
-      <label>Assets</label>
+      <label>Inventory</label>
       <div
         className={clsx(
           classes.assetsContainer,
@@ -121,20 +119,19 @@ const NFTItem: React.FC<Props> = ({ tokenBalance }) => {
         <ul className={classes.assetList}>
           {mechBalances.map((balance, index) => (
             <li key={index} className={classes.asset}>
-              <div className={classes.name}>{balance.contractInfo?.name}</div>
+              <div>{balance.name}</div>
               <div className={classes.value}>
                 <p>
-                  {formatUnits(
-                    BigInt(balance.balance),
-                    balance.contractInfo?.decimals || 0
-                  )}
+                  {formatUnits(BigInt(balance.balance), balance.decimals || 0)}
                 </p>
-                <p>{balance.contractInfo?.symbol}</p>
+                <p>{balance.symbol}</p>
               </div>
             </li>
           ))}
         </ul>
       </div>
+      <label>NFTs</label>
+      <AccountNftGrid address={mechAddress} />
     </div>
   )
 }

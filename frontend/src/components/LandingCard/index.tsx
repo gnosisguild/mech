@@ -1,13 +1,10 @@
-import { useWeb3Modal } from "@web3modal/react"
 import usdcIcon from "cryptocurrency-icons/svg/color/usdc.svg"
 import gnoIcon from "cryptocurrency-icons/svg/color/gno.svg"
 
-import Button from "../Button"
 import classes from "./LandingCard.module.css"
 import clsx from "clsx"
 
 const LandingCard: React.FC = () => {
-  const { open } = useWeb3Modal()
   return (
     <div className={classes.landingCard}>
       <p>
@@ -23,22 +20,7 @@ const LandingCard: React.FC = () => {
         />
         <ul className={classes.demoInfo}>
           <li>
-            <label>Mech</label>
-            <div className={clsx(classes.infoItem, classes.address)}>
-              0x1F34...1543
-            </div>
-          </li>
-          <li>
-            <label>Inventory</label>
-            <div className={classes.infoItem}>
-              <img src={usdcIcon} alt="usdc token icon" /> <p>101.12 USDC</p>
-            </div>
-            <div className={classes.infoItem}>
-              <img src={gnoIcon} alt="gno token icon" /> <p>14.121 GNO</p>
-            </div>
-          </li>
-          <li>
-            <label>Operator</label>
+            <label>Mech Operator</label>
             <div className={clsx(classes.infoItem, classes.operator)}>
               <img src="/milady142.jpg" alt="Milady #142" />
               <div>
@@ -47,11 +29,23 @@ const LandingCard: React.FC = () => {
               </div>
             </div>
           </li>
+          <li>
+            <label>Mech Address</label>
+            <div className={clsx(classes.infoItem, classes.address)}>
+              0x1F34...1543
+            </div>
+          </li>
+          <li>
+            <label>Mech Inventory</label>
+            <div className={classes.infoItem}>
+              <img src={usdcIcon} alt="usdc token icon" /> <p>101.12 USDC</p>
+            </div>
+            <div className={classes.infoItem}>
+              <img src={gnoIcon} alt="gno token icon" /> <p>14.121 GNO</p>
+            </div>
+          </li>
         </ul>
       </div>
-      <Button onClick={open} className={classes.connectButton}>
-        Connect wallet to view available Mechs
-      </Button>
     </div>
   )
 }
