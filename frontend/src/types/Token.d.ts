@@ -34,3 +34,20 @@ export interface MoralisFungible {
   balance: string
   possible_spam?: boolean
 }
+
+export interface MoralisCollectionMetadata {
+  token_address: string
+  name: string
+  symbol: string
+  contract_type: NFTType
+  possible_spam: boolean
+  verified_collection: boolean
+  synced_at: string
+}
+
+export interface MoralisApiListResponse {
+  cursor: string
+  page: number
+  page_size: number
+  result: MoralisNFT[] | MoralisFungible[]
+}

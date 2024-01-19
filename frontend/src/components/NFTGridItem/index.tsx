@@ -1,25 +1,19 @@
 import { useState } from "react"
-import copy from "copy-to-clipboard"
 import clsx from "clsx"
 import { Link } from "react-router-dom"
 
 import classes from "./NFTItem.module.css"
-import Button from "../Button"
-import { shortenAddress } from "../../utils/shortenAddress"
-import Spinner from "../Spinner"
 import ChainIcon from "../ChainIcon"
-import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import { CHAINS } from "../../chains"
-import { useDeployMech } from "../../hooks/useDeployMech"
 import { MoralisNFT } from "../../types/Token"
-import { getNFTContext } from "../../utils/getNFTContext"
 
 interface Props {
   nft: { deployed: boolean } & MoralisNFT
   chainId: number
+  showCollectionName?: boolean
 }
 
-const NFTGridItem: React.FC<Props> = ({ nft, chainId }) => {
+const NFTGridItem: React.FC<Props> = ({ nft, chainId, showCollectionName }) => {
   const [imageError, setImageError] = useState(false)
 
   const chain = CHAINS[chainId]
@@ -32,13 +26,9 @@ const NFTGridItem: React.FC<Props> = ({ nft, chainId }) => {
       className={classes.linkContainer}
     >
       <div className={classes.header}>
-        <p className={classes.tokenName}>
-          <Link
-            to={`/mech/${chain.prefix}:${nft.token_address}/${nft.token_id}`}
-          >
-            {name || "..."}
-          </Link>
-        </p>
+        {showCollectionName && (
+          <p className={classes.tokenName}>{name || "..."}</p>
+        )}
         {nft.token_id.length < 7 && (
           <p className={classes.tokenId}>{nft.token_id || "..."}</p>
         )}
