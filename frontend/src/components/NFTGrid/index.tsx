@@ -37,6 +37,14 @@ export const AccountNftGrid: React.FC<Props> = ({ address }) => {
 
   if (isLoading) return <Spinner />
 
+  if (nfts.length === 0) {
+    return (
+      <div className={classes.noNfts}>
+        <p>No NFTs found</p>
+      </div>
+    )
+  }
+
   return (
     <ul className={classes.grid}>
       {nfts.map((nft, index) => (

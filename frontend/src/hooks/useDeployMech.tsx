@@ -81,6 +81,7 @@ export const useDeployedMechs = (nfts: NFTContext[], chainId: number) => {
           },
         ])
         .catch((e) => {
+          console.error(e)
           /* when switching networks, this might throw an error (`Missing queryFn for queryKey`) */
         })
     })

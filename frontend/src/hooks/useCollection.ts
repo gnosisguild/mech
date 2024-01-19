@@ -4,13 +4,14 @@ import { MoralisApiListResponse, MoralisNFT } from "../types/Token"
 interface Props {
   tokenAddress: string
   chainId: number
+  page?: number
 }
 
 if (!process.env.REACT_APP_PROXY_URL) {
   throw new Error("REACT_APP_PROXY_URL not set")
 }
 
-const useCollection = ({ tokenAddress, chainId }: Props) => {
+const useCollection = ({ tokenAddress, chainId, page = 0 }: Props) => {
   return useQuery({
     queryKey: ["collection", chainId, tokenAddress],
     queryFn: async () => {

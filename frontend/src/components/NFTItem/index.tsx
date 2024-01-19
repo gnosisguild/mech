@@ -12,6 +12,7 @@ import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import { formatUnits } from "viem"
 import { MoralisNFT } from "../../types/Token"
 import { getNFTContext } from "../../utils/getNFTContext"
+import { AccountNftGrid } from "../NFTGrid"
 
 interface Props {
   nft: MoralisNFT
@@ -33,10 +34,10 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
     chainId,
   })
 
-  console.log(data)
   const mechBalances = data ? [data.native, ...data.erc20s] : []
   const { deployed } = useDeployMech(getNFTContext(nft), chainId)
-  const name = nft.name || nft.metadata?.name || "..."
+  const metadata = JSON.parse(nft.metadata || "{}")
+  const name = nft.name || metadata?.name || "..."
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
@@ -47,13 +48,13 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
         </p>
       </div>
       <div className={classes.main}>
-        {(imageError || !nft.metadata?.image) && (
+        {(imageError || !metadata?.image) && (
           <div className={classes.noImage}></div>
         )}
-        {!imageError && nft.metadata?.image && (
+        {!imageError && metadata?.image && (
           <div className={classes.imageContainer}>
             <img
-              src={nft.metadata?.image}
+              src={metadata?.image}
               alt={name}
               className={classes.image}
               onError={() => setImageError(true)}
@@ -81,7 +82,7 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
               onClick={() => copy(mechAddress)}
               title={mechAddress}
             >
-              {shortenAddress(mechAddress)}
+              {shortenAddress(mechAddress, 6)}
             </div>
           </li>
           <li>
@@ -96,21 +97,15 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
               title={operatorAddress}
             >
               <div className={classes.ellipsis}>
-                {operatorAddress ? shortenAddress(operatorAddress) : "\u2014"}
+                {operatorAddress
+                  ? shortenAddress(operatorAddress, 6)
+                  : "\u2014"}
               </div>
             </div>
           </li>
-          {/* <li>
-            <label>Balance</label>
-            <div className={clsx(classes.infoItem)}>
-              {assetsError || !assetsData
-                ? "n/a"
-                : `$ ${assetsData.totalBalanceUSD}`}
-            </div>
-          </li> */}
         </ul>
       </div>
-      <label>Assets</label>
+      <label>Inventory</label>
       <div
         className={clsx(
           classes.assetsContainer,
@@ -135,6 +130,8 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
           ))}
         </ul>
       </div>
+      <label>NFTs</label>
+      <AccountNftGrid address={mechAddress} />
     </div>
   )
 }
