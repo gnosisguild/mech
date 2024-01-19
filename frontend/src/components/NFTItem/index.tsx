@@ -119,7 +119,7 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
         <ul className={classes.assetList}>
           {mechBalances.map((balance, index) => (
             <li key={index} className={classes.asset}>
-              <div className={classes.name}>{balance.name}</div>
+              <div>{balance.name}</div>
               <div className={classes.value}>
                 <p>
                   {formatUnits(BigInt(balance.balance), balance.decimals || 0)}

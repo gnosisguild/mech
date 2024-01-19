@@ -76,3 +76,33 @@
 .nav a:hover {
   filter: brightness(1.2);
 }
+
+.accountButtons {
+  position: relative;
+}
+
+.accountButtons:hover .viewAccountContainer {
+  display: block;
+}
+
+.viewAccountContainer {
+  display: none;
+  position: absolute;
+  bottom: -120%;
+  right: 0;
+  z-index: 90;
+  padding-top: 30%;
+}
+
+button.viewAccount {
+  background: rgb(248 212 226);
+  border-radius: 10px;
+  padding: 6px 12px;
+  border: 2px solid var(--button-bg);
+  box-shadow: 2px 2px 10px 0px rgba(150, 203, 0, 0.44);
+}
+
+button.viewAccount:hover {
+  background-color: var(--button-bg);
+  filter: brightness(1);
+}

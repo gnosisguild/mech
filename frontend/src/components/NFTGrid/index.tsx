@@ -2,7 +2,6 @@ import NFTGridItem from "../NFTGridItem"
 import Spinner from "../Spinner"
 
 import classes from "./NFTGrid.module.css"
-import clsx from "clsx"
 import { useChainId } from "wagmi"
 import { useDeployedMechs } from "../../hooks/useDeployMech"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"

@@ -1,3 +1,8 @@
+.container {
+  position: relative;
+  z-index: 100;
+}
+
 .blockie {
   height: 1.5em;
 }

@@ -1,18 +1,19 @@
 import { ReactNode } from "react"
 
 import classes from "./Layout.module.css"
-import { shortenAddress } from "../../utils/shortenAddress"
 import { Link } from "react-router-dom"
 import ChainSelect from "../ChainSelect"
 import ConnectButton from "../ConnectButton"
 import Search from "../Search"
+import { useAccount } from "wagmi"
+import Button from "../Button"
 
 interface Props {
-  mechAddress?: string
   children: ReactNode
 }
 
-const Layout: React.FC<Props> = ({ children, mechAddress }) => {
+const Layout: React.FC<Props> = ({ children }) => {
+  const { address } = useAccount()
   return (
     <div className={classes.layout}>
       <img src="/cockpit.png" alt="cockpit" className={classes.cockpit} />
@@ -26,7 +27,22 @@ const Layout: React.FC<Props> = ({ children, mechAddress }) => {
           </div>
           <div className={classes.buttonGroup}>
             <ChainSelect />
-            <ConnectButton />
+            <div className={classes.accountButtons}>
+              <ConnectButton />
+              {address && (
+                <div className={classes.viewAccountContainer}>
+                  <Link to={`/account/${address}`}>
+                    <Button
+                      secondary
+                      onClick={() => {}}
+                      className={classes.viewAccount}
+                    >
+                      View account
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>

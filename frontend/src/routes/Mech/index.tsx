@@ -58,7 +58,7 @@ const Mech: React.FC = () => {
   const handleRequest = useHandleRequest(mechAddress)
 
   return (
-    <Layout mechAddress={mechAddress || undefined}>
+    <Layout>
       <div className={classes.container}>
         {isLoading && <Spinner />}
         {!error && !isLoading && nft && mechAddress && (

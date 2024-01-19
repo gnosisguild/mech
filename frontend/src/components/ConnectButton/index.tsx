@@ -22,6 +22,7 @@ export const ConnectButton = () => {
                 userSelect: "none",
               },
             })}
+            className={classes.container}
           >
             {(() => {
               if (!connected) {
