@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query"
-import { CHAINS } from "../chains"
 import { MoralisNFT } from "../types/Token"
 
 interface Props {

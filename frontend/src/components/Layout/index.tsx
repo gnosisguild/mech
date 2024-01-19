@@ -16,16 +16,18 @@ const Layout: React.FC<Props> = ({ children, mechAddress }) => {
   return (
     <div className={classes.layout}>
       <img src="/cockpit.png" alt="cockpit" className={classes.cockpit} />
-      <header className={classes.header}>
-        <div className={classes.nav}>
-          <Link to="/">
-            <h1>Mech</h1>
-          </Link>
-          <Search />
-        </div>
-        <div className={classes.buttonGroup}>
-          <ChainSelect />
-          <ConnectButton />
+      <header className={classes.headerContainer}>
+        <div className={classes.header}>
+          <div className={classes.nav}>
+            <Link to="/">
+              <h1>Mech</h1>
+            </Link>
+            <Search />
+          </div>
+          <div className={classes.buttonGroup}>
+            <ChainSelect />
+            <ConnectButton />
+          </div>
         </div>
       </header>
       <main className={classes.main}>{children}</main>

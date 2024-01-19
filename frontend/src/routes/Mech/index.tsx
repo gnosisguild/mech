@@ -12,7 +12,6 @@ import { useDeployMech } from "../../hooks/useDeployMech"
 import MechDeploy from "../../components/Deploy"
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
 import { CHAINS } from "../../chains"
-import useTokenBalances from "../../hooks/useTokenBalances"
 import useNFTMetadata from "../../hooks/useTokenMetadata"
 import { getNFTContext } from "../../utils/getNFTContext"
 

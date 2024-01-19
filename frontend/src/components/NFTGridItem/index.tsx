@@ -15,7 +15,7 @@ import { MoralisNFT } from "../../types/Token"
 import { getNFTContext } from "../../utils/getNFTContext"
 
 interface Props {
-  nft: MoralisNFT
+  nft: { deployed: boolean } & MoralisNFT
   chainId: number
 }
 
@@ -24,16 +24,13 @@ const NFTGridItem: React.FC<Props> = ({ nft, chainId }) => {
 
   const chain = CHAINS[chainId]
 
-  const mechAddress = calculateMechAddress(getNFTContext(nft), chainId)
-  const { deploy, deployPending, deployed } = useDeployMech(
-    getNFTContext(nft),
-    chainId
-  )
-
-  const name = nft.name || nft.metadata?.name
-
+  const metadata = JSON.parse(nft.metadata || "{}")
+  const name = nft.name || metadata.name
   return (
-    <div className={classes.itemContainer}>
+    <Link
+      to={`/mech/${chain.prefix}:${nft.token_address}/${nft.token_id}`}
+      className={classes.linkContainer}
+    >
       <div className={classes.header}>
         <p className={classes.tokenName}>
           <Link
@@ -42,57 +39,45 @@ const NFTGridItem: React.FC<Props> = ({ nft, chainId }) => {
             {name || "..."}
           </Link>
         </p>
-        {nft.token_id.length < 5 && (
+        {nft.token_id.length < 7 && (
           <p className={classes.tokenId}>{nft.token_id || "..."}</p>
         )}
       </div>
+      <div className={classes.footer}>
+        <div className={classes.deployStatus}>
+          <div
+            className={clsx(
+              classes.indicator,
+              !nft.deployed && classes.undeployed
+            )}
+          ></div>
+          <p>{nft.deployed ? "Deployed" : "Not Deployed"}</p>
+        </div>
+        <div className={classes.chain}>
+          <ChainIcon chainId={chainId} />
+        </div>
+      </div>
       <div className={classes.main}>
-        {(imageError || !nft.metadata?.image) && (
+        {(imageError || !metadata.image) && (
           <div className={classes.noImage}></div>
         )}
-        {!imageError && nft.metadata?.image && (
+        {!imageError && metadata.image && (
           <div className={classes.imageContainer}>
             <img
-              src={nft.metadata?.image}
+              src={metadata.image}
               alt={name}
               className={classes.image}
               onError={() => setImageError(true)}
             />
           </div>
         )}
-        <div className={classes.info}>
-          <div
-            className={clsx(classes.infoItem, classes.address)}
-            onClick={() => copy(mechAddress)}
-          >
-            {shortenAddress(mechAddress)}
-          </div>
-          <div className={classes.infoItem}>
-            <p>Chain:</p>
-            <ChainIcon chainId={chain.id} className={classes.chainIcon} />
-          </div>
-        </div>
       </div>
-      {deployed ? (
-        <Link to={`mechs/${chain.prefix}:${nft.token_address}/${nft.token_id}`}>
-          <Button className={classes.useButton} onClick={() => {}}>
-            Use Mech
-          </Button>
-        </Link>
-      ) : (
-        <>
-          {deployPending ? (
-            <div className={classes.spinner}>
-              <Spinner />
-            </div>
-          ) : (
-            <Button onClick={deploy} secondary>
-              Deploy Mech
-            </Button>
-          )}
-        </>
-      )}
-    </div>
+      <div className={classes.visit}>
+        <h3>⬈⬈⬈⬈⬈⬈⬈⬈⬈</h3>
+        <h3>View Mech</h3>
+        <h3>⬈⬈⬈⬈⬈⬈⬈⬈⬈</h3>
+      </div>
+    </Link>
   )
 }
 

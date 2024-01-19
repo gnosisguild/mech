@@ -1,4 +1,35 @@
-.connectButton {
-  font-size: 24px;
+.container {
   width: 100%;
+  background: var(--box-bg);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.accountHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: var(--box-bg);
+  border-radius: 10px;
+  padding: 10px 20px;
+  width: 100%;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.title {
+  font-size: 1.5rem;
+}
+.accountHeader h1 {
+  font-size: 1rem;
+}
+
+.blockie {
+  width: 25px;
+  aspect-ratio: 1/1;
 }

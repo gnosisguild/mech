@@ -16,7 +16,6 @@ interface Props {
 
 const NFTGrid: React.FC<Props> = ({ address }) => {
   const chainId = useChainId()
-  console.log("chainId", chainId)
   const { data, isLoading, error } = useTokenBalances({
     accountAddress: address,
     chainId,
@@ -33,46 +32,18 @@ const NFTGrid: React.FC<Props> = ({ address }) => {
           calculateMechAddress(getNFTContext(nft), chainId).toLowerCase()
     )
 
-  const deployed = nftBalances.filter(isDeployed)
-  const undeployed = nftBalances.filter((nft) => !isDeployed(nft))
-  console.log("undeployed", undeployed.length)
+  const nfts = nftBalances.map((nft) => ({ ...nft, deployed: isDeployed(nft) }))
+
+  if (isLoading) return <Spinner />
+
   return (
-    <div className={classes.container}>
-      <div className={classes.categoryContainer}>
-        <div className={classes.category}>
-          <div className={classes.indicator}></div>
-          <h2>Deployed</h2>
-        </div>
-      </div>
-      {deployed.length === 0 && (
-        <div className={classes.noDeployed}>
-          <p>No mechs deployed</p>
-        </div>
-      )}
-      <ul className={classes.grid}>
-        {deployed.map((nft, index) => (
-          <li key={`${index}-${nft.token_address}`}>
-            <NFTGridItem chainId={chainId} nft={nft} />
-          </li>
-        ))}
-      </ul>
-      <div className={classes.categoryContainer}>
-        <div className={classes.category}>
-          <div className={clsx(classes.indicator, classes.undeployed)}></div>
-          <h2>Undeployed</h2>
-        </div>
-      </div>
-      {undeployed.length > 0 && (
-        <ul className={classes.grid}>
-          {undeployed.map((nft, index) => (
-            <li key={`${index}-${nft.token_address}`}>
-              <NFTGridItem chainId={chainId} nft={nft} />
-            </li>
-          ))}
-        </ul>
-      )}
-      {isLoading && <Spinner />}
-    </div>
+    <ul className={classes.grid}>
+      {nfts.map((nft, index) => (
+        <li key={`${index}-${nft.token_address}`}>
+          <NFTGridItem chainId={chainId} nft={nft} />
+        </li>
+      ))}
+    </ul>
   )
 }
 
