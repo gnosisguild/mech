@@ -1,4 +1,3 @@
-import { useState } from "react"
 import clsx from "clsx"
 import { Link } from "react-router-dom"
 
@@ -6,6 +5,7 @@ import classes from "./NFTItem.module.css"
 import ChainIcon from "../ChainIcon"
 import { CHAINS } from "../../chains"
 import { MoralisNFT } from "../../types/Token"
+import NFTMedia from "../NFTMedia"
 
 interface Props {
   nft: { deployed: boolean } & MoralisNFT
@@ -14,8 +14,6 @@ interface Props {
 }
 
 const NFTGridItem: React.FC<Props> = ({ nft, chainId, showCollectionName }) => {
-  const [imageError, setImageError] = useState(false)
-
   const chain = CHAINS[chainId]
 
   const metadata = JSON.parse(nft.metadata || "{}")
@@ -48,19 +46,7 @@ const NFTGridItem: React.FC<Props> = ({ nft, chainId, showCollectionName }) => {
         </div>
       </div>
       <div className={classes.main}>
-        {(imageError || !metadata.image) && (
-          <div className={classes.noImage}></div>
-        )}
-        {!imageError && metadata.image && (
-          <div className={classes.imageContainer}>
-            <img
-              src={metadata.image}
-              alt={name}
-              className={classes.image}
-              onError={() => setImageError(true)}
-            />
-          </div>
-        )}
+        <NFTMedia nft={nft} />
       </div>
       <div className={classes.visit}>
         <h3>⬈⬈⬈⬈⬈⬈⬈⬈⬈</h3>

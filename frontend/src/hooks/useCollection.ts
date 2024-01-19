@@ -19,7 +19,7 @@ const useCollection = ({ tokenAddress, chainId, page = 0 }: Props) => {
 
       // get collection metadata
       const nftRes = await fetch(
-        `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/nft/${tokenAddress}`
+        `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/nft/${tokenAddress}?media_items=true`
       )
       if (!nftRes.ok) {
         throw new Error("NFT request failed")

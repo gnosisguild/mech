@@ -20,7 +20,7 @@ const useTokenBalances = ({ accountAddress, chainId }: Props) => {
       try {
         // get nfts
         const nftRes = await fetch(
-          `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/${accountAddress}/nft`
+          `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/${accountAddress}/nft?media_items=true`
         )
         if (!nftRes.ok) {
           throw new Error("NFT request failed")

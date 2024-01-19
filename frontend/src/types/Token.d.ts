@@ -6,6 +6,25 @@ export interface NFTContext {
 
 export type NFTType = "ERC721" | "ERC1155"
 
+interface MoralisMediaItem {
+  width: number
+  height: number
+  url: string
+}
+
+export interface MoralisMediaCollection {
+  status: string
+  updateAt: string
+  mimetype: string
+  parent_hash: string
+  media_collection: {
+    low: MoralisMediaItem
+    medium: MoralisMediaItem
+    high: MoralisMediaItem
+  }
+  original_media_url: string
+}
+
 export interface MoralisNFT {
   amount: string
   token_id: string
@@ -22,6 +41,7 @@ export interface MoralisNFT {
   minter_address: string
   verified_collection: boolean
   possible_spam: boolean
+  media?: MoralisMediaCollection
 }
 
 export interface MoralisFungible {

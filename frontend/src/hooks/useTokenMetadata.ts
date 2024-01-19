@@ -20,7 +20,7 @@ const useNFTMetadata = ({ tokenAddress, tokenId, chainId }: Props) => {
 
       // get nfts
       const nftRes = await fetch(
-        `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/nft/${tokenAddress}/${tokenId}`
+        `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/nft/${tokenAddress}/${tokenId}?media_items=true`
       )
       if (!nftRes.ok) {
         throw new Error("NFT request failed")
