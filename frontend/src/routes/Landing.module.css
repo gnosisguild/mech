@@ -1,0 +1,28 @@
+.footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 20px;
+}
+
+.gg {
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 10px;
+  background-color: var(--box-bg);
+  border-radius: 20px;
+  padding: 3px 8px 3px 3px;
+  text-decoration: none;
+  border: 2px solid transparent;
+  font-size: 12px;
+}
+
+.gg:hover {
+  border: 2px solid var(--button-border);
+  filter: brightness(1.2);
+}
+
+.logo {
+}
