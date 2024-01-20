@@ -1,5 +1,5 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
-import { MoralisApiListResponse, MoralisNFT } from "../types/Token"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { MoralisApiListResponse } from "../types/Token"
 
 interface Props {
   tokenAddress: string

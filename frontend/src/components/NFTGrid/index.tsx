@@ -17,7 +17,7 @@ interface Props {
 
 export const AccountNftGrid: React.FC<Props> = ({ address }) => {
   const chainId = useChainId()
-  const { data, isLoading, error } = useTokenBalances({
+  const { data, isLoading } = useTokenBalances({
     accountAddress: address,
     chainId,
   })

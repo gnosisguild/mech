@@ -1,5 +1,4 @@
 import classes from "./NFTItem.module.css"
-import { useState } from "react"
 import { shortenAddress } from "../../utils/shortenAddress"
 import copy from "copy-to-clipboard"
 import clsx from "clsx"
@@ -24,8 +23,6 @@ interface Props {
 const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
   const mechAddress = calculateMechAddress(getNFTContext(nft), chainId)
   const operatorAddress = nft.owner_of
-
-  const [imageError, setImageError] = useState(false)
 
   const {
     data,

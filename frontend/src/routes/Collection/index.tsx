@@ -18,7 +18,7 @@ const Collection: React.FC = () => {
   } catch (error) {
     console.log(error)
   }
-  const { data, isLoading, error } = useCollectionMetadata({
+  const { data, isLoading } = useCollectionMetadata({
     tokenAddress: validAddress,
     chainId,
   })
