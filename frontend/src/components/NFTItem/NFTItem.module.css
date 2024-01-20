@@ -32,6 +32,10 @@
 
 .tokenName {
   max-width: 68%;
+  color: var(--text-color);
+}
+.tokenName:hover {
+  filter: brightness(1.2);
 }
 
 .main {

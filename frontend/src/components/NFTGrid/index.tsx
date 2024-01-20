@@ -9,6 +9,7 @@ import useTokenBalances from "../../hooks/useTokenBalances"
 import { getNFTContext, getNFTContexts } from "../../utils/getNFTContext"
 import { MoralisNFT } from "../../types/Token"
 import useCollection from "../../hooks/useCollection"
+import Button from "../Button"
 
 interface Props {
   address: string
@@ -57,11 +58,16 @@ export const AccountNftGrid: React.FC<Props> = ({ address }) => {
 
 export const CollectionNftGrid: React.FC<Props> = ({ address }) => {
   const chainId = useChainId()
-  const { data, isLoading, error } = useCollection({
+  const { data, isLoading, fetchNextPage, fetchPreviousPage } = useCollection({
     tokenAddress: address,
     chainId,
   })
-  const nftBalances = data || []
+  const currentPage = data?.pages[0]
+  const nftBalances =
+    (currentPage?.result as MoralisNFT[]) || ([] as MoralisNFT[])
+
+  const previousPageAvailable = (data?.pageParams[0] as string[]).length > 0
+  const nextPageAvailable = currentPage?.cursor && currentPage.cursor.length > 0
 
   const deployedMechs = useDeployedMechs(getNFTContexts(nftBalances), chainId)
 
@@ -78,12 +84,31 @@ export const CollectionNftGrid: React.FC<Props> = ({ address }) => {
   if (isLoading) return <Spinner />
 
   return (
-    <ul className={classes.grid}>
-      {nfts.map((nft, index) => (
-        <li key={`${index}-${nft.token_address}`}>
-          <NFTGridItem chainId={chainId} nft={nft} />
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className={classes.grid}>
+        {nfts.map((nft, index) => (
+          <li key={`${index}-${nft.token_address}`}>
+            <NFTGridItem chainId={chainId} nft={nft} />
+          </li>
+        ))}
+      </ul>
+      <div className={classes.pageButtons}>
+        <Button
+          secondary
+          onClick={() => fetchPreviousPage()}
+          disabled={!previousPageAvailable}
+        >
+          Previous
+        </Button>
+
+        <Button
+          secondary
+          onClick={() => fetchNextPage()}
+          disabled={!nextPageAvailable}
+        >
+          Next
+        </Button>
+      </div>
+    </>
   )
 }

@@ -38,3 +38,11 @@
   padding: 20px;
   font-size: 12px;
 }
+
+.pageButtons {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { MoralisApiListResponse, MoralisNFT } from "../types/Token"
 
 interface Props {
@@ -12,21 +12,30 @@ if (!process.env.REACT_APP_PROXY_URL) {
 }
 
 const useCollection = ({ tokenAddress, chainId, page = 0 }: Props) => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["collection", chainId, tokenAddress],
-    queryFn: async () => {
+    queryFn: async ({ pageParam }) => {
       if (!chainId || !tokenAddress) throw new Error("No chainId or token")
-
+      const params = new URLSearchParams([
+        ["cursor", pageParam],
+        ["media_items", "true"],
+      ])
       // get collection metadata
       const nftRes = await fetch(
-        `${process.env.REACT_APP_PROXY_URL}/${chainId}/moralis/nft/${tokenAddress}?media_items=true`
+        `${
+          process.env.REACT_APP_PROXY_URL
+        }/${chainId}/moralis/nft/${tokenAddress}?${params.toString()}`
       )
       if (!nftRes.ok) {
         throw new Error("NFT request failed")
       }
       const collection = (await nftRes.json()) as MoralisApiListResponse
-      return collection.result as MoralisNFT[]
+      return collection
     },
+    initialPageParam: "",
+    maxPages: 1,
+    getNextPageParam: (lastPage) => lastPage.cursor || "",
+    getPreviousPageParam: (firstPage) => firstPage.cursor || "",
     enabled: !!chainId && !!tokenAddress,
   })
 }

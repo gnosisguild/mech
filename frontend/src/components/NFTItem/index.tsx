@@ -13,6 +13,8 @@ import { formatUnits } from "viem"
 import { MoralisNFT } from "../../types/Token"
 import { getNFTContext } from "../../utils/getNFTContext"
 import { AccountNftGrid } from "../NFTGrid"
+import NFTMedia from "../NFTMedia"
+import { Link } from "react-router-dom"
 
 interface Props {
   nft: MoralisNFT
@@ -41,26 +43,19 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
   return (
     <div className={classes.itemContainer}>
       <div className={classes.header}>
-        <p className={classes.tokenName}>{name}</p>
+        <Link
+          to={`/collection/${nft.token_address}`}
+          className={classes.tokenName}
+        >
+          <p>{name}</p>
+        </Link>
 
         <p className={classes.tokenId} title={nft.token_id}>
           {nft.token_id}
         </p>
       </div>
       <div className={classes.main}>
-        {(imageError || !metadata?.image) && (
-          <div className={classes.noImage}></div>
-        )}
-        {!imageError && metadata?.image && (
-          <div className={classes.imageContainer}>
-            <img
-              src={metadata?.image}
-              alt={name}
-              className={classes.image}
-              onError={() => setImageError(true)}
-            />
-          </div>
-        )}
+        <NFTMedia nft={nft} />
 
         <ul className={classes.info}>
           <li>
