@@ -22,7 +22,6 @@ const Landing: React.FC = () => {
             alt="Gnosis Guild"
             width={24}
             height={24}
-            className={classes.logo}
           />
           <p>Built by Gnosis Guild</p>
         </a>

@@ -1,6 +1,6 @@
 {
-  "short_name": "Club Card",
-  "name": "A wallet for your mechs",
+  "short_name": "Mech",
+  "name": "Mech — Inventories for NFTs",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,18 +8,18 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "icon3x.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo310.png",
+      "src": "icon3x.png",
       "type": "image/png",
       "sizes": "310x310"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#bc3f4d",
+  "background_color": "#fac0ea"
 }

@@ -1,14 +1,14 @@
 {
-    "name": "Mech",
-    "short_name": "Mech",
-    "icons": [
-        {
-            "src": "/android-chrome-144x144.png",
-            "sizes": "144x144",
-            "type": "image/png"
-        }
-    ],
-    "theme_color": "#fac0ea",
-    "background_color": "#fac0ea",
-    "display": "standalone"
+  "name": "Mech — Inventories for NFTs",
+  "short_name": "Mech",
+  "icons": [
+    {
+      "src": "/android-chrome-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#fac0ea",
+  "background_color": "#fac0ea",
+  "display": "standalone"
 }
