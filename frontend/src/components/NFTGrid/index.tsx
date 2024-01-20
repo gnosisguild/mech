@@ -66,7 +66,10 @@ export const CollectionNftGrid: React.FC<Props> = ({ address }) => {
   const nftBalances =
     (currentPage?.result as MoralisNFT[]) || ([] as MoralisNFT[])
 
-  const previousPageAvailable = (data?.pageParams[0] as string[]).length > 0
+  const previousPageAvailable =
+    data &&
+    data.pageParams.length > 0 &&
+    (data.pageParams[0] as string[]).length > 0
   const nextPageAvailable = currentPage?.cursor && currentPage.cursor.length > 0
 
   const deployedMechs = useDeployedMechs(getNFTContexts(nftBalances), chainId)
