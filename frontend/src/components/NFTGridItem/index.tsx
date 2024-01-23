@@ -28,7 +28,14 @@ const NFTGridItem: React.FC<Props> = ({ nft, chainId, showCollectionName }) => {
           <p className={classes.tokenName}>{name || "..."}</p>
         )}
         {nft.token_id.length < 7 && (
-          <p className={classes.tokenId}>{nft.token_id || "..."}</p>
+          <p
+            className={clsx(
+              classes.tokenId,
+              !showCollectionName && classes.collectionTokenId
+            )}
+          >
+            {nft.token_id || "..."}
+          </p>
         )}
       </div>
       <div className={classes.footer}>

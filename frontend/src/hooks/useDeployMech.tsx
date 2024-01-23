@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react"
-import {
-  usePublicClient,
-  useWalletClient,
-  useQuery,
-  useQueryClient,
-} from "wagmi"
+import { usePublicClient, useWalletClient } from "wagmi"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { PublicClient } from "viem"
 import { calculateMechAddress } from "../utils/calculateMechAddress"
 import { makeMechDeployTransaction } from "../utils/deployMech"
@@ -32,13 +28,11 @@ export const useDeployMech = (token: NFTContext | null, chainId: number) => {
   const mechAddress = token && calculateMechAddress(token, chainId)
 
   const publicClient = usePublicClient({ chainId: chainId })
-  const { data: deployed } = useQuery<boolean>(
-    ["mechDeployed", { address: mechAddress, chainId: chainId }] as const,
-    {
-      queryFn: queryFn(publicClient) as any,
-      enabled: !!mechAddress,
-    }
-  )
+  const { data: deployed } = useQuery<boolean>({
+    queryKey: ["mechDeployed", { address: mechAddress, chainId: chainId }],
+    queryFn: queryFn(publicClient) as any,
+    enabled: !!mechAddress,
+  })
 
   const { data: walletClient } = useWalletClient({ chainId })
 
@@ -69,27 +63,31 @@ export const useDeployMech = (token: NFTContext | null, chainId: number) => {
 
 export const useDeployedMechs = (nfts: NFTContext[], chainId: number) => {
   const queryClient = useQueryClient()
+  const publicClient = usePublicClient({ chainId })
 
   useEffect(() => {
     nfts.forEach((nft) => {
       queryClient
-        .ensureQueryData([
-          "mechDeployed",
-          {
-            address: calculateMechAddress(nft, chainId),
-            chainId: chainId,
-          },
-        ])
+        .ensureQueryData({
+          queryKey: [
+            "mechDeployed",
+            {
+              address: calculateMechAddress(nft, chainId),
+              chainId: chainId,
+            },
+          ],
+          queryFn: queryFn(publicClient),
+        })
         .catch((e) => {
           console.error(e)
           /* when switching networks, this might throw an error (`Missing queryFn for queryKey`) */
         })
     })
-  }, [queryClient, nfts, chainId])
+  }, [queryClient, nfts, chainId, publicClient])
 
-  const deployedMechs = queryClient.getQueriesData([
-    "mechDeployed",
-  ]) as unknown as [
+  const deployedMechs = queryClient.getQueriesData({
+    queryKey: ["mechDeployed"],
+  }) as unknown as [
     [
       string,
       {
