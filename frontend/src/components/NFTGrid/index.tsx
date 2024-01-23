@@ -1,5 +1,5 @@
 import NFTGridItem from "../NFTGridItem"
-import Spinner from "../Spinner"
+import Loading from "../Loading"
 
 import classes from "./NFTGrid.module.css"
 import { useChainId } from "wagmi"
@@ -35,7 +35,7 @@ export const AccountNftGrid: React.FC<Props> = ({ address }) => {
 
   const nfts = nftBalances.map((nft) => ({ ...nft, deployed: isDeployed(nft) }))
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <Loading />
 
   if (nfts.length === 0) {
     return (
@@ -84,7 +84,7 @@ export const CollectionNftGrid: React.FC<Props> = ({ address }) => {
 
   const nfts = nftBalances.map((nft) => ({ ...nft, deployed: isDeployed(nft) }))
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <Loading />
 
   return (
     <>

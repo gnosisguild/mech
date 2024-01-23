@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import useWalletConnect, { Session } from "../../hooks/useWalletConnect"
-import Spinner from "../Spinner"
+import Loading from "../Loading"
 
 import classes from "./Connect.module.css"
 import Button from "../Button"
@@ -44,7 +44,7 @@ const MechConnect: React.FC = () => {
           placeholder="wc:9e5b70f5-ddef-4403-999e-"
         />
       </div>
-      {loading && <Spinner />}
+      {loading && <Loading />}
 
       {sessions.length > 0 && (
         <>

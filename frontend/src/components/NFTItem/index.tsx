@@ -4,7 +4,7 @@ import copy from "copy-to-clipboard"
 import clsx from "clsx"
 
 import useTokenBalances from "../../hooks/useTokenBalances"
-import Spinner from "../Spinner"
+import Loading from "../Loading"
 import { useDeployMech } from "../../hooks/useDeployMech"
 
 import { calculateMechAddress } from "../../utils/calculateMechAddress"
@@ -105,7 +105,7 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
         )}
       >
         {mechBalancesError && <p>Failed to load assets</p>}
-        {mechBalancesLoading && <Spinner />}
+        {mechBalancesLoading && <Loading />}
 
         {mechBalances.length === 0 && <p>No assets found</p>}
         <ul className={classes.assetList}>

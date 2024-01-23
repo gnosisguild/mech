@@ -4,7 +4,7 @@ import Layout from "../../components/Layout"
 import NFTItem from "../../components/NFTItem"
 
 import classes from "./Mech.module.css"
-import Spinner from "../../components/Spinner"
+import Loading from "../../components/Loading"
 import MechConnect from "../../components/Connect"
 import { ProvideWalletConnect } from "../../hooks/useWalletConnect"
 import { useHandleRequest } from "../../hooks/useHandleRequest"
@@ -60,7 +60,7 @@ const Mech: React.FC = () => {
   return (
     <Layout>
       <div className={classes.container}>
-        {isLoading && <Spinner />}
+        {isLoading && <Loading />}
         {!error && !isLoading && nft && mechAddress && (
           <>
             <NFTItem nft={nft} chainId={chain.id} />

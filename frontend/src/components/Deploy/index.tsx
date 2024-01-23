@@ -1,5 +1,5 @@
 import React from "react"
-import Spinner from "../Spinner"
+import Loading from "../Loading"
 
 import classes from "./Deploy.module.css"
 import Button from "../Button"
@@ -18,7 +18,7 @@ const MechDeploy: React.FC<Props> = ({ deployPending, deploy }) => {
         <Button onClick={deploy} disabled={deployPending}>
           {deployPending ? (
             <>
-              <Spinner /> Deploying...
+              <Loading /> Deploying...
             </>
           ) : (
             "Deploy"

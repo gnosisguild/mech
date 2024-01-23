@@ -5,6 +5,7 @@ import classes from "./Search.module.css"
 import SearchResults, { SearchResult } from "./SearchResults"
 import { useChainId, usePublicClient } from "wagmi"
 import parseMechBytecode from "../../utils/parseMechBytecode"
+import Loading from "../Loading"
 
 const Search = () => {
   const chainId = useChainId()
@@ -12,18 +13,27 @@ const Search = () => {
   const [search, setSearch] = useState("")
   const [validSearch, setValidSearch] = useState(true)
   const [results, setResults] = useState<SearchResult[]>([])
+  const [resultsLoading, setResultsLoading] = useState(false)
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setResultsLoading(true)
     setResults([])
     const newSearch = e.target.value || ""
     setSearch(newSearch)
 
     if (!newSearch) {
+      setResultsLoading(false)
       return setValidSearch(true)
     }
-    setValidSearch(isAddress(newSearch))
 
-    if (isAddress(newSearch)) {
+    const valid = isAddress(newSearch)
+    setValidSearch(valid)
+
+    if (!valid) {
+      return setResultsLoading(false)
+    }
+
+    if (valid) {
       // check if address is deployed contract
       // check if bytecode is mech
       // if not mech, check if address is nft collection
@@ -51,6 +61,7 @@ const Search = () => {
               type: "account",
             },
           ])
+          setResultsLoading(false)
           return
         }
 
@@ -62,6 +73,7 @@ const Search = () => {
             name: nftCollection.name,
           },
         ])
+        setResultsLoading(false)
       } else {
         // only an EOA
         setResults([
@@ -70,6 +82,7 @@ const Search = () => {
             type: "account",
           },
         ])
+        setResultsLoading(false)
       }
     }
   }
@@ -102,9 +115,10 @@ const Search = () => {
           <p>Please use a valid address</p>
         </div>
       )}
-      {results.length > 0 && (
+      {(resultsLoading || results.length > 0) && (
         <div className={classes.results}>
-          <SearchResults results={results} />
+          {results.length > 0 && <SearchResults results={results} />}
+          {resultsLoading && <Loading />}
         </div>
       )}
     </div>
