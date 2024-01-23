@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MoralisNFT } from "../../types/Token"
 
 import classes from "./NFTMedia.module.css"
@@ -12,8 +12,13 @@ const getIPFSHashFromURL = (url: string) => {
 
 const NFTMedia = ({ nft }: { nft: MoralisNFT }) => {
   const [imageError, setImageError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
   const metadata = JSON.parse(nft.metadata || "{}")
   const alt = metadata.name || "NFT image"
+
+  useEffect(() => {
+    setImageLoaded(false)
+  }, [nft])
 
   let src = ""
   let type = "image/*"
@@ -45,7 +50,9 @@ const NFTMedia = ({ nft }: { nft: MoralisNFT }) => {
   }
   return (
     <>
-      {(imageError || !src) && <div className={classes.noImage}></div>}
+      {(imageError || !imageLoaded || !src) && (
+        <div className={classes.noImage}></div>
+      )}
       {!imageError && src && (
         <div className={classes.imageContainer}>
           {type.includes("image") && (
@@ -54,6 +61,7 @@ const NFTMedia = ({ nft }: { nft: MoralisNFT }) => {
               alt={alt}
               className={classes.image}
               onError={() => setImageError(true)}
+              onLoad={() => setImageLoaded(true)}
             />
           )}
           {type.includes("video") && (
@@ -61,6 +69,7 @@ const NFTMedia = ({ nft }: { nft: MoralisNFT }) => {
               src={src}
               className={classes.image}
               onError={() => setImageError(true)}
+              onLoad={() => setImageLoaded(true)}
               autoPlay
               muted
             />

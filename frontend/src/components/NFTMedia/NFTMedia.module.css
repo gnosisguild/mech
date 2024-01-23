@@ -1,5 +1,6 @@
 .noImage {
-  height: 100%;
+  width: 100%;
+  aspect-ratio: 1;
   background-color: var(--box-bg);
   border-radius: 10px;
 }
