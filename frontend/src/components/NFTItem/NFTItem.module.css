@@ -136,6 +136,9 @@
 }
 
 .assetList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
 }
 
@@ -143,6 +146,17 @@
   display: flex;
   justify-content: space-between;
   font-size: 12px;
+}
+
+.assetName {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.assetName img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
 }
 
 .asset .value {

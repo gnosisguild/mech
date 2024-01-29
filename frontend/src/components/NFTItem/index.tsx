@@ -33,7 +33,8 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
     chainId,
   })
 
-  const mechBalances = data ? [data.native, ...data.erc20s] : []
+  const mechNativeBalance = data ? data.native : null
+  const mechErc20Balances = data ? data.erc20s : []
   const { deployed } = useDeployMech(getNFTContext(nft), chainId)
   const metadata = JSON.parse(nft.metadata || "{}")
   const name = nft.name || metadata?.name || "..."
@@ -98,20 +99,30 @@ const NFTItem: React.FC<Props> = ({ nft, chainId }) => {
         </ul>
       </div>
       <label>Inventory</label>
-      <div
-        className={clsx(
-          classes.assetsContainer,
-          mechBalances.length === 0 && classes.empty
-        )}
-      >
+      <div className={clsx(classes.assetsContainer)}>
         {mechBalancesError && <p>Failed to load assets</p>}
         {mechBalancesLoading && <Loading />}
-
-        {mechBalances.length === 0 && <p>No assets found</p>}
         <ul className={classes.assetList}>
-          {mechBalances.map((balance, index) => (
+          {!mechBalancesLoading && !mechBalancesError && mechNativeBalance && (
+            <li className={classes.asset}>
+              <div>{mechNativeBalance.name}</div>
+              <div className={classes.value}>
+                <p>
+                  {formatUnits(
+                    BigInt(mechNativeBalance.balance),
+                    mechNativeBalance.decimals || 0
+                  )}
+                </p>
+                <p>{mechNativeBalance.symbol}</p>
+              </div>
+            </li>
+          )}
+          {mechErc20Balances.map((balance, index) => (
             <li key={index} className={classes.asset}>
-              <div>{balance.name}</div>
+              <div className={classes.assetName}>
+                <img src={balance.logo} alt={`logo for ${balance.name}`} />
+                <div>{balance.name}</div>
+              </div>
               <div className={classes.value}>
                 <p>
                   {formatUnits(BigInt(balance.balance), balance.decimals || 0)}
