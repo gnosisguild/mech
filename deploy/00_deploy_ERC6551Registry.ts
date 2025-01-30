@@ -49,7 +49,9 @@ const deployERC6551Registry: DeployFunction = async (hre) => {
       `  ✔ ERC6551 registry contract deployed at ${expectedAddress} (tx hash: ${hash})`
     )
   }
-
+  if (hre.network.name === "hardhat") {
+    return
+  }
   try {
     await hre.run("verify:verify", {
       address: expectedAddress,

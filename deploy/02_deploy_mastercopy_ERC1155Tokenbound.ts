@@ -38,7 +38,9 @@ const deployMastercopyERC1155Tokenbound: DeployFunction = async (hre) => {
     await await deployERC1155TokenboundMechMastercopy(deployerClient)
     console.log(`  ✔ Contract deployed at ${address}`)
   }
-
+  if (hre.network.name === "hardhat") {
+    return
+  }
   try {
     await hre.run("verify:verify", {
       address,
