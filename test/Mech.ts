@@ -16,6 +16,9 @@ import { deployFactories } from "./utils"
 const EIP1271_MAGIC_VALUE = "0x1626ba7e"
 
 describe("Mech base contract", () => {
+  before(async () => {
+    await ethers.provider.send("hardhat_reset", [])
+  })
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.

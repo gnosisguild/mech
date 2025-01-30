@@ -35,6 +35,9 @@ import {
 import { deployFactories } from "./utils"
 
 describe("deterministic deployment", () => {
+  before(async () => {
+    await ethers.provider.send("hardhat_reset", [])
+  })
   describe("calculateERC721TokenboundMechAddress()", () => {
     it("returns the correct address", async () => {
       const { deployerClient, erc6551Registry } = await loadFixture(
