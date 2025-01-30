@@ -56,39 +56,45 @@ The repo is structured as a monorepo with `mech-contracts` as the container pack
 
 ##### Install all dependencies
 
-```
+```sh
 yarn install
 ```
 
 ##### Compile contracts and generate TypeScript interfaces for the SDK and front-end
 
-```
+```sh
 yarn build
 ```
 
 ##### Build SDK
 
-```
+```sh
 yarn build:sdk
 ```
 
 This step is necessary to make changes in SDK functions available to a locally running front-end.
 
+##### Make ENV file.
+
+```sh
+cp .env.example .env
+```
+
 ##### Start front-end
 
-```
+```sh
 yarn start
 ```
 
 ##### Run tests
 
-```
+```sh
 yarn test
 ```
 
 Tests covers both, the contract logic as well as the SDK functions.
 
-```
+```sh
 yarn integrationTest
 ```
 
