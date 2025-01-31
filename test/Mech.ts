@@ -53,7 +53,7 @@ describe("Mech base contract", () => {
     )
 
     // deploy mech2 bound to testToken#2
-    deployERC721TokenboundMech(deployerClient, {
+    await deployERC721TokenboundMech(deployerClient, {
       token: testTokenAddress,
       tokenId: 2n,
       from: registryAddress,
