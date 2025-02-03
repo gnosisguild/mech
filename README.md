@@ -1,7 +1,6 @@
 # Mech
 
-[![Build Status](https://github.com/gnosisguild/mech/actions/workflows/ci.yml/badge.svg)](https://github.com/gnosisguild/mech/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/gnosisguild/mech/badge.svg?branch=main&bust=1)](https://coveralls.io/github/gnosisguild/mech?branch=main)
+[![Build Status](https://github.com/gnosisguild/mech/actions/workflows/ci.yml/badge.svg)](https://github.com/gnosisguild/mech/actions/workflows/ci.yml) <!-- [![Coverage Status](https://coveralls.io/repos/github/gnosisguild/mech/badge.svg?branch=main&bust=1)](https://coveralls.io/github/gnosisguild/mech?branch=main) -->
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://github.com/gnosisguild/CODE_OF_CONDUCT)
 
 Smart account with programmable ownership

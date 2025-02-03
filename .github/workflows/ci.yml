@@ -15,9 +15,10 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - run: yarn
       - run: yarn build
-      - run: yarn coverage
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage/lcov.info
+      - run: yarn test
+      # - run: yarn coverage
+      # - name: Coveralls
+      #   uses: coverallsapp/github-action@master
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     path-to-lcov: coverage/lcov.info
