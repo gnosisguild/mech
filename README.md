@@ -1,8 +1,7 @@
 # Mech
 
-[![Build Status](https://github.com/gnosis/mech/actions/workflows/ci.yml/badge.svg)](https://github.com/gnosis/mech/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/mech/badge.svg?branch=main&bust=1)](https://coveralls.io/github/gnosis/mech?branch=main)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://github.com/gnosis/CODE_OF_CONDUCT)
+[![Build Status](https://github.com/gnosisguild/mech/actions/workflows/ci.yml/badge.svg)](https://github.com/gnosisguild/mech/actions/workflows/ci.yml) <!-- [![Coverage Status](https://coveralls.io/repos/github/gnosisguild/mech/badge.svg?branch=main&bust=1)](https://coveralls.io/github/gnosisguild/mech?branch=main) -->
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://github.com/gnosisguild/CODE_OF_CONDUCT)
 
 Smart account with programmable ownership
 
@@ -18,7 +17,7 @@ Smart account with programmable ownership
 
 #### Programmable ownership
 
-- [ZodiacMech.sol](contracts/ZodiacMech.sol): allow enabled [zodiac](https://github.com/gnosis/zodiac) modules to sign transactions on behalf of the Mech
+- [ZodiacMech.sol](contracts/ZodiacMech.sol): allow enabled [zodiac](https://github.com/gnosisguild/zodiac) modules to sign transactions on behalf of the Mech
 - [Mech.sol](contracts/base/Mech.sol): implement custom ownership terms by extending this abstract contract
 
 ![mech hierarchy](docs/mech-hierarchy.png)
