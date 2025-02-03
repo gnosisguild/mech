@@ -15,6 +15,9 @@ describe("ERC721TokenboundMech contract", () => {
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.
+  before(async () => {
+    await ethers.provider.send("hardhat_reset", [])
+  })
   async function deployMech1() {
     const { deployerClient, erc6551Registry, alice, bob } =
       await deployFactories()

@@ -25,6 +25,9 @@ import { deployFactories } from "./utils"
 export const entryPoint = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
 
 describe("Account base contract", () => {
+  before(async () => {
+    await ethers.provider.send("hardhat_reset", [])
+  })
   // We define a fixture to reuse the same setup in every test. We use
   // loadFixture to run this setup once, snapshot that state, and reset Hardhat
   // Network to that snapshot in every test.

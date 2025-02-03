@@ -35,6 +35,9 @@ import {
 import { deployFactories } from "./utils"
 
 describe("deterministic deployment", () => {
+  before(async () => {
+    await ethers.provider.send("hardhat_reset", [])
+  })
   describe("calculateERC721TokenboundMechAddress()", () => {
     it("returns the correct address", async () => {
       const { deployerClient, erc6551Registry } = await loadFixture(
@@ -56,10 +59,10 @@ describe("deterministic deployment", () => {
       ).to.equal(
         await erc6551Registry.account(
           calculateERC721TokenboundMechMastercopyAddress(),
+          DEFAULT_SALT,
           deployerClient.chain.id,
           testTokenAddress,
-          1n,
-          DEFAULT_SALT
+          1n
         )
       )
     })
@@ -148,10 +151,10 @@ describe("deterministic deployment", () => {
       ).to.equal(
         await erc6551Registry.account(
           calculateERC1155TokenboundMechMastercopyAddress(),
+          DEFAULT_SALT,
           deployerClient.chain.id,
           testTokenAddress,
-          1n,
-          DEFAULT_SALT
+          1n
         )
       )
     })
@@ -219,7 +222,9 @@ describe("deterministic deployment", () => {
 
   describe.skip("deployERC1155ThresholdMech()", () => {
     it("correctly initializes the mech proxy instance", async () => {
-      const { alice, deployer } = await loadFixture(deployFactories)
+      const { alice, deployer, deployerClient } = await loadFixture(
+        deployFactories
+      )
 
       const TestToken = await ethers.getContractFactory("ERC1155Token")
       const testToken = await TestToken.deploy()
