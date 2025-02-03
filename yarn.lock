@@ -1932,7 +1932,7 @@ __metadata:
 "@erc6551/reference@https://github.com/erc6551/reference.git#commit=a38d3fe531c6c644d4880f41229ef49252804b92":
   version: 0.2.1
   resolution: "@erc6551/reference@https://github.com/erc6551/reference.git#commit=a38d3fe531c6c644d4880f41229ef49252804b92"
-  checksum: b4688c7ecf1dcd24e7979677bd80fe1397816707b8f70f23f5e05a085a6d42d90c92b8e95b204eba00b252781a76f1e3f219ad13596b3434783f5f2df2c7b495
+  checksum: 5e9f17574757fd51b966836e141275f2b4b3cdcdb5a8c287ac260c241861822529806eb5da049f804a20ab76cec24b67c423b8eadb772dbc8b58b2cda42caf29
   languageName: node
   linkType: hard
 
